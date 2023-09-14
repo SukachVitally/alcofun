@@ -1,0 +1,21 @@
+.product-item {
+    width: 18rem;
+    overflow: hidden;
+    margin: 0.5rem;
+}
+
+img.product-item__image {
+    width: 100%;
+    max-height: 26rem;
+}
+
+.product-item .card-title {
+    height: 2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-item__footer {
+    text-align: center;
+}
