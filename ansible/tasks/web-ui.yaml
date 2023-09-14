@@ -1,0 +1,7 @@
+---
+- name: Copy web ui application
+  become: true
+  copy:
+    owner: nginx
+    src: /home/vitalii/Documents/alcofun-web-ui/build/
+    dest: /var/nginx/application

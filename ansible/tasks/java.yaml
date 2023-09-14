@@ -1,0 +1,16 @@
+---
+- name: Install Java package
+  become: true
+  yum:
+    name:
+      - java-17-amazon-corretto-headless
+      - java-17-amazon-corretto
+      - java-17-amazon-corretto-devel
+      - java-17-amazon-corretto-jmods
+    state: present
+    update_cache: yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Check Java package
+  command: java -version
+  ignore_errors: True

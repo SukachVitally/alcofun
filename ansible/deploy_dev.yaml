@@ -1,0 +1,21 @@
+---
+- name: Deploy
+  hosts: dev
+  remote_user: ec2-user
+  become: false
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    application_config_name: application_dev
+
+  tasks:
+#    - include_tasks: tasks/java.yaml
+#    - include_tasks: tasks/supervisor.yaml
+#    - include_tasks: tasks/application.yaml
+    - include_tasks: tasks/web-ui.yaml
+    - include_tasks: tasks/nginx.yaml
+
+
+  handlers:
+    - import_tasks: handlers/supervisor.yaml
+    - import_tasks: handlers/nginx.yaml

@@ -1,0 +1,9 @@
+---
+- name: Copy java application
+  copy:
+    src: ../target/searchapp-0.0.1-SNAPSHOT.jar
+    dest: /home/ec2-user/searchapp.jar
+    mode: 0644
+    force: true
+  notify: "restart_supervisor"
+
