@@ -21,11 +21,7 @@ function Navigation() {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    if (search === "") {
-      navigate("/products/");
-    } else {
-      navigate("/products/?search=" + search);
-    }
+    navigate(`/products/${search !== "" ? '?search=' + search : ''}`);
   };
 
   useEffect(() => {
