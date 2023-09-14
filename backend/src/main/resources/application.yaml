@@ -1,0 +1,40 @@
+server:
+  port: 7080
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/alcosearch
+    username: user
+    password: password
+  thymeleaf:
+    cache: false
+  flyway:
+    url: jdbc:postgresql://localhost:5432/alcosearch
+    user: user
+    password: password
+    locations: classpath:db/migration
+
+app:
+  image-service:
+    base-url: http://localhost:7080/images/
+  filesystem-storage:
+    path: ./src/main/resources/static/images/
+
+  provider:
+    list:
+      - ALCOMAG
+      - ROZETKA
+      - OKWINE
+      - MAUDAU
+  scheduler:
+    enable: false
+    delay-sec: 1
+
+#logging:
+#  level:
+#    io.r2dbc.postgresql.QUERY: DEBUG # for queries
+#    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+
+springdoc:
+  swagger-ui:
+    path: /swagger/

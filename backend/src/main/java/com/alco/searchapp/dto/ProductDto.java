@@ -1,0 +1,26 @@
+package com.alco.searchapp.dto;
+
+import com.alco.searchapp.constants.CategoryTypeEnum;
+import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class ProductDto {
+    private Long id;
+
+    private String ean;
+
+    private String name;
+
+    private String description;
+
+    private List<ProviderProductDto> providers;
+
+    private List<String> imageUrls;
+
+    private CategoryTypeEnum category;
+
+    private List<CharacteristicDto> characteristics;
+}

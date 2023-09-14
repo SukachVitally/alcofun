@@ -1,0 +1,25 @@
+<nav aria-label="Page navigation" th:fragment="paginator">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" th:classappend="${currentPageNumber == 0} ? 'disabled'">
+      <a class="page-link" th:href="${paginatorFirstPage}" tabindex="-1" aria-disabled="true">First</a>
+    </li>
+    <li class="page-item" th:classappend="${currentPageNumber == 0} ? 'disabled'">
+      <a class="page-link" th:href="${paginatorPreviousPage}" aria-disabled="true">Previous</a>
+    </li>
+
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+
+    <li class="page-item disabled">
+      <a class="page-link" href="#" aria-disabled="true" th:text="${currentPageNumber}"></a>
+    </li>
+
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+
+    <li class="page-item" th:classappend="${currentPageNumber == lastPageNumber} ? 'disabled'">
+      <a class="page-link" th:href="${paginatorNextPage}">Next</a>
+    </li>
+    <li class="page-item" th:classappend="${currentPageNumber == lastPageNumber} ? 'disabled'">
+      <a class="page-link" th:href="${paginatorLastPage}">Last</a>
+    </li>
+  </ul>
+</nav>

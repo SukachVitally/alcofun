@@ -1,0 +1,17 @@
+TODO:
+- Add volume value to product
+- Add country manufacture to product
+- Add product recommendation 
+- Add product brand. 
+- Product filter
+    - By product volume
+    - By brand
+    - By country manufacture
+- Product sorting
+    - Sort by price
+    - Sort by name
+    - Sort by created at
+    - Sort by best price
+- Sitemap for SEO
+- Breadcrumbs
+- Google Analytics

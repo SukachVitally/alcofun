@@ -1,0 +1,110 @@
+package com.alco.searchapp.controller.api;
+
+import com.alco.searchapp.BaseFunctionalTest;
+import com.alco.searchapp.constants.CategoryTypeEnum;
+import com.alco.searchapp.constants.CharacteristicTypeEnum;
+import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.repository.CategoryRepository;
+import com.alco.searchapp.repository.CharacteristicRepository;
+import com.alco.searchapp.repository.ProductRepository;
+import com.alco.searchapp.repository.ProviderRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+@SpringBootTest()
+@AutoConfigureWebTestClient
+public class ProductControllerTest extends BaseFunctionalTest {
+    @Autowired
+    private WebTestClient webClient;
+
+    @Autowired
+    private ProductRepository repository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ProviderRepository providerRepository;
+
+    @Autowired
+    private CharacteristicRepository characteristicRepository;
+
+    @Test
+    void testGetAllProductList() {
+        addProducts();
+
+        webClient.get()
+                .uri("/api/product/")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(6)
+                .jsonPath("$.pageCount").isEqualTo(1)
+                .jsonPath("$.currentPage").isEqualTo(1);
+    }
+
+    @Test
+    void testGetProductListForCategory() {
+        addProducts();
+
+        var category = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId()).block();
+
+        Assertions.assertNotNull(category);
+        webClient.get()
+                .uri("/api/product/?categories=" + category.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(2);
+    }
+
+    @Test
+    void testGetProductListForProvider() {
+        addProducts();
+
+        var provider = providerRepository.findOneByTypeId(ProviderTypeEnum.ALCOMAG.getId()).block();
+
+        Assertions.assertNotNull(provider);
+        webClient.get()
+                .uri("/api/product/?providers=" + provider.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(6);
+    }
+
+    @Test
+    void testGetProductListForCharacteristics() {
+        addProducts();
+
+        var characteristic = characteristicRepository.findOneByTypeIdAndValue(
+                CharacteristicTypeEnum.VOLUME.getId(), "700")
+                .block();
+
+        Assertions.assertNotNull(characteristic);
+        webClient.get()
+                .uri("/api/product/?characteristics=" + characteristic.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(6);
+    }
+
+    @Test
+    void testGetProduct() {
+        addProducts();
+
+        var product = repository.findAll().take(1).single().block();
+        Assertions.assertNotNull(product);
+        webClient.get()
+                .uri("/api/product/" + product.getId())
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+
+}
