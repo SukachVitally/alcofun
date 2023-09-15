@@ -2,6 +2,7 @@ package com.alco.searchapp.repository;
 
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.entity.ProductEntity;
+import io.r2dbc.spi.Readable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,17 +32,7 @@ public class CustomProductRepository {
         }
 
         return spec
-                .map(row -> {
-                    var entity = new ProductEntity();
-                    entity.setId(row.get("id", Long.class));
-                    entity.setName(row.get("name", String.class));
-                    entity.setEan(row.get("ean", String.class));
-                    entity.setDescription(row.get("description", String.class));
-                    entity.setCategoryId(row.get("category_id", Long.class));
-                    entity.setCreatedAt(row.get("created_at", LocalDateTime.class));
-
-                    return entity;
-                })
+                .map(this::map)
                 .all();
     }
 
@@ -103,6 +94,18 @@ public class CustomProductRepository {
         }
 
         return new Query(sql, bindParameters);
+    }
+
+    private ProductEntity map(Readable row) {
+        var entity = new ProductEntity();
+        entity.setId(row.get("id", Long.class));
+        entity.setName(row.get("name", String.class));
+        entity.setEan(row.get("ean", String.class));
+        entity.setDescription(row.get("description", String.class));
+        entity.setCategoryId(row.get("category_id", Long.class));
+        entity.setCreatedAt(row.get("created_at", LocalDateTime.class));
+
+        return entity;
     }
 
     record Query (String sql, Map<String, Object> bindParameters) {
