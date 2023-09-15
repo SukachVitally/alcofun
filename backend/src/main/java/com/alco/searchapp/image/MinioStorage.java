@@ -1,5 +1,6 @@
 package com.alco.searchapp.image;
 
+import com.alco.searchapp.constants.StorageEnum;
 import io.minio.MinioClient;
 import io.minio.UploadObjectArgs;
 import java.io.File;
@@ -10,9 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
-@ConditionalOnProperty(name = "aws.s3.bucket")
+@ConditionalOnProperty(name = "app.image-service.storage", havingValue="MINIO")
 @Component
 @RequiredArgsConstructor
 public class MinioStorage implements StorageInterface {
@@ -23,31 +25,26 @@ public class MinioStorage implements StorageInterface {
     @Override
     public Mono<Boolean> save(String bucket, String filename, byte[] content) {
         var filePath = tempDir + "/" + filename;
-
         File file = new File(filePath);
 
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(content);
-            client.uploadObject(
-                    UploadObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(filename)
-                            .filename(filePath)
-                            .build());
-            return Mono.just(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error: " + e.getMessage());
-        } finally {
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("File deleted successfully.");
-                } else {
-                    System.err.println("Failed to delete the file.");
+        return Mono.fromCallable(() -> {
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(content);
+                client.uploadObject(
+                        UploadObjectArgs.builder()
+                                .bucket(bucket)
+                                .object(filename)
+                                .filename(filePath)
+                                .build());
+                log.info(String.format("File %s was successfully uploaded.", filename));
+                return true;
+            } catch (IOException e) {
+                return false;
+            } finally {
+                if (file.exists() && file.delete()) {
+                    log.info("temporary file was removed");
                 }
             }
-        }
-
-        return Mono.just(false);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 }

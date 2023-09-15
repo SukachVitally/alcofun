@@ -37,9 +37,9 @@ app:
 
 minio:
   access-key: QJ52quYkutsOMNLAPrNi
-  access-secret: grZxZ1dH7iT2p3m3wBQ3LnlDnQWqV54KzqmueRsx
   bucket: images
   url: http://localhost:19000
+  secret-key: grZxZ1dH7iT2p3m3wBQ3LnlDnQWqV54KzqmueRsx
 
 aws:
   s3:

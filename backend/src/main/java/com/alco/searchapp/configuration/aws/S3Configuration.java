@@ -12,7 +12,7 @@ import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@ConditionalOnProperty(name = "aws.s3.bucket")
+@ConditionalOnProperty(name = "app.image-service.storage", havingValue="S3")
 @Configuration
 @RequiredArgsConstructor
 public class S3Configuration {

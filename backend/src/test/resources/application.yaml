@@ -1,6 +1,3 @@
-server:
-  port: 7080
-
 spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/test_alcosearch
@@ -15,10 +12,6 @@ spring:
     locations: classpath:db/migration
 
 app:
-  image-service:
-    base-url: http://localhost:7080/images/
-  filesystem-storage:
-    path: ./src/main/resources/static/images/
   provider:
     list:
       - ALCOMAG
