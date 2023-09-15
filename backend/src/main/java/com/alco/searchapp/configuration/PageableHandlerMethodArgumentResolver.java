@@ -15,6 +15,8 @@ public class PageableHandlerMethodArgumentResolver implements HandlerMethodArgum
     private static final String DEFAULT_PAGE = "1";
     private static final String DEFAULT_SIZE = "24";
     private static final Integer MAX_SIZE = 60;
+    private static final int MIN_PAGE_NUMBER = 1;
+    private static final int MIN_SIZE = 1;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -23,11 +25,30 @@ public class PageableHandlerMethodArgumentResolver implements HandlerMethodArgum
 
     @Override
     public Mono<Object> resolveArgument(MethodParameter methodParameter, BindingContext bindingContext, ServerWebExchange serverWebExchange) {
-        List<String> pageValues = serverWebExchange.getRequest().getQueryParams().getOrDefault("page", List.of(DEFAULT_PAGE));
-        List<String> sizeValues = serverWebExchange.getRequest().getQueryParams().getOrDefault("size", List.of(DEFAULT_SIZE));
+        return Mono.just(
+                PageRequest.of(
+                        getPageNumber(serverWebExchange),
+                        getSize(serverWebExchange),
+                        getSort(serverWebExchange)
+                )
+        );
+    }
 
-        String page = pageValues.get(0);
+    private int getPageNumber(ServerWebExchange serverWebExchange) {
+        List<String> pageValues = serverWebExchange.getRequest().getQueryParams()
+                .getOrDefault("page", List.of(DEFAULT_PAGE));
+        var page = Integer.parseInt(pageValues.get(0));
 
+        return Math.max(page, MIN_PAGE_NUMBER);
+    }
+
+    private int getSize(ServerWebExchange serverWebExchange) {
+        List<String> sizeValues = serverWebExchange.getRequest().getQueryParams()
+                .getOrDefault("size", List.of(DEFAULT_SIZE));
+        return Math.max(MIN_SIZE, Math.min(Integer.parseInt(sizeValues.get(0)), MAX_SIZE));
+    }
+
+    private Sort getSort(ServerWebExchange serverWebExchange) {
         String sortParam = serverWebExchange.getRequest().getQueryParams().getFirst("sort");
         Sort sort = Sort.unsorted();
 
@@ -39,13 +60,6 @@ public class PageableHandlerMethodArgumentResolver implements HandlerMethodArgum
                 sort = Sort.by(direction, property);
             }
         }
-
-        return Mono.just(
-                PageRequest.of(
-                        Integer.parseInt(page),
-                        Math.min(Integer.parseInt(sizeValues.get(0)),
-                                MAX_SIZE), sort
-                )
-        );
+        return sort;
     }
 }
