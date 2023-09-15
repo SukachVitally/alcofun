@@ -1,8 +1,5 @@
-const BASE_URL = "http://localhost:7080/api/";
-
-
 async function fetchJson(path) {
-  const response = await fetch(BASE_URL + path);
+  const response = await fetch(process.env.REACT_APP_SERVER_API_URL + path);
   return await response.json();
 }
 
