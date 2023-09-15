@@ -89,7 +89,29 @@ public class CustomProductRepository {
         }
 
         if (filterable.getCharacteristics() != null && !filterable.getCharacteristics().isEmpty()) {
-            sql += " AND id IN (SELECT product_id FROM product_characteristic WHERE characteristic_id in (:characteristicIds))";
+            sql += """
+                     AND id IN (
+                       WITH type_counts AS (
+                          SELECT pc.product_id, c.type_id
+                          FROM product_characteristic pc
+                          JOIN characteristic c ON c.id = pc.characteristic_id
+                          WHERE pc.characteristic_id IN (:characteristicIds)
+                          GROUP BY pc.product_id, c.type_id
+                      ),
+                      group_count AS (
+                          SELECT COUNT(DISTINCT type_id) AS ct
+                          FROM type_counts
+                      )
+                      SELECT tt.product_id
+                      FROM (
+                          SELECT product_id, COUNT(*) AS cnt
+                          FROM type_counts
+                          GROUP BY product_id
+                      ) AS tt
+                      CROSS JOIN group_count
+                      WHERE tt.cnt = group_count.ct;
+                    )
+                    """;
             bindParameters.put("characteristicIds", filterable.getCharacteristics());
         }
 
