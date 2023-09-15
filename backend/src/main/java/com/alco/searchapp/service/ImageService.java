@@ -28,7 +28,7 @@ public class ImageService {
                     var entity = new ProductImageEntity();
                     entity.setProductId(productId);
                     entity.setPath(String.format("%s-%s.jpeg", productId, UUID.randomUUID()));
-                    return storage.save(entity.getPath(), content)
+                    return storage.save(property.getBucket(), entity.getPath(), content)
                             .flatMap(res -> repository.save(entity));
                 });
     }

@@ -12,7 +12,20 @@ services:
       POSTGRES_DB: alcosearch
     volumes:
       - database_data:/var/lib/postgresql/data
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "19000:9000"
+      - "19001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_storage:/data
+    command: server --console-address ":9001" /data
 
 volumes:
   database_data:
   pgadmin_data:
+  minio_storage: {}

@@ -1,6 +1,5 @@
 package com.alco.searchapp.image;
 
-import com.alco.searchapp.properites.AwsS3Property;
 import java.nio.ByteBuffer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,14 +14,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Component
 @RequiredArgsConstructor
 public class AwsS3Storage implements StorageInterface {
-    private final AwsS3Property properties;
-
     private final S3AsyncClient s3Client;
 
     @Override
-    public Mono<Boolean> save(String path, byte[] content) {
+    public Mono<Boolean> save(String bucket, String path, byte[] content) {
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(properties.getBucket())
+                .bucket(bucket)
                 .key(path)
                 .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();

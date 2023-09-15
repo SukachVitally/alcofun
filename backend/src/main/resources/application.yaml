@@ -17,8 +17,8 @@ spring:
 app:
   image-service:
     base-url: http://localhost:7080/images/
-  filesystem-storage:
-    path: ./src/main/resources/static/images/
+    storage: MINIO
+    bucket: images
 
   provider:
     list:
@@ -34,6 +34,19 @@ app:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
 #    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+
+minio:
+  access-key: QJ52quYkutsOMNLAPrNi
+  access-secret: grZxZ1dH7iT2p3m3wBQ3LnlDnQWqV54KzqmueRsx
+  bucket: images
+  url: http://localhost:19000
+
+aws:
+  s3:
+    accessKey: AKIAYMBPWFAHSAJN3H42
+    secretKey: 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
+    region: eu-north-1
+    bucket: dev-alcofun-images
 
 springdoc:
   swagger-ui:
