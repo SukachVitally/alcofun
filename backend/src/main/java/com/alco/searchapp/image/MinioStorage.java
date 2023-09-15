@@ -1,6 +1,5 @@
 package com.alco.searchapp.image;
 
-import com.alco.searchapp.constants.StorageEnum;
 import io.minio.MinioClient;
 import io.minio.UploadObjectArgs;
 import java.io.File;
@@ -42,7 +41,7 @@ public class MinioStorage implements StorageInterface {
                 return false;
             } finally {
                 if (file.exists() && file.delete()) {
-                    log.info("temporary file was removed");
+                    log.debug("temporary file was removed");
                 }
             }
         }).subscribeOn(Schedulers.boundedElastic());

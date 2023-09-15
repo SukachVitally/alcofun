@@ -12,6 +12,10 @@ spring:
     locations: classpath:db/migration
 
 app:
+  image-service:
+    base-url: http://localhost:19000/test-images/
+    storage: MINIO
+    bucket: test-images
   provider:
     list:
       - ALCOMAG
@@ -23,3 +27,9 @@ logging:
   level:
     io.r2dbc.postgresql.QUERY: INFO # for queries
     io.r2dbc.postgresql.PARAM: INFO # for parameters
+
+minio:
+  access-key: QJ52quYkutsOMNLAPrNi
+  bucket: images
+  url: http://localhost:19000
+  secret-key: grZxZ1dH7iT2p3m3wBQ3LnlDnQWqV54KzqmueRsx

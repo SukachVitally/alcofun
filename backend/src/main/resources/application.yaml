@@ -16,7 +16,7 @@ spring:
 
 app:
   image-service:
-    base-url: http://localhost:7080/images/
+    base-url: http://localhost:19000/images/
     storage: MINIO
     bucket: images
 
