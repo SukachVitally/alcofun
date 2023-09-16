@@ -1,6 +1,6 @@
 package com.alco.searchapp.repository;
 
-import com.alco.searchapp.dto.DenormalizedProductDto;
+import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,14 +66,26 @@ public class CustomProductRepository {
                 .all();
     }
 
-    public static List<Long> parseLongList(String input) {
+    public Flux<List<Long>> getCharacteristicBlocks(List<Long> ids) {
+        var sql = """
+                SELECT type_id, array_agg(id) AS ids
+                FROM characteristic
+                GROUP BY type_id
+            """;
+
+        return connection.sql(sql)
+                .map(row -> parseLongList(row.get("ids", String.class)))
+                .all();
+    }
+
+    private static List<Long> parseLongList(String input) {
         input = input.replaceAll("[{}]", "");
         return Arrays.stream(input.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
     }
 
-    public static Map<Long, Double> parseDoubleMap(String input) {
+    private static Map<Long, Double> parseDoubleMap(String input) {
         Map<Long, Double> parsedMap = new HashMap<>();
         input = input.replaceAll("[{\"}]", "");
 

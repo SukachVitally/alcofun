@@ -1,10 +1,9 @@
 package com.alco.searchapp.controller.api;
 
-import com.alco.searchapp.dto.DenormalizedProductDto;
+import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.ProductDto;
-import com.alco.searchapp.dto.ProductInfoDto;
 import com.alco.searchapp.service.ProductListService;
 import com.alco.searchapp.service.ProductService;
 import lombok.RequiredArgsConstructor;

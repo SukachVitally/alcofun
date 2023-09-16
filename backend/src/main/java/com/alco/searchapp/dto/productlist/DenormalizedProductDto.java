@@ -1,4 +1,4 @@
-package com.alco.searchapp.dto;
+package com.alco.searchapp.dto.productlist;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
