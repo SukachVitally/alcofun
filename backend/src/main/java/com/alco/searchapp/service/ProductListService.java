@@ -25,9 +25,9 @@ public class ProductListService {
     public Flux<DenormalizedProductDto> getProducts(Filterable filterable) {
         return Optional.ofNullable(filterable.getCharacteristics())
                 .filter(characteristics -> !characteristics.isEmpty())
-                .map(repository::getCharacteristicBlocks)
-                .map(Flux::collectList)
-                .orElse(Mono.empty())
+                .map(characteristics -> repository.getCharacteristicBlocks(characteristics)
+                        .collectList())
+                .orElse(Mono.just(List.of()))
                 .flatMapMany(characteristicBlocks -> getDenormalizedStructure()
                         .map(dto -> DenormalizedProductDto.builder()
                                 .id(dto.getId())

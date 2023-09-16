@@ -70,10 +70,12 @@ public class CustomProductRepository {
         var sql = """
                 SELECT type_id, array_agg(id) AS ids
                 FROM characteristic
+                WHERE id in (:ids)
                 GROUP BY type_id
             """;
 
         return connection.sql(sql)
+                .bind("ids", ids)
                 .map(row -> parseLongList(row.get("ids", String.class)))
                 .all();
     }
