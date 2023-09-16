@@ -1,10 +1,12 @@
 package com.alco.searchapp.repository;
 
 import com.alco.searchapp.dto.Filterable;
+import com.alco.searchapp.dto.ProductSearchDto;
 import com.alco.searchapp.entity.ProductEntity;
 import io.r2dbc.spi.Readable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,47 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomProductRepository {
     private final DatabaseClient connection;
+
+    public Flux<ProductSearchDto> generateDenormalizedStructure(LocalDateTime startTime) {
+        var sql = """
+                SELECT p.id, gpp.providers, p.ean, p.name, p.category_id, gpc.characteristic_ids
+                FROM (
+                    SELECT pp.product_id,
+                           pp.provider_id,
+                           pp.price
+                    FROM provider_product pp
+                    WHERE created_at > :startTime
+                    JOIN (
+                        SELECT product_id,
+                               provider_id,
+                               MAX(created_at) AS max_created_at
+                        FROM provider_product
+                        GROUP BY product_id, provider_id
+                    ) max_dates
+                    ON pp.product_id = max_dates.product_id
+                       AND pp.provider_id = max_dates.provider_id
+                       AND pp.created_at = max_dates.max_created_at;
+                ) gpp
+                JOIN product p ON p.id = gpp.product_id
+                JOIN (
+                    SELECT pc.product_id, array_agg(pc.characteristic_id) AS characteristic_ids
+                    FROM product_characteristic pc
+                    GROUP BY pc.product_id
+                ) gpc ON gpc.product_id = p.id
+                """;
+
+        return connection.sql(sql)
+                .bind("startTime", startTime)
+                .map(row -> ProductSearchDto.builder()
+                        .id(row.get("id", Long.class))
+                        .ean(row.get("ean", String.class))
+                        .categoryId(row.get("category_id", Long.class))
+                        .characteristicIds(row.get("characteristic_ids", ListLong.class))
+                        .providers(row.get("providers", MapPrice.class))
+                        .build()
+                )
+                .all();
+    }
 
     public Flux<ProductEntity> findAll(Filterable filterable, Pageable pageable, LocalDateTime startTime) {
         var query = createQuery(filterable, false, startTime);
@@ -130,6 +173,14 @@ public class CustomProductRepository {
         return entity;
     }
 
-    record Query (String sql, Map<String, Object> bindParameters) {
+    record Query (String sql, java.util.Map<String, Object> bindParameters) {
+    }
+
+    private interface ListLong extends List<Long> {
+
+    }
+
+    private interface MapPrice extends Map<String, Double> {
+
     }
 }

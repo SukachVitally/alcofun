@@ -22,12 +22,12 @@ app:
 
   provider:
     list:
-      - ALCOMAG
+#      - ALCOMAG
       - ROZETKA
-      - OKWINE
-      - MAUDAU
+#      - OKWINE
+#      - MAUDAU
   scheduler:
-    enable: false
+    enable: true
     delay-sec: 1
 
 #logging:

@@ -40,6 +40,7 @@ public class ProductService {
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable, Pageable pageable) {
         var date = LocalDateTime.now().minusDays(1);
+        var lst = customProductRepository.generateDenormalizedStructure(date).collectList().block();
         return customProductRepository.findAll(filterable, pageable, date)
                 .flatMap(entity -> mapProductInfo(entity, filterable.getProviders()));
     }
