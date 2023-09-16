@@ -2,13 +2,10 @@ package com.alco.searchapp.service;
 
 import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.dto.CharacteristicDto;
-import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ProductDto;
-import com.alco.searchapp.dto.ProductInfoDto;
 import com.alco.searchapp.entity.ProductEntity;
 import com.alco.searchapp.entity.ProviderProductEntity;
 import com.alco.searchapp.provider.dto.Product;
-import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,7 +14,6 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,20 +31,6 @@ public class ProductService {
     private final ProviderService providerService;
 
     private final CharacteristicService characteristicService;
-
-    private final CustomProductRepository customProductRepository;
-
-    public Flux<ProductInfoDto> getProducts(Filterable filterable, Pageable pageable) {
-        var date = LocalDateTime.now().minusDays(1);
-        var lst = customProductRepository.generateDenormalizedStructure(date).collectList().block();
-        return customProductRepository.findAll(filterable, pageable, date)
-                .flatMap(entity -> mapProductInfo(entity, filterable.getProviders()));
-    }
-
-    public Mono<Long> getProductCount(Filterable filter) {
-        var date = LocalDateTime.now().minusDays(1);
-        return customProductRepository.count(filter, date);
-    }
 
     public Mono<ProductDto> getProduct(Long id) {
         return productRepository.findById(id)
@@ -132,23 +114,5 @@ public class ProductService {
                                 )
                         )
                 );
-    }
-
-    private Mono<ProductInfoDto> mapProductInfo(ProductEntity entity, List<Long> providerIds) {
-        return imageService.getProductImageUrls(entity.getId())
-                .collectList()
-                .flatMap(imageUrls -> providerService.getRelevantProductPrices(entity.getId())
-                        .map(productPrices -> ProductInfoDto.builder()
-                                .id(entity.getId())
-                                .name(entity.getName())
-                                .imageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0))
-                                .price(productPrices.entrySet().stream()
-                                        .filter(entry -> providerIds == null
-                                                || providerIds.isEmpty() || providerIds.contains(entry.getKey()))
-                                        .map(Map.Entry::getValue)
-                                        .min(Double::compare)
-                                        .orElse(null)
-                                )
-                                .build()));
     }
 }

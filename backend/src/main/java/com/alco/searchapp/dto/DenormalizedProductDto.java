@@ -1,5 +1,6 @@
 package com.alco.searchapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
@@ -7,11 +8,19 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ProductSearchDto {
+public class DenormalizedProductDto {
     private Long id;
-    private Map<String, Double> providers;
+
+    @JsonIgnore
+    private Map<Long, Double> providers;
+
     private String ean;
+
     private String name;
+
+    @JsonIgnore
     private List<Long> characteristicIds;
+
+    @JsonIgnore
     private Long categoryId;
 }

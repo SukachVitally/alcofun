@@ -1,9 +1,11 @@
 package com.alco.searchapp.controller.api;
 
+import com.alco.searchapp.dto.DenormalizedProductDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.ProductDto;
 import com.alco.searchapp.dto.ProductInfoDto;
+import com.alco.searchapp.service.ProductListService;
 import com.alco.searchapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,18 +21,22 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/product/")
 @RequiredArgsConstructor
 public class ProductController {
+    private final ProductListService productListService;
+
     private final ProductService productService;
 
     @GetMapping("/")
-    public Mono<ListResponseDto<ProductInfoDto>> getList(Pageable pageable, Filterable filter) {
-        return productService.getProducts(filter, pageable)
+    public Mono<ListResponseDto<DenormalizedProductDto>> getList(Pageable pageable, Filterable filter) {
+        return productListService.getProducts(filter)
                 .collectList()
-                .flatMap(list -> productService.getProductCount(filter)
-                        .map(count -> ListResponseDto.<ProductInfoDto>builder()
-                                .results(list)
-                                .currentPage(pageable.getPageNumber())
-                                .pageCount((int) Math.ceil((float) count / pageable.getPageSize()))
-                                .build()));
+                .map(list -> ListResponseDto.<DenormalizedProductDto>builder()
+                        .results(list.stream()
+                                .skip(pageable.getPageNumber())
+                                .limit(pageable.getPageSize())
+                                .toList())
+                        .currentPage(pageable.getPageNumber())
+                        .pageCount((int) Math.ceil((float) list.size() / pageable.getPageSize()))
+                        .build());
     }
 
     @GetMapping("/{id}")
