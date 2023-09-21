@@ -198,6 +198,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var list = productListService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(2, list.size());
+        Assertions.assertEquals(3, list.size());
     }
 }

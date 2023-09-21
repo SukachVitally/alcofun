@@ -2,6 +2,7 @@ package com.alco.searchapp.service;
 
 import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
 import com.alco.searchapp.dto.Filterable;
+import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.repository.CustomProductRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -22,27 +22,32 @@ public class ProductListService {
 
     private final CustomProductRepository repository;
 
-    public Flux<DenormalizedProductDto> getProducts(Filterable filterable) {
+    public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         return Optional.ofNullable(filterable.getCharacteristics())
                 .filter(characteristics -> !characteristics.isEmpty())
                 .map(characteristics -> repository.getCharacteristicBlocks(characteristics)
                         .collectList())
                 .orElse(Mono.just(List.of()))
                 .flatMapMany(characteristicBlocks -> getDenormalizedStructure()
-                        .map(dto -> DenormalizedProductDto.builder()
-                                .id(dto.getId())
-                                .ean(dto.getEan())
-                                .name(dto.getName())
-                                .categoryId(dto.getCategoryId())
-                                .characteristicIds(dto.getCharacteristicIds())
-                                .providers(dto.getProviders().entrySet().stream()
-                                        .filter(entry -> filterable.getProviders() == null
-                                                || filterable.getProviders().isEmpty()
-                                                || filterable.getProviders().contains(entry.getKey()))
-                                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                                .build()
-                        )
-                        .filter(dto -> !dto.getProviders().keySet().isEmpty())
+                        .map(dto -> {
+                            var price = dto.getProviders().entrySet().stream()
+                                    .filter(entry -> filterable.getProviders() == null
+                                            || filterable.getProviders().isEmpty()
+                                            || filterable.getProviders().contains(entry.getKey()))
+                                    .map(Map.Entry::getValue)
+                                    .min(Comparator.comparingDouble(value -> value))
+                                    .orElse(null);
+
+                            return ProductInfoDto.builder()
+                                    .id(dto.getId())
+                                    .ean(dto.getEan())
+                                    .name(dto.getName())
+                                    .categoryId(dto.getCategoryId())
+                                    .characteristicIds(dto.getCharacteristicIds())
+                                    .price(price)
+                                    .build();
+                        })
+                        .filter(dto -> dto.getPrice() != null)
                         .filter(this.filter(filterable, characteristicBlocks)));
     }
 
@@ -51,7 +56,7 @@ public class ProductListService {
         return repository.generateDenormalizedStructure(date);
     }
 
-    private Predicate<DenormalizedProductDto> filter(Filterable filterable, List<List<Long>> characteristicBlocks) {
+    private Predicate<ProductInfoDto> filter(Filterable filterable, List<List<Long>> characteristicBlocks) {
         return dto ->  filterCategories(dto, filterable.getCategories())
                     && filterSearch(dto, filterable.getSearch())
                     && filterPrice(dto, filterable.getPrice())
@@ -59,36 +64,29 @@ public class ProductListService {
 
     }
 
-    private Boolean filterCategories(DenormalizedProductDto dto, List<Long> categories) {
+    private Boolean filterCategories(ProductInfoDto dto, List<Long> categories) {
         return categories == null
                 || categories.isEmpty()
                 || categories.contains(dto.getCategoryId());
     }
 
-    private Boolean filterSearch(DenormalizedProductDto dto, String search) {
+    private Boolean filterSearch(ProductInfoDto dto, String search) {
         return search == null
                 || search.isEmpty()
                 || dto.getName().toLowerCase().contains(search.toLowerCase())
                 || dto.getEan().equals(search);
     }
 
-    private Boolean filterPrice(DenormalizedProductDto dto, Filterable.Price price) {
+    private Boolean filterPrice(ProductInfoDto dto, Filterable.Price price) {
         if (price == null || (price.min() == null && price.max() == null)) {
             return true;
         }
 
-        var bestPrice = dto.getProviders().values().stream()
-                .min(Comparator.comparingDouble(value -> value))
-                .orElse(null);
-
-        if (bestPrice == null) {
-            return false;
-        }
-
-        return (price.min() == null || bestPrice > price.min()) && (price.max() == null || bestPrice < price.max());
+        return (price.min() == null || dto.getPrice() >= price.min())
+                && (price.max() == null || dto.getPrice() <= price.max());
     }
 
-    private Boolean filterCharacteristics(DenormalizedProductDto dto, List<List<Long>> blocks) {
+    private Boolean filterCharacteristics(ProductInfoDto dto, List<List<Long>> blocks) {
         if (blocks.isEmpty()) {
             return true;
         }

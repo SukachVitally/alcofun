@@ -4,6 +4,7 @@ import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.ProductDto;
+import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.service.ProductListService;
 import com.alco.searchapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,12 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/")
-    public Mono<ListResponseDto<DenormalizedProductDto>> getList(Pageable pageable, Filterable filter) {
+    public Mono<ListResponseDto<ProductInfoDto>> getList(Pageable pageable, Filterable filter) {
         return productListService.getProducts(filter)
                 .collectList()
-                .map(list -> ListResponseDto.<DenormalizedProductDto>builder()
+                .map(list -> ListResponseDto.<ProductInfoDto>builder()
                         .results(list.stream()
-                                .skip(pageable.getPageNumber())
+                                .skip((long) (pageable.getPageNumber() - 1) * pageable.getPageSize())
                                 .limit(pageable.getPageSize())
                                 .toList())
                         .currentPage(pageable.getPageNumber())
