@@ -1,8 +1,6 @@
 package com.alco.searchapp.dto.productlist;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
