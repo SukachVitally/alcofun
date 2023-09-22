@@ -1,9 +1,10 @@
 package com.alco.searchapp.service;
 
-import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
+import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.repository.CustomProductRepository;
+import com.alco.searchapp.repository.DenormalizedProductRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,9 +20,12 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ProductListService {
 
     private final CustomProductRepository repository;
+
+    private final DenormalizedProductRepository denormalizedProductRepository;
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         return Optional.ofNullable(filterable.getCharacteristics())
@@ -51,9 +56,10 @@ public class ProductListService {
                         .filter(this.filter(filterable, characteristicBlocks)));
     }
 
-    private Flux<DenormalizedProductDto> getDenormalizedStructure() {
+    private Flux<DenormalizedProductEntity> getDenormalizedStructure() {
         var date = LocalDateTime.now().minusDays(1);
-        return repository.generateDenormalizedStructure(date);
+        return repository.generateDenormalizedStructure(date)
+                .flatMap(denormalizedProductRepository::save);
     }
 
     private Predicate<ProductInfoDto> filter(Filterable filterable, List<List<Long>> characteristicBlocks) {

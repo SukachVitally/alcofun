@@ -1,6 +1,6 @@
 package com.alco.searchapp.repository;
 
-import com.alco.searchapp.dto.productlist.DenormalizedProductDto;
+import com.alco.searchapp.entity.DenormalizedProductEntity;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 public class CustomProductRepository {
     private final DatabaseClient connection;
 
-    public Flux<DenormalizedProductDto> generateDenormalizedStructure(LocalDateTime startTime) {
+    public Flux<DenormalizedProductEntity> generateDenormalizedStructure(LocalDateTime startTime) {
         var sql = """
             SELECT p.id, gpp.providers, p.ean, p.name, p.category_id, gpc.characteristic_ids
             FROM (
@@ -53,16 +53,16 @@ public class CustomProductRepository {
 
         return connection.sql(sql)
                 .bind("startTime", startTime)
-                .map(row ->
-                        DenormalizedProductDto.builder()
-                        .id(row.get("id", Long.class))
-                        .ean(row.get("ean", String.class))
-                        .name(row.get("name", String.class))
-                        .categoryId(row.get("category_id", Long.class))
-                        .characteristicIds(parseLongList(row.get("characteristic_ids", String.class)))
-                        .providers(parseDoubleMap(row.get("providers", String.class)))
-                        .build()
-                )
+                .map(row -> {
+                    var entity = new DenormalizedProductEntity();
+                    entity.setId(row.get("id", Long.class));
+                    entity.setEan(row.get("ean", String.class));
+                    entity.setName(row.get("name", String.class));
+                    entity.setCategoryId(row.get("category_id", Long.class));
+                    entity.setCharacteristicIds(parseLongList(row.get("characteristic_ids", String.class)));
+                    entity.setProviders(parseDoubleMap(row.get("providers", String.class)));
+                    return entity;
+                })
                 .all();
     }
 
