@@ -27,7 +27,7 @@ public class ProductSearchService {
 
     private final DenormalizedProductRepository denormalizedProductRepository;
 
-    public Mono<Void> refresh() {
+    public Mono<Boolean> refresh() {
         return denormalizedProductRepository.clean()
                 .flatMap(unused -> {
                     var date = LocalDateTime.now().minusDays(1);
@@ -35,7 +35,7 @@ public class ProductSearchService {
                             .collectList()
                             .flatMap(denormalizedProductRepository::addList);
                 })
-                .then(Mono.empty());
+                .then(Mono.just(true));
     }
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
