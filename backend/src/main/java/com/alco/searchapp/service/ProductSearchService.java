@@ -44,10 +44,10 @@ public class ProductSearchService {
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
         if (!filterable.getCategories().isEmpty()) {
+            var values = filterable.getCategories().stream().map(FieldValue::of).toList();
             builder.withQuery(QueryBuilders.terms(b -> b
                     .field("categoryId")
-                    .terms(f -> f.value(filterable.getCategories().stream()
-                            .map(FieldValue::of).toList()))));
+                    .terms(f -> f.value(values))));
         }
 
         return template.search(new NativeQuery(builder), DenormalizedProductEntity.class).map(SearchHit::getContent)
