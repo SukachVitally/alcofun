@@ -38,7 +38,14 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         addProducts();
         productSearchService.refresh().block();
 
-        var filter = Filterable.builder().build();
+        var filter = Filterable
+                .builder()
+                .categories(List.of())
+                .providers(List.of())
+                .search(null)
+                .characteristics(List.of())
+//                .price()
+                .build();
 
         var list = productSearchService.getProducts(filter)
                 .collectList()
@@ -57,6 +64,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
         var filter = Filterable.builder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
+                .providers(List.of())
+                .search(null)
+                .characteristics(List.of())
                 .build();
 
         var list = productSearchService.getProducts(filter)
