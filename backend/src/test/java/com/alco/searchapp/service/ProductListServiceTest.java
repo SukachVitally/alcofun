@@ -11,6 +11,7 @@ import com.alco.searchapp.repository.ProviderProductRepository;
 import com.alco.searchapp.repository.ProviderRepository;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,18 +34,22 @@ public class ProductListServiceTest extends BaseFunctionalTest {
     @Autowired
     private ProviderProductRepository providerProductRepository;
 
-    @Test
-    public void getProductsAll() {
+    @BeforeEach
+    public void setup() {
+        cleanDatabase();
         addProducts();
         productSearchService.refresh().block();
+    }
 
+    @Test
+    public void getProductsAll() {
         var filter = Filterable
                 .builder()
                 .categories(List.of())
                 .providers(List.of())
                 .search(null)
                 .characteristics(List.of())
-//                .price()
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -55,8 +60,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCategories() {
-        addProducts();
-
         var rumCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId())
                 .blockOptional().orElseThrow();
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
@@ -67,6 +70,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .providers(List.of())
                 .search(null)
                 .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -77,8 +81,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCategoriesWithEan() {
-        addProducts();
-
         var rumCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId())
                 .blockOptional().orElseThrow();
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
@@ -87,6 +89,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = Filterable.builder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search(EAN4)
+                .providers(List.of())
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)

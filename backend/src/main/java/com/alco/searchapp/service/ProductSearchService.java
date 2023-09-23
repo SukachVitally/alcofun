@@ -45,10 +45,14 @@ public class ProductSearchService {
         NativeQueryBuilder builder = new NativeQueryBuilder();
         if (!filterable.getCategories().isEmpty()) {
             var values = filterable.getCategories().stream().map(FieldValue::of).toList();
-            builder.withQuery(QueryBuilders.terms(b -> b
-                    .field("categoryId")
-                    .terms(f -> f.value(values))));
+            builder.withQuery(QueryBuilders.bool(b -> b
+                    .filter(f -> f
+                            .terms(t -> t
+                                    .field("categoryId")
+                                    .terms(tt -> tt.value(values))))));
         }
+
+        // Query: {"bool":{"filter":[{"terms":{"categoryId":[5835,5840]}}]}}
 
         return template.search(new NativeQuery(builder), DenormalizedProductEntity.class).map(SearchHit::getContent)
             .map(dto -> {

@@ -35,6 +35,7 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
                         .categories(categories)
                         .providers(providers)
                         .characteristics(characteristics)
+                        .price(new Filterable.Price(null, null))
                         .build()
         );
     }
