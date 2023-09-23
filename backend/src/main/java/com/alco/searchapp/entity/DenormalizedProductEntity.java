@@ -6,7 +6,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-@Document(indexName = "product_index")
+@Document(indexName = "products")
 @Data
 public class DenormalizedProductEntity {
     @Id
