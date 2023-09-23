@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 @SpringBootTest()
 public class ProductListServiceTest extends BaseFunctionalTest {
     @Autowired
-    private ProductListService productListService;
+    private ProductSearchService productSearchService;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -36,10 +36,11 @@ public class ProductListServiceTest extends BaseFunctionalTest {
     @Test
     public void getProductsAll() {
         addProducts();
+        productSearchService.refresh().block();
 
         var filter = Filterable.builder().build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(6, list.size());
@@ -58,7 +59,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(4, list.size());
@@ -78,7 +79,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search(EAN4)
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(1, list.size());
@@ -100,7 +101,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
         var pageable = PageRequest.of(1, 10);
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(1, list.size());
@@ -120,7 +121,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("NAME FOR " + EAN4)
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(1, list.size());
@@ -140,7 +141,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("Name for " + EAN2)
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(0, list.size());
@@ -157,7 +158,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .characteristics(List.of(entity.getId()))
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(1, list.size());
@@ -180,7 +181,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .providers(List.of(entity.getId()))
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(1, list.size());
@@ -195,7 +196,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .price(new Filterable.Price(200d, 400d))
                 .build();
 
-        var list = productListService.getProducts(filter)
+        var list = productSearchService.getProducts(filter)
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(3, list.size());

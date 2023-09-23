@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,12 @@ import reactor.core.publisher.Mono;
 public class DenormalizedProductRepository {
 
     private final ReactiveElasticsearchClient client;
+
+    public Mono<Void> clean() {
+        return client.indices()
+                .delete(new DeleteIndexRequest.Builder().index(List.of("products")).build())
+                .then(Mono.empty());
+    }
 
     public Mono<BulkResponse> addList(List<DenormalizedProductEntity> list) {
         BulkRequest.Builder builder = new BulkRequest.Builder();

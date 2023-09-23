@@ -21,11 +21,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class ProductListService {
+public class ProductSearchService {
 
     private final CustomProductRepository repository;
 
     private final DenormalizedProductRepository denormalizedProductRepository;
+
+    public Mono<Void> refresh() {
+        return denormalizedProductRepository.clean()
+                .flatMap(unused -> {
+                    var date = LocalDateTime.now().minusDays(1);
+                    return repository.generateDenormalizedStructure(date)
+                            .collectList()
+                            .flatMap(denormalizedProductRepository::addList);
+                })
+                .then(Mono.empty());
+    }
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         return Optional.ofNullable(filterable.getCharacteristics())
@@ -58,8 +69,7 @@ public class ProductListService {
 
     private Flux<DenormalizedProductEntity> getDenormalizedStructure() {
         var date = LocalDateTime.now().minusDays(1);
-        return repository.generateDenormalizedStructure(date)
-                .flatMap(denormalizedProductRepository::save);
+        return repository.generateDenormalizedStructure(date);
     }
 
     private Predicate<ProductInfoDto> filter(Filterable filterable, List<List<Long>> characteristicBlocks) {

@@ -4,7 +4,7 @@ import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.ProductDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
-import com.alco.searchapp.service.ProductListService;
+import com.alco.searchapp.service.ProductSearchService;
 import com.alco.searchapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +20,13 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/product/")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductListService productListService;
+    private final ProductSearchService productSearchService;
 
     private final ProductService productService;
 
     @GetMapping("/")
     public Mono<ListResponseDto<ProductInfoDto>> getList(Pageable pageable, Filterable filter) {
-        return productListService.getProducts(filter)
+        return productSearchService.getProducts(filter)
                 .collectList()
                 .map(list -> ListResponseDto.<ProductInfoDto>builder()
                         .results(list.stream()
