@@ -1,6 +1,7 @@
 package com.alco.searchapp.service;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
@@ -9,6 +10,7 @@ import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,10 +58,10 @@ public class ProductSearchService {
         }
 
         if (filterable.getSearch() != null) {
-            boolQueryBuilder.filter(f -> f
-                    .match(m -> m
-                            .field("ean")
-                            .query(filterable.getSearch())));
+            boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
+                    new Query.Builder().match(m -> m.field("ean").query(filterable.getSearch())).build(),
+                    new Query.Builder().match(m -> m.field("name").query(filterable.getSearch())).build()
+            ))));
         }
 
         if (!filterable.getCategories().isEmpty() || filterable.getSearch() != null) {
