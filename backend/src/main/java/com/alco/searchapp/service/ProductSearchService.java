@@ -20,7 +20,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.reindex.ReindexRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -82,18 +81,22 @@ public class ProductSearchService {
             ))));
         }
 
-        if (!filterable.getCategories().isEmpty() || filterable.getSearch() != null) {
+        if (!characteristicBlocks.isEmpty()) {
+            characteristicBlocks.forEach(ids -> boolQueryBuilder.filter(f -> f
+                    .terms(t -> t
+                            .field("characteristicIds")
+                            .terms(tt -> tt.value(ids.stream().map(FieldValue::of).toList()))
+                    ))
+            );
+        }
+
+        if (!filterable.getCategories().isEmpty()
+                || filterable.getSearch() != null
+                || !characteristicBlocks.isEmpty()) {
             builder.withFilter(QueryBuilders.bool(b -> boolQueryBuilder));
         }
 
-        if (!characteristicBlocks.isEmpty()) {
-            characteristicBlocks.forEach(ids -> boolQueryBuilder.filter(f -> f
-                .terms(t -> t
-                        .field("characteristicIds")
-                        .terms(tt -> tt.value(ids.stream().map(FieldValue::of).toList()))
-                ))
-            );
-        }
+
 
         return new NativeQuery(builder);
     }
