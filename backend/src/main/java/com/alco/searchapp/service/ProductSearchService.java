@@ -17,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.reindex.ReindexRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,6 +30,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
+    private final ReactiveElasticsearchClient client;
     private final CustomProductRepository repository;
 
     private final DenormalizedProductRepository searchRepository;
@@ -72,7 +75,10 @@ public class ProductSearchService {
         if (filterable.getSearch() != null) {
             boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
                     new Query.Builder().match(m -> m.field("ean").query(filterable.getSearch())).build(),
-                    new Query.Builder().match(m -> m.field("name").query(filterable.getSearch())).build()
+                    new Query.Builder().regexp(m -> m.field("name")
+                            .value(filterable.getSearch())
+                            .caseInsensitive(true)
+                        ).build()
             ))));
         }
 
