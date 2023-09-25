@@ -74,7 +74,7 @@ public class ProductSearchService {
 
         if (filterable.getSearch() != null) {
             boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
-                    new Query.Builder().match(m -> m.field("ean").query(filterable.getSearch())).build(),
+                    new Query.Builder().term(m -> m.field("ean").value(filterable.getSearch())).build(),
                     new Query.Builder().regexp(m -> m.field("name")
                             .value(filterable.getSearch())
                             .caseInsensitive(true)
