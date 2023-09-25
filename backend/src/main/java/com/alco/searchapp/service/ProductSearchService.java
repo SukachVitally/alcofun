@@ -50,9 +50,9 @@ public class ProductSearchService {
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
-                        ? Mono.just(List.of())
+                        ? Mono.just(List.<List<Long>>of())
                         : repository.getCharacteristicBlocks(ids).collectList())
-                .flatMapMany(blocks -> template.search(createQuery(filterable, (List<List<Long>>) blocks),
+                .flatMapMany(blocks -> template.search(createQuery(filterable, blocks),
                                 DenormalizedProductEntity.class)
                         .map(SearchHit::getContent)
                         .map(this.map(filterable.getProviders())));
