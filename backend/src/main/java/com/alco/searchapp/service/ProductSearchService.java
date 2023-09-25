@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -44,6 +45,17 @@ public class ProductSearchService {
     }
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
+        return Mono.just(filterable.getCharacteristics())
+                .flatMap(ids -> ids.isEmpty()
+                        ? Mono.just(List.of())
+                        : repository.getCharacteristicBlocks(ids).collectList())
+                .flatMapMany(blocks -> template.search(createQuery(filterable, (List<List<Long>>) blocks),
+                                DenormalizedProductEntity.class)
+                        .map(SearchHit::getContent)
+                        .map(this.map(filterable.getProviders())));
+    }
+
+    private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
         var boolQueryBuilder =  QueryBuilders.bool();
         if (!filterable.getCategories().isEmpty()) {
@@ -68,24 +80,34 @@ public class ProductSearchService {
             builder.withFilter(QueryBuilders.bool(b -> boolQueryBuilder));
         }
 
-        return template.search(new NativeQuery(builder), DenormalizedProductEntity.class).map(SearchHit::getContent)
-            .map(dto -> {
-                var price = dto.getProviders().entrySet().stream()
-                        .filter(entry -> filterable.getProviders() == null
-                                || filterable.getProviders().isEmpty()
-                                || filterable.getProviders().contains(entry.getKey()))
-                        .map(Map.Entry::getValue)
-                        .min(Comparator.comparingDouble(value -> value))
-                        .orElse(null);
+        if (!characteristicBlocks.isEmpty()) {
+            characteristicBlocks.forEach(ids -> boolQueryBuilder.filter(f -> f
+                .terms(t -> t
+                        .field("characteristicIds")
+                        .terms(tt -> tt.value(ids.stream().map(FieldValue::of).toList()))
+                ))
+            );
+        }
 
-                return ProductInfoDto.builder()
-                        .id(dto.getId())
-                        .ean(dto.getEan())
-                        .name(dto.getName())
-                        .categoryId(dto.getCategoryId())
-                        .characteristicIds(dto.getCharacteristicIds())
-                        .price(price)
-                        .build();
-            });
+        return new NativeQuery(builder);
+    }
+
+    private Function<DenormalizedProductEntity, ProductInfoDto> map(List<Long> providers) {
+        return entity -> {
+            var price = entity.getProviders().entrySet().stream()
+                    .filter(entry -> providers.isEmpty() || providers.contains(entry.getKey()))
+                    .map(Map.Entry::getValue)
+                    .min(Comparator.comparingDouble(value -> value))
+                    .orElse(null);
+
+            return ProductInfoDto.builder()
+                    .id(entity.getId())
+                    .ean(entity.getEan())
+                    .name(entity.getName())
+                    .categoryId(entity.getCategoryId())
+                    .characteristicIds(entity.getCharacteristicIds())
+                    .price(price)
+                    .build();
+        };
     }
 }

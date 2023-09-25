@@ -112,6 +112,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = Filterable.builder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("Name for " + EAN4)
+                .providers(List.of())
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var pageable = PageRequest.of(1, 10);
@@ -134,6 +137,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = Filterable.builder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("NAME FOR " + EAN4)
+                .providers(List.of())
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -154,6 +160,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = Filterable.builder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("Name for " + EAN2)
+                .providers(List.of())
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -170,7 +179,10 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         Assertions.assertNotNull(entity);
 
         var filter = Filterable.builder()
+                .categories(List.of())
                 .characteristics(List.of(entity.getId()))
+                .providers(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -194,6 +206,8 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
         var filter = Filterable.builder()
                 .providers(List.of(entity.getId()))
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -208,6 +222,10 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         addProducts();
 
         var filter = Filterable.builder()
+                .categories(List.of())
+                .providers(List.of())
+                .search(null)
+                .characteristics(List.of())
                 .price(new Filterable.Price(200d, 400d))
                 .build();
 
