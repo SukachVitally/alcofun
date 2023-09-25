@@ -29,7 +29,6 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
-    private final ReactiveElasticsearchClient client;
     private final CustomProductRepository repository;
 
     private final DenormalizedProductRepository searchRepository;
@@ -90,9 +89,19 @@ public class ProductSearchService {
             );
         }
 
+        if (!filterable.getProviders().isEmpty()) {
+            boolQueryBuilder.filter(f -> f.bool(b -> b.should(filterable.getProviders().stream()
+                    .map(id -> new Query.Builder()
+                            .exists(e -> e.field(String.format("providers.%s", id)))
+                            .build())
+                    .toList()
+            )));
+        }
+
         if (!filterable.getCategories().isEmpty()
                 || filterable.getSearch() != null
-                || !characteristicBlocks.isEmpty()) {
+                || !characteristicBlocks.isEmpty()
+                || !filterable.getProviders().isEmpty()) {
             builder.withFilter(QueryBuilders.bool(b -> boolQueryBuilder));
         }
 
