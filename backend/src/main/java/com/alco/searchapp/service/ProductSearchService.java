@@ -43,16 +43,28 @@ public class ProductSearchService {
 
     public Flux<ProductInfoDto> getProducts(Filterable filterable) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
+        var boolQueryBuilder =  QueryBuilders.bool();
         if (!filterable.getCategories().isEmpty()) {
             var values = filterable.getCategories().stream().map(FieldValue::of).toList();
-            builder.withQuery(QueryBuilders.bool(b -> b
-                    .filter(f -> f
-                            .terms(t -> t
-                                    .field("categoryId")
-                                    .terms(tt -> tt.value(values))))));
+
+            boolQueryBuilder.filter(f -> f
+                    .terms(t -> t
+                            .field("categoryId")
+                            .terms(tt -> tt.value(values))
+                    )
+            );
         }
 
-        // Query: {"bool":{"filter":[{"terms":{"categoryId":[5835,5840]}}]}}
+        if (filterable.getSearch() != null) {
+            boolQueryBuilder.filter(f -> f
+                    .match(m -> m
+                            .field("ean")
+                            .query(filterable.getSearch())));
+        }
+
+        if (!filterable.getCategories().isEmpty() || filterable.getSearch() != null) {
+            builder.withFilter(QueryBuilders.bool(b -> boolQueryBuilder));
+        }
 
         return template.search(new NativeQuery(builder), DenormalizedProductEntity.class).map(SearchHit::getContent)
             .map(dto -> {
