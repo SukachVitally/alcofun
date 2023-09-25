@@ -43,13 +43,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsAll() {
-        var filter = Filterable
-                .builder()
-                .categories(List.of())
-                .providers(List.of())
-                .search(null)
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
+        var filter = getFilterableBuilder()
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -65,12 +59,8 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
                 .blockOptional().orElseThrow();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
-                .providers(List.of())
-                .search(null)
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -86,12 +76,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
                 .blockOptional().orElseThrow();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search(EAN4)
-                .providers(List.of())
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -102,19 +89,14 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCategoriesWithName() {
-        addProducts();
-
         var rumCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId())
                 .blockOptional().orElseThrow();
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
                 .blockOptional().orElseThrow();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("Name for " + EAN4)
-                .providers(List.of())
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var pageable = PageRequest.of(1, 10);
@@ -127,19 +109,14 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCategoriesWithNameLowerCase() {
-        addProducts();
-
         var rumCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId())
                 .blockOptional().orElseThrow();
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
                 .blockOptional().orElseThrow();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("NAME FOR " + EAN4)
-                .providers(List.of())
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -150,19 +127,14 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCategoriesWithNotExistName() {
-        addProducts();
-
         var rumCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId())
                 .blockOptional().orElseThrow();
         var cognacCategory = categoryRepository.findOneByTypeId(CategoryTypeEnum.COGNAC.getId())
                 .blockOptional().orElseThrow();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .search("Name for " + EAN2)
-                .providers(List.of())
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -173,16 +145,12 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCharacteristics() {
-        addProducts();
         var entity = characteristicRepository.findOneByTypeIdAndValue(
                 CharacteristicTypeEnum.COUNTRY.getId(), "Ukraine").block();
         Assertions.assertNotNull(entity);
 
-        var filter = Filterable.builder()
-                .categories(List.of())
+        var filter = getFilterableBuilder()
                 .characteristics(List.of(entity.getId()))
-                .providers(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -193,8 +161,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForProviders() {
-        addProducts();
-
         var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.ALCOMAG.getId()).block();
         Assertions.assertNotNull(entity);
 
@@ -204,10 +170,8 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .flatMap(providerProductEntity -> providerProductRepository.delete(providerProductEntity))
                 .collectList().block();
 
-        var filter = Filterable.builder()
+        var filter = getFilterableBuilder()
                 .providers(List.of(entity.getId()))
-                .characteristics(List.of())
-                .price(new Filterable.Price(null, null))
                 .build();
 
         var list = productSearchService.getProducts(filter)
@@ -219,13 +183,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForPriceRange() {
-        addProducts();
-
-        var filter = Filterable.builder()
-                .categories(List.of())
-                .providers(List.of())
-                .search(null)
-                .characteristics(List.of())
+        var filter = getFilterableBuilder()
                 .price(new Filterable.Price(200d, 400d))
                 .build();
 
@@ -233,5 +191,14 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(3, list.size());
+    }
+
+    private Filterable.FilterableBuilder getFilterableBuilder() {
+        return Filterable.builder()
+                .categories(List.of())
+                .providers(List.of())
+                .search(null)
+                .characteristics(List.of())
+                .price(new Filterable.Price(null, null));
     }
 }
