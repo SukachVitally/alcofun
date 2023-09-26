@@ -8,9 +8,10 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "products")
+@Document(indexName = DenormalizedProductEntity.INDEX)
 @Data
 public class DenormalizedProductEntity {
+    public static final String INDEX = "products";
     @Id
     private Long id;
 
@@ -20,7 +21,7 @@ public class DenormalizedProductEntity {
     @Field(type = FieldType.Keyword)
     private String ean;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     private String name;
 
     @Field(type = FieldType.Long)
@@ -28,4 +29,7 @@ public class DenormalizedProductEntity {
 
     @Field(type = FieldType.Long)
     private Long categoryId;
+
+    @Field(type = FieldType.Keyword, index = false)
+    private String imageUrl;
 }

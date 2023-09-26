@@ -39,7 +39,6 @@ public class ProductSearchService {
 
     public Mono<Boolean> refresh() {
         var date = LocalDateTime.now().minusDays(1);
-//        client.indices().putMapping(f -> f.index("products").)
         return searchRepository.deleteAll()
                 .log()
                 .then(repository.generateDenormalizedStructure(date)
@@ -76,9 +75,8 @@ public class ProductSearchService {
         if (filterable.getSearch() != null) {
             boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
                     new Query.Builder().term(m -> m.field("ean").value(filterable.getSearch())).build(),
-                    new Query.Builder().regexp(m -> m.field("name")
-                            .value(filterable.getSearch())
-                            .caseInsensitive(true)
+                    new Query.Builder().matchPhrase(p -> p.field("name")
+                            .query(filterable.getSearch())
                         ).build()
             ))));
         }
