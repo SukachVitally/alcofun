@@ -3,6 +3,7 @@ package com.alco.searchapp.service;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
+    private final ReactiveElasticsearchClient client;
     private final CustomProductRepository repository;
 
     private final DenormalizedProductRepository searchRepository;
@@ -37,6 +39,7 @@ public class ProductSearchService {
 
     public Mono<Boolean> refresh() {
         var date = LocalDateTime.now().minusDays(1);
+//        client.indices().putMapping(f -> f.index("products").)
         return searchRepository.deleteAll()
                 .log()
                 .then(repository.generateDenormalizedStructure(date)
