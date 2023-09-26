@@ -161,7 +161,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForProviders() {
-        var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.ALCOMAG.getId()).block();
+        var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.OKWINE.getId()).block();
         Assertions.assertNotNull(entity);
 
         providerProductRepository.findAll()
