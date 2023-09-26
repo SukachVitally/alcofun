@@ -145,12 +145,15 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Test
     public void getProductsForCharacteristics() {
-        var entity = characteristicRepository.findOneByTypeIdAndValue(
-                CharacteristicTypeEnum.COUNTRY.getId(), "Ukraine").block();
-        Assertions.assertNotNull(entity);
+        var usa = characteristicRepository.findOneByTypeIdAndValue(
+                CharacteristicTypeEnum.COUNTRY.getId(), "USA").block();
+        Assertions.assertNotNull(usa);
+        var abv40 = characteristicRepository.findOneByTypeIdAndValue(
+                CharacteristicTypeEnum.ALCOHOL_BY_VOLUME.getId(), "40.0").block();
+        Assertions.assertNotNull(abv40);
 
         var filter = getFilterableBuilder()
-                .characteristics(List.of(entity.getId()))
+                .characteristics(List.of(usa.getId(), abv40.getId()))
                 .build();
 
         var list = productSearchService.getProducts(filter)
