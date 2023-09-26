@@ -14,6 +14,7 @@ public class DenormalizedProductEntity {
     @Id
     private Long id;
 
+    @Field(type = FieldType.Flattened)
     private Map<Long, Double> providers;
 
     @Field(type = FieldType.Keyword)
