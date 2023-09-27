@@ -1,6 +1,7 @@
 package com.alco.searchapp.service;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
@@ -75,8 +76,9 @@ public class ProductSearchService {
         if (filterable.getSearch() != null) {
             boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
                     new Query.Builder().term(m -> m.field("ean").value(filterable.getSearch())).build(),
-                    new Query.Builder().matchPhrase(p -> p.field("name")
+                    new Query.Builder().match(p -> p.field("name")
                             .query(filterable.getSearch())
+                            .operator(Operator.And)
                         ).build()
             ))));
         }
