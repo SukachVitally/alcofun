@@ -4,13 +4,14 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
+import com.alco.searchapp.utils.ProductQueryUtils;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -61,54 +62,27 @@ public class ProductSearchService {
 
     private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
-        var boolQueryBuilder =  QueryBuilders.bool();
-        if (!filterable.getCategories().isEmpty()) {
-            var values = filterable.getCategories().stream().map(FieldValue::of).toList();
+        ArrayList<Query> queries = new ArrayList<>();
 
-            boolQueryBuilder.filter(f -> f
-                    .terms(t -> t
-                            .field("categoryId")
-                            .terms(tt -> tt.value(values))
-                    )
-            );
+        if (!filterable.getCategories().isEmpty()) {
+            queries.add(ProductQueryUtils.createCategoriesQuery(filterable.getCategories()));
         }
 
         if (filterable.getSearch() != null) {
-            boolQueryBuilder.filter(f -> f.bool(b -> b.should(List.of(
-                    new Query.Builder().term(m -> m.field("ean").value(filterable.getSearch())).build(),
-                    new Query.Builder().match(p -> p.field("name")
-                            .query(filterable.getSearch())
-                            .operator(Operator.And)
-                        ).build()
-            ))));
+            queries.add(ProductQueryUtils.createSearchQuery(filterable.getSearch()));
         }
 
         if (!characteristicBlocks.isEmpty()) {
-            characteristicBlocks.forEach(ids -> boolQueryBuilder.filter(f -> f
-                    .terms(t -> t
-                            .field("characteristicIds")
-                            .terms(tt -> tt.value(ids.stream().map(FieldValue::of).toList()))
-                    ))
-            );
+            queries.add(ProductQueryUtils.createCharacteristicsQuery(characteristicBlocks));
         }
 
         if (!filterable.getProviders().isEmpty()) {
-            boolQueryBuilder.filter(f -> f.bool(b -> b.should(filterable.getProviders().stream()
-                    .map(id -> new Query.Builder()
-                            .exists(e -> e.field(String.format("providers.%s", id)))
-                            .build())
-                    .toList()
-            )));
+            queries.add(ProductQueryUtils.createProvidersQuery(filterable.getProviders()));
         }
 
-        if (!filterable.getCategories().isEmpty()
-                || filterable.getSearch() != null
-                || !characteristicBlocks.isEmpty()
-                || !filterable.getProviders().isEmpty()) {
-            builder.withFilter(QueryBuilders.bool(b -> boolQueryBuilder));
+        if (!queries.isEmpty()) {
+            builder.withFilter(QueryBuilders.bool(b -> b.must(queries)));
         }
-
-
 
         return new NativeQuery(builder);
     }
