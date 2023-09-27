@@ -43,10 +43,12 @@ public class ProductQueryUtils {
     }
 
     public Query createProvidersQuery(List<Long> ids) {
-        return new Query.Builder().bool(b -> b.should((ids.stream()
-                .map(id -> new Query.Builder()
+        return new Query.Builder()
+                .bool(b -> b.should((ids.stream()
+                    .map(id -> new Query.Builder()
                         .exists(e -> e.field(String.format("providers.%s", id)))
                         .build())
-                .toList()))).build();
+                    .toList())))
+                .build();
     }
 }

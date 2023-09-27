@@ -81,7 +81,7 @@ public class ProductSearchService {
         }
 
         if (!queries.isEmpty()) {
-            builder.withFilter(QueryBuilders.bool(b -> b.must(queries)));
+            builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
         }
 
         return new NativeQuery(builder);
