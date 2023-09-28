@@ -44,11 +44,12 @@ public class ProductQueryUtils {
 
     public Query createProvidersQuery(List<Long> ids) {
         return new Query.Builder()
-                .bool(b -> b.should((ids.stream()
-                    .map(id -> new Query.Builder()
-                        .exists(e -> e.field(String.format("providers.%s", id)))
-                        .build())
-                    .toList())))
+                .nested(n -> n
+                        .path("providers")
+                        .query(b -> b
+                                .terms(t -> t
+                                        .field("providers.id")
+                                        .terms(v -> v.value(ids.stream().map(FieldValue::of).toList())))))
                 .build();
     }
 }

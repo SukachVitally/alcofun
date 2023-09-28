@@ -15,8 +15,8 @@ public class DenormalizedProductEntity {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Flattened)
-    private Map<Long, Double> providers;
+    @Field(type = FieldType.Nested)
+    private List<Provider> providers;
 
     @Field(type = FieldType.Keyword)
     private String ean;
@@ -32,4 +32,13 @@ public class DenormalizedProductEntity {
 
     @Field(type = FieldType.Keyword, index = false)
     private String imageUrl;
+
+    @Data
+    public static class Provider {
+        @Field(type = FieldType.Long)
+        private Long id;
+
+        @Field(type = FieldType.Float)
+        private Double price;
+    }
 }

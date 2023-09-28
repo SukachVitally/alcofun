@@ -89,9 +89,9 @@ public class ProductSearchService {
 
     private Function<DenormalizedProductEntity, ProductInfoDto> map(List<Long> providers) {
         return entity -> {
-            var price = entity.getProviders().entrySet().stream()
-                    .filter(entry -> providers.isEmpty() || providers.contains(entry.getKey()))
-                    .map(Map.Entry::getValue)
+            var price = entity.getProviders().stream()
+                    .filter(provider -> providers.isEmpty() || providers.contains(provider.getId()))
+                    .map(DenormalizedProductEntity.Provider::getPrice)
                     .min(Comparator.comparingDouble(value -> value))
                     .orElse(null);
 

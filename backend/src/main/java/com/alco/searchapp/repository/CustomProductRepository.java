@@ -60,7 +60,15 @@ public class CustomProductRepository {
                     entity.setName(row.get("name", String.class));
                     entity.setCategoryId(row.get("category_id", Long.class));
                     entity.setCharacteristicIds(parseLongList(row.get("characteristic_ids", String.class)));
-                    entity.setProviders(parseDoubleMap(row.get("providers", String.class)));
+                    entity.setProviders(parseDoubleMap(row.get("providers", String.class))
+                            .entrySet().stream()
+                            .map(entry -> {
+                                var provider = new DenormalizedProductEntity.Provider();
+                                provider.setId(entry.getKey());
+                                provider.setPrice(entry.getValue());
+                                return provider;
+                            })
+                            .toList());
                     return entity;
                 })
                 .all();
