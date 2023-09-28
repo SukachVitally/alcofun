@@ -95,8 +95,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("Name for " + EAN4)
                 .build();
 
-        var pageable = PageRequest.of(1, 10);
-
         var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
                 .collectList()
                 .blockOptional().orElseThrow();
@@ -232,6 +230,16 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .collectList()
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(3, list.size());
+    }
+
+    @Test
+    public void getProductsAllWithPageOffset() {
+        var filter = getFilterableBuilder()
+                .build();
+        var list = productSearchService.getProducts(filter, PageRequest.of(1, 4))
+                .collectList()
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(2, list.size());
     }
 
     private Filterable.FilterableBuilder getFilterableBuilder() {
