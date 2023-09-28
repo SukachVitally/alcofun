@@ -8,7 +8,9 @@ import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.repository.ProviderRepository;
+import com.alco.searchapp.service.ProductSearchService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -33,10 +35,18 @@ public class ProductControllerTest extends BaseFunctionalTest {
     @Autowired
     private CharacteristicRepository characteristicRepository;
 
+    @Autowired
+    private ProductSearchService productSearchService;
+
+    @BeforeEach
+    public void setup() {
+        cleanDatabase();
+        addProducts();
+        productSearchService.refresh().block();
+    }
+
     @Test
     void testGetAllProductList() {
-        addProducts();
-
         webClient.get()
                 .uri("/api/product/")
                 .exchange()
@@ -49,8 +59,6 @@ public class ProductControllerTest extends BaseFunctionalTest {
 
     @Test
     void testGetProductListForCategory() {
-        addProducts();
-
         var category = categoryRepository.findOneByTypeId(CategoryTypeEnum.RUM.getId()).block();
 
         Assertions.assertNotNull(category);
@@ -64,8 +72,6 @@ public class ProductControllerTest extends BaseFunctionalTest {
 
     @Test
     void testGetProductListForProvider() {
-        addProducts();
-
         var provider = providerRepository.findOneByTypeId(ProviderTypeEnum.ALCOMAG.getId()).block();
 
         Assertions.assertNotNull(provider);
@@ -79,8 +85,6 @@ public class ProductControllerTest extends BaseFunctionalTest {
 
     @Test
     void testGetProductListForCharacteristics() {
-        addProducts();
-
         var characteristic = characteristicRepository.findOneByTypeIdAndValue(
                 CharacteristicTypeEnum.VOLUME.getId(), "700")
                 .block();
@@ -96,8 +100,6 @@ public class ProductControllerTest extends BaseFunctionalTest {
 
     @Test
     void testGetProduct() {
-        addProducts();
-
         var product = repository.findAll().take(1).single().block();
         Assertions.assertNotNull(product);
         webClient.get()
@@ -105,6 +107,4 @@ public class ProductControllerTest extends BaseFunctionalTest {
                 .exchange()
                 .expectStatus().isOk();
     }
-
-
 }

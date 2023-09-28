@@ -26,16 +26,7 @@ public class ProductController {
 
     @GetMapping("/")
     public Mono<ListResponseDto<ProductInfoDto>> getList(Pageable pageable, Filterable filter) {
-        return productSearchService.getProducts(filter, pageable)
-                .collectList()
-                .map(list -> ListResponseDto.<ProductInfoDto>builder()
-                        .results(list.stream()
-                                .skip((long) (pageable.getPageNumber() - 1) * pageable.getPageSize())
-                                .limit(pageable.getPageSize())
-                                .toList())
-                        .currentPage(pageable.getPageNumber())
-                        .pageCount((int) Math.ceil((float) list.size() / pageable.getPageSize()))
-                        .build());
+        return productSearchService.getProducts(filter, pageable);
     }
 
     @GetMapping("/{id}")

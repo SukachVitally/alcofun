@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @SpringBootTest()
 public class ProductListServiceTest extends BaseFunctionalTest {
@@ -42,10 +41,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
     public void getProductsAll() {
         var filter = getFilterableBuilder()
                 .build();
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(6, list.size());
+        Assertions.assertEquals(6, res.getResults().size());
     }
 
     @Test
@@ -59,10 +57,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .categories(List.of(rumCategory.getId(), cognacCategory.getId()))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(4, list.size());
+        Assertions.assertEquals(4, res.getResults().size());
     }
 
     @Test
@@ -77,10 +74,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search(EAN4)
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -95,10 +91,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("Name for " + EAN4)
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -113,10 +108,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("NAME FOR " + EAN4)
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -131,10 +125,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .search("Name for " + EAN2)
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(0, list.size());
+        Assertions.assertEquals(0, res.getResults().size());
     }
 
     @Test
@@ -150,10 +143,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .characteristics(List.of(usa.getId(), abv40.getId()))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -165,11 +157,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .providers(List.of(entity.getId()))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
-
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -178,10 +168,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .price(new Filterable.Price(200d, 400d))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(3, list.size());
+        Assertions.assertEquals(3, res.getResults().size());
     }
 
     @Test
@@ -194,10 +183,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .price(new Filterable.Price(305d, 315d))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(1, res.getResults().size());
     }
 
     @Test
@@ -210,10 +198,9 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .price(new Filterable.Price(305d, null))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(4, list.size());
+        Assertions.assertEquals(4, res.getResults().size());
     }
 
     @Test
@@ -226,20 +213,18 @@ public class ProductListServiceTest extends BaseFunctionalTest {
                 .price(new Filterable.Price(null, 315d))
                 .build();
 
-        var list = productSearchService.getProducts(filter, PageRequest.of(0, 6))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(3, list.size());
+        Assertions.assertEquals(3, res.getResults().size());
     }
 
     @Test
     public void getProductsAllWithPageOffset() {
         var filter = getFilterableBuilder()
                 .build();
-        var list = productSearchService.getProducts(filter, PageRequest.of(1, 4))
-                .collectList()
+        var res = productSearchService.getProducts(filter, PageRequest.of(2, 4))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(2, list.size());
+        Assertions.assertEquals(2, res.getResults().size());
     }
 
     private Filterable.FilterableBuilder getFilterableBuilder() {

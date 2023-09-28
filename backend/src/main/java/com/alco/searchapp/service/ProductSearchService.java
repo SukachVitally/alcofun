@@ -3,8 +3,10 @@ package com.alco.searchapp.service;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
+import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
+import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
@@ -47,17 +50,23 @@ public class ProductSearchService {
                         .then(Mono.just(true)));
     }
 
-    public Flux<ProductInfoDto> getProducts(Filterable filterable, Pageable pageable) {
+    public Mono<ListResponseDto<ProductInfoDto>> getProducts(Filterable filterable, Pageable pageable) {
+        var internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize());
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
                         : repository.getCharacteristicBlocks(ids).collectList())
-                .flatMapMany(blocks -> template.searchForPage(createQuery(filterable, blocks).setPageable(pageable),
-                                DenormalizedProductEntity.class)
-                        .flatMapMany(result -> Flux.fromIterable(result.getContent().stream()
+                .flatMap(blocks -> template
+                        .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), DenormalizedProductEntity.class)
+                        .map(result -> ListResponseDto.<ProductInfoDto>builder()
+                                .results(result.getContent().stream()
                                         .map(SearchHit::getContent)
-                                        .toList()))
-                        .map(this.map(filterable.getProviders())));
+                                        .map(this.map(filterable.getProviders()))
+                                        .toList())
+                                .pageCount(result.getTotalPages())
+                                .currentPage(pageable.getPageNumber())
+                                .build()
+                        ));
     }
 
     private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
