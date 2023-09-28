@@ -39,7 +39,7 @@ public class ProductQueryUtils {
                         .toList()));
     }
 
-    public Query createProviderPriceRangeQuery(List<Long> ids, Filterable.Price price) {
+    public Query createProviderQuery(List<Long> ids, Filterable.Price price) {
         ArrayList<Query> queries = new ArrayList<>();
         if (!ids.isEmpty()) {
             queries.add(QueryBuilders.terms(t -> t

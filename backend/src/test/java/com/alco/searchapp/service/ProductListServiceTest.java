@@ -7,7 +7,6 @@ import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
-import com.alco.searchapp.repository.ProviderProductRepository;
 import com.alco.searchapp.repository.ProviderRepository;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -30,9 +29,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
 
     @Autowired
     private ProviderRepository providerRepository;
-
-    @Autowired
-    private ProviderProductRepository providerProductRepository;
 
     @BeforeEach
     public void setup() {

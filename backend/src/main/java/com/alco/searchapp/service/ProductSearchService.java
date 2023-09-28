@@ -1,7 +1,5 @@
 package com.alco.searchapp.service;
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
@@ -14,11 +12,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
@@ -80,7 +76,7 @@ public class ProductSearchService {
         if (!filterable.getProviders().isEmpty()
                 || filterable.getPrice().min() != null
                 || filterable.getPrice().max() != null) {
-            queries.add(ProductQueryUtils.createProviderPriceRangeQuery(filterable.getProviders(), filterable.getPrice()));
+            queries.add(ProductQueryUtils.createProviderQuery(filterable.getProviders(), filterable.getPrice()));
         }
 
         builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));

@@ -1,7 +1,6 @@
 package com.alco.searchapp.entity;
 
 import java.util.List;
-import java.util.Map;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
