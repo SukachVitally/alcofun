@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
@@ -46,14 +47,16 @@ public class ProductSearchService {
                         .then(Mono.just(true)));
     }
 
-    public Flux<ProductInfoDto> getProducts(Filterable filterable) {
+    public Flux<ProductInfoDto> getProducts(Filterable filterable, Pageable pageable) {
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
                         : repository.getCharacteristicBlocks(ids).collectList())
-                .flatMapMany(blocks -> template.search(createQuery(filterable, blocks),
+                .flatMapMany(blocks -> template.searchForPage(createQuery(filterable, blocks).setPageable(pageable),
                                 DenormalizedProductEntity.class)
-                        .map(SearchHit::getContent)
+                        .flatMapMany(result -> Flux.fromIterable(result.getContent().stream()
+                                        .map(SearchHit::getContent)
+                                        .toList()))
                         .map(this.map(filterable.getProviders())));
     }
 

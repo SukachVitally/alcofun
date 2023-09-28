@@ -26,7 +26,7 @@ public class ProductController {
 
     @GetMapping("/")
     public Mono<ListResponseDto<ProductInfoDto>> getList(Pageable pageable, Filterable filter) {
-        return productSearchService.getProducts(filter)
+        return productSearchService.getProducts(filter, pageable)
                 .collectList()
                 .map(list -> ListResponseDto.<ProductInfoDto>builder()
                         .results(list.stream()
