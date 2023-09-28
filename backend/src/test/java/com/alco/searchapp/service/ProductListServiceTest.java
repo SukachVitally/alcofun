@@ -167,12 +167,6 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.OKWINE.getId()).block();
         Assertions.assertNotNull(entity);
 
-        providerProductRepository.findAll()
-                .filter(providerProductEntity -> providerProductEntity.getProviderId().equals(entity.getId()))
-                .skip(1)
-                .flatMap(providerProductEntity -> providerProductRepository.delete(providerProductEntity))
-                .collectList().block();
-
         var filter = getFilterableBuilder()
                 .providers(List.of(entity.getId()))
                 .build();
@@ -188,6 +182,54 @@ public class ProductListServiceTest extends BaseFunctionalTest {
     public void getProductsForPriceRange() {
         var filter = getFilterableBuilder()
                 .price(new Filterable.Price(200d, 400d))
+                .build();
+
+        var list = productSearchService.getProducts(filter)
+                .collectList()
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(3, list.size());
+    }
+
+    @Test
+    public void getProductsForPriceRangeWithProviders() {
+        var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.MAUDAU.getId()).block();
+        Assertions.assertNotNull(entity);
+
+        var filter = getFilterableBuilder()
+                .providers(List.of(entity.getId()))
+                .price(new Filterable.Price(305d, 315d))
+                .build();
+
+        var list = productSearchService.getProducts(filter)
+                .collectList()
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(1, list.size());
+    }
+
+    @Test
+    public void getProductsForPriceRangeWithProvidersWithoutMax() {
+        var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.MAUDAU.getId()).block();
+        Assertions.assertNotNull(entity);
+
+        var filter = getFilterableBuilder()
+                .providers(List.of(entity.getId()))
+                .price(new Filterable.Price(305d, null))
+                .build();
+
+        var list = productSearchService.getProducts(filter)
+                .collectList()
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(4, list.size());
+    }
+
+    @Test
+    public void getProductsForPriceRangeWithProvidersWithoutMin() {
+        var entity = providerRepository.findOneByTypeId(ProviderTypeEnum.MAUDAU.getId()).block();
+        Assertions.assertNotNull(entity);
+
+        var filter = getFilterableBuilder()
+                .providers(List.of(entity.getId()))
+                .price(new Filterable.Price(null, 315d))
                 .build();
 
         var list = productSearchService.getProducts(filter)

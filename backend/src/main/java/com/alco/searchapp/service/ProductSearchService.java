@@ -77,13 +77,13 @@ public class ProductSearchService {
             queries.add(ProductQueryUtils.createCharacteristicsQuery(characteristicBlocks));
         }
 
-        if (!filterable.getProviders().isEmpty()) {
-            queries.add(ProductQueryUtils.createProvidersQuery(filterable.getProviders()));
+        if (!filterable.getProviders().isEmpty()
+                || filterable.getPrice().min() != null
+                || filterable.getPrice().max() != null) {
+            queries.add(ProductQueryUtils.createProviderPriceRangeQuery(filterable.getProviders(), filterable.getPrice()));
         }
 
-        if (!queries.isEmpty()) {
-            builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
-        }
+        builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
 
         return new NativeQuery(builder);
     }
