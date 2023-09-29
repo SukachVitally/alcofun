@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 @SpringBootTest()
-public class ProductListServiceTest extends BaseFunctionalTest {
+public class ProductSearchServiceTest extends BaseFunctionalTest {
     @Autowired
     private ProductSearchService productSearchService;
 

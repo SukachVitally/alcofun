@@ -6,8 +6,14 @@ import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
+import com.alco.searchapp.entity.ProductCharacteristicEntity;
+import com.alco.searchapp.entity.ProductEntity;
+import com.alco.searchapp.entity.ProviderProductEntity;
 import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
+import com.alco.searchapp.repository.ProductCharacteristicRepository;
+import com.alco.searchapp.repository.ProductRepository;
+import com.alco.searchapp.repository.ProviderProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +31,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -36,7 +43,15 @@ public class ProductSearchService {
 
     private final DenormalizedProductRepository searchRepository;
 
+    private final ProviderProductRepository providerProductRepository;
+
+    private final ProductRepository productRepository;
+
     private final ReactiveElasticsearchTemplate template;
+
+    private final ProductCharacteristicRepository productCharacteristicRepository;
+
+    private final ImageService imageService;
 
     private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
             "created_at", "id");
@@ -45,7 +60,7 @@ public class ProductSearchService {
         var date = LocalDateTime.now().minusDays(1);
         return searchRepository.deleteAll()
                 .log()
-                .then(repository.generateDenormalizedStructure(date)
+                .then(generateDenormalizedStructure(date)
                         .flatMap(searchRepository::save)
                         .log()
                         .then(Mono.just(true)));
@@ -68,6 +83,33 @@ public class ProductSearchService {
                                 .currentPage(pageable.getPageNumber())
                                 .build()
                         ));
+    }
+
+    private Flux<DenormalizedProductEntity> generateDenormalizedStructure(LocalDateTime time) {
+        return providerProductRepository.findAllByCreatedAtAfterOrderByIdDesc(time)
+            .groupBy(ProviderProductEntity::getProductId)
+            .flatMap(providerProductGroup -> providerProductGroup.collectList()
+                .flatMap(productProviders ->
+                    productCharacteristicRepository.findAllByProductId(providerProductGroup.key())
+                        .collectList()
+                        .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
+                        .flatMap(characteristicIds -> imageService.getProductMainImageUrl(providerProductGroup.key())
+                            .flatMap(imageUrl -> productRepository.findById(providerProductGroup.key())
+                                .map(product -> {
+                                    var entity = new DenormalizedProductEntity();
+                                    entity.setId(product.getId());
+                                    entity.setEan(product.getEan());
+                                    entity.setName(product.getName());
+                                    entity.setCategoryId(entity.getCategoryId());
+                                    entity.setImageUrl(imageUrl);
+                                    entity.setCharacteristicIds(characteristicIds);
+                                    entity.setProviders(productProviders.stream()
+                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(providerProduct.getProviderId(),
+                                                providerProduct.getPrice()))
+                                        .toList());
+                                    return entity;
+                                })))
+                ));
     }
 
     private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {

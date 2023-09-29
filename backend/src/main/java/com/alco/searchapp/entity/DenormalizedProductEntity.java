@@ -1,6 +1,7 @@
 package com.alco.searchapp.entity;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -37,6 +38,7 @@ public class DenormalizedProductEntity {
     private String imageUrl;
 
     @Data
+    @AllArgsConstructor
     public static class Provider {
         @Field(type = FieldType.Long)
         private Long id;

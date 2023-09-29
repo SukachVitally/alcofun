@@ -51,11 +51,6 @@ public class ProviderService {
         return providerProductRepository.save(providerProductEntity);
     }
 
-    public Mono<Map<Long, Double>> getRelevantProductPrices(Long id) {
-        return findRelevantProducts(id)
-                .collectMap(ProviderProductEntity::getProviderId, ProviderProductEntity::getPrice);
-    }
-
     public Flux<ProviderProductDto> getRelevantProducts(Long id) {
         return findRelevantProducts(id)
                 .flatMap(entity -> providerRepository.findById(entity.getProviderId())

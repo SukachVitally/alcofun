@@ -34,6 +34,14 @@ public class ImageService {
     }
 
     public Flux<String> getProductImageUrls(long productId) {
-        return repository.findByProductId(productId).map(entity -> property.getBaseUrl() + entity.getPath());
+        return repository.findByProductId(productId).map(this::map);
+    }
+
+    public Mono<String> getProductMainImageUrl(long productId) {
+        return repository.findOneByProductIdOrderByIdAsc(productId).map(this::map);
+    }
+
+    private String map(ProductImageEntity entity) {
+        return property.getBaseUrl() + entity.getPath();
     }
 }

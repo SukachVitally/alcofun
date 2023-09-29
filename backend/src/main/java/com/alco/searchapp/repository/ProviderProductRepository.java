@@ -10,4 +10,6 @@ public interface ProviderProductRepository extends R2dbcRepository<ProviderProdu
     @Query("SELECT DISTINCT ON (e.provider_id) * FROM provider_product e WHERE e.product_id = :productId " +
             "AND e.created_at > :createdAt ORDER BY e.provider_id, e.id DESC")
     Flux<ProviderProductEntity> findByProductIdAndCreatedAtAfter(Long productId, LocalDateTime createdAt);
+
+    Flux<ProviderProductEntity> findAllByCreatedAtAfterOrderByIdDesc(LocalDateTime createdAt);
 }
