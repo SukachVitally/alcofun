@@ -13,11 +13,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
@@ -36,6 +38,9 @@ public class ProductSearchService {
 
     private final ReactiveElasticsearchTemplate template;
 
+    private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
+            "created_at", "id");
+
     public Mono<Boolean> refresh() {
         var date = LocalDateTime.now().minusDays(1);
         return searchRepository.deleteAll()
@@ -47,8 +52,7 @@ public class ProductSearchService {
     }
 
     public Mono<ListResponseDto<ProductInfoDto>> getProducts(Filterable filterable, Pageable pageable) {
-        var internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(),
-                pageable.getSort());
+        var internalPageable = mapToInternal(pageable);
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
@@ -110,5 +114,13 @@ public class ProductSearchService {
                     .price(price)
                     .build();
         };
+    }
+
+    private Pageable mapToInternal(Pageable pageable) {
+        var sort = Sort.by(pageable.getSort().stream()
+                    .filter(order -> SORT_PROPERTIES_MAP.containsKey(order.getProperty()))
+                    .map(order -> new Sort.Order(order.getDirection(), SORT_PROPERTIES_MAP.get(order.getProperty())))
+                    .toList());
+        return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), sort);
     }
 }

@@ -29,13 +29,19 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
                 .toList();
         List<String> search = serverWebExchange.getRequest().getQueryParams().getOrDefault("search", List.of());
 
+        Double priceMin = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_min", List.of())
+                .stream().map(Double::parseDouble).findAny().orElse(null);
+
+        Double priceMax = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of())
+                .stream().map(Double::parseDouble).findAny().orElse(null);
+
         return Mono.just(
                 Filterable.builder()
                         .search(!search.isEmpty() ? search.get(0) : null)
                         .categories(categories)
                         .providers(providers)
                         .characteristics(characteristics)
-                        .price(new Filterable.Price(null, null))
+                        .price(new Filterable.Price(priceMin, priceMax))
                         .build()
         );
     }

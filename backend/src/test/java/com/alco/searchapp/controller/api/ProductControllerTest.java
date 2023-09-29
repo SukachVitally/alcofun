@@ -99,6 +99,41 @@ public class ProductControllerTest extends BaseFunctionalTest {
     }
 
     @Test
+    void testGetProductListForPriceRange() {
+        webClient.get()
+                .uri("/api/product/?price_min=500&price_max=600")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(2);
+    }
+
+    @Test
+    void testGetAllProductListWithPagination() {
+        webClient.get()
+                .uri("/api/product/?page=2&size=4")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(2)
+                .jsonPath("$.pageCount").isEqualTo(2)
+                .jsonPath("$.currentPage").isEqualTo(2);
+    }
+
+    @Test
+    void testGetAllProductListWithSortByName() {
+        webClient.get()
+                .uri("/api/product/?sort=name,desc")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.results.length()").isEqualTo(6)
+                .jsonPath("$.pageCount").isEqualTo(1)
+                .jsonPath("$.currentPage").isEqualTo(1)
+                .jsonPath("$.results[0].name").isEqualTo("Name for " + EAN6);
+    }
+
+    @Test
     void testGetProduct() {
         var product = repository.findAll().take(1).single().block();
         Assertions.assertNotNull(product);

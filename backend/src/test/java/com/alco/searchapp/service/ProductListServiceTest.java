@@ -235,7 +235,7 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = getFilterableBuilder()
                 .build();
         var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
-                        Sort.by(Sort.Direction.DESC, "name.keyword")))
+                        Sort.by(Sort.Direction.DESC, "name")))
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(6, res.getResults().size());
         Assertions.assertEquals("Name for " + EAN6, res.getResults().get(0).getName());
@@ -247,10 +247,10 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var filter = getFilterableBuilder()
                 .build();
         var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
-                        Sort.by(Sort.Direction.DESC, "id")))
+                        Sort.by(Sort.Direction.DESC, "created_at")))
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(6, res.getResults().size());
-        
+
         Assertions.assertEquals(res.getResults().get(0).getId(), res.getResults().stream()
                 .max(Comparator.comparingLong(ProductInfoDto::getId))
                 .map(ProductInfoDto::getId).orElse(0L));
