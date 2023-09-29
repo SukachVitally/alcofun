@@ -104,7 +104,8 @@ public class ProductSearchService {
                                     entity.setImageUrl(imageUrl);
                                     entity.setCharacteristicIds(characteristicIds);
                                     entity.setProviders(productProviders.stream()
-                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(providerProduct.getProviderId(),
+                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(
+                                                providerProduct.getProviderId(),
                                                 providerProduct.getPrice()))
                                         .toList());
                                     return entity;

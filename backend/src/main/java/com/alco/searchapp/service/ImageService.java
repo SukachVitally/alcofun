@@ -34,11 +34,15 @@ public class ImageService {
     }
 
     public Flux<String> getProductImageUrls(long productId) {
-        return repository.findByProductId(productId).map(this::map);
+        return repository.findByProductId(productId)
+                .map(this::map)
+                .switchIfEmpty(Flux.just(""));
     }
 
     public Mono<String> getProductMainImageUrl(long productId) {
-        return repository.findOneByProductIdOrderByIdAsc(productId).map(this::map);
+        return repository.findOneByProductIdOrderByIdAsc(productId)
+                .map(this::map)
+                .switchIfEmpty(Mono.just(""));
     }
 
     private String map(ProductImageEntity entity) {
