@@ -7,7 +7,6 @@ import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
-import com.alco.searchapp.entity.ProviderProductEntity;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
@@ -57,7 +56,7 @@ public class ProductSearchService {
     public Mono<Long> refresh() {
         var date = LocalDateTime.now().minusDays(1);
         return searchRepository.deleteAll()
-                .flatMapMany(v -> generateDenormalizedStructure(date))
+                .thenMany(generateDenormalizedStructure(date))
                 .flatMap(searchRepository::save)
                 .count();
     }
@@ -82,73 +81,39 @@ public class ProductSearchService {
     }
 
     private Flux<DenormalizedProductEntity> generateDenormalizedStructure(LocalDateTime time) {
-        return providerProductRepository.findAllByCreatedAtAfterOrderByIdDesc(time)
-            .groupBy(ProviderProductEntity::getProductId)
-            .flatMap(providerProductGroup -> providerProductGroup.collectList()
-                .flatMap(productProviders ->
-                    productCharacteristicRepository.findAllByProductId(providerProductGroup.key())
+        return productRepository.findAll()
+                .map(product -> {
+                        var entity = new DenormalizedProductEntity();
+                        entity.setId(product.getId());
+                        entity.setName(product.getName());
+                        entity.setEan(product.getEan());
+                        entity.setCategoryId(product.getCategoryId());
+                        return entity;
+                })
+                .flatMap(entity -> providerProductRepository.findByProductIdAndCreatedAtAfter(entity.getId(), time)
+                        .collectList()
+                        .map(productProviders -> productProviders.stream()
+                                .map(providerProduct -> new DenormalizedProductEntity.Provider(
+                                        providerProduct.getProviderId(),
+                                        providerProduct.getPrice()))
+                                .toList())
+                        .map(list -> {
+                            entity.setProviders(list);
+                            return entity;
+                        }))
+                .flatMap(entity -> productCharacteristicRepository.findAllByProductId(entity.getId())
                         .collectList()
                         .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
-                        .flatMap(characteristicIds -> imageService.getProductMainImageUrl(providerProductGroup.key())
-                            .flatMap(imageUrl -> productRepository.findById(providerProductGroup.key())
-                                .map(product -> {
-                                    var entity = new DenormalizedProductEntity();
-                                    entity.setId(product.getId());
-                                    entity.setEan(product.getEan());
-                                    entity.setName(product.getName());
-                                    entity.setCategoryId(product.getCategoryId());
-                                    entity.setImageUrl(imageUrl);
-                                    entity.setCharacteristicIds(characteristicIds);
-                                    entity.setProviders(productProviders.stream()
-                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(
-                                                providerProduct.getProviderId(),
-                                                providerProduct.getPrice()))
-                                        .toList());
-                                    return entity;
-                                })))
-                ));
+                        .map(ids -> {
+                            entity.setCharacteristicIds(ids);
+                            return entity;
+                        }))
+                .flatMap(entity -> imageService.getProductMainImageUrl(entity.getId())
+                        .map(imageUrl -> {
+                            entity.setImageUrl(imageUrl);
+                            return entity;
+                        }));
     }
-
-//    private Flux<DenormalizedProductEntity> generateDenormalizedStructure(LocalDateTime time) {
-//        return providerProductRepository.findAllByCreatedAtAfterOrderByIdDesc(time)
-//                .groupBy(ProviderProductEntity::getProductId)
-//                .flatMap(providerProductGroup -> providerProductGroup
-//                        .collectList()
-//                        .map(productProviders -> {
-//                            var entity = new DenormalizedProductEntity();
-//                            entity.setId(providerProductGroup.key());
-//                            entity.setProviders(productProviders.stream()
-//                                    .map(providerProduct -> new DenormalizedProductEntity.Provider(
-//                                            providerProduct.getProviderId(),
-//                                            providerProduct.getPrice()))
-//                                    .toList());
-//                            log.info("Add providers");
-//                            return entity;
-//                        }))
-//                .flatMap(entity -> productCharacteristicRepository.findAllByProductId(entity.getId())
-//                        .collectList()
-//                        .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
-//                        .map(ids -> {
-//                            entity.setCharacteristicIds(ids);
-//                            log.info("Add characteristics");
-//                            return entity;
-//                        }))
-//                .flatMap(entity -> imageService.getProductMainImageUrl(entity.getId())
-//                        .map(imageUrl -> {
-//                            entity.setImageUrl(imageUrl);
-//                            log.info("Add image");
-//                            return entity;
-//                        }))
-//                .flatMap(entity -> productRepository.findById(entity.getId())
-//                        .map(product -> {
-//                            entity.setName(product.getName());
-//                            entity.setEan(product.getEan());
-//                            entity.setCategoryId(product.getCategoryId());
-//                            log.info("Add product info");
-//                            return entity;
-//                        })
-//                );
-//    }
 
     private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
