@@ -7,9 +7,7 @@ import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
-import com.alco.searchapp.entity.ProductEntity;
 import com.alco.searchapp.entity.ProviderProductEntity;
-import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
@@ -39,8 +37,6 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
-    private final CustomProductRepository repository;
-
     private final DenormalizedProductRepository searchRepository;
 
     private final ProviderProductRepository providerProductRepository;
@@ -50,6 +46,8 @@ public class ProductSearchService {
     private final ReactiveElasticsearchTemplate template;
 
     private final ProductCharacteristicRepository productCharacteristicRepository;
+
+    private final CharacteristicService characteristicService;
 
     private final ImageService imageService;
 
@@ -71,7 +69,7 @@ public class ProductSearchService {
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
-                        : repository.getCharacteristicBlocks(ids).collectList())
+                        : characteristicService.spitByTypes(ids))
                 .flatMap(blocks -> template
                         .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), DenormalizedProductEntity.class)
                         .map(result -> ListResponseDto.<ProductInfoDto>builder()
@@ -100,7 +98,7 @@ public class ProductSearchService {
                                     entity.setId(product.getId());
                                     entity.setEan(product.getEan());
                                     entity.setName(product.getName());
-                                    entity.setCategoryId(entity.getCategoryId());
+                                    entity.setCategoryId(product.getCategoryId());
                                     entity.setImageUrl(imageUrl);
                                     entity.setCharacteristicIds(characteristicIds);
                                     entity.setProviders(productProviders.stream()

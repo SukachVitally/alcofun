@@ -10,6 +10,7 @@ import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.utils.CharacteristicComparator;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DuplicateKeyException;
@@ -64,6 +65,13 @@ public class CharacteristicService {
                 .map(this::map)
                 .collectSortedList(new CharacteristicComparator())
                 .flatMapMany(Flux::fromIterable);
+    }
+
+    public Mono<List<List<Long>>> spitByTypes(List<Long> ids){
+        return characteristicRepository.findAllByIds(ids)
+                .groupBy(CharacteristicEntity::getTypeId)
+                .flatMap(group -> group.map(CharacteristicEntity::getId).collectList())
+                .collectList();
     }
 
     private CharacteristicDto map(CharacteristicEntity entity) {
