@@ -35,8 +35,8 @@ public class ProductController {
     }
 
     // todo: Temporary. Need check admin access to it.
-    @GetMapping("/refresh")
-    public Mono<Boolean> refreshElasticCache() {
+    @GetMapping(path = "/refresh")
+    public Mono<Long> refreshElasticCache() {
         return productSearchService.refresh();
     }
 }
