@@ -6,12 +6,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.InnerField;
+import org.springframework.data.elasticsearch.annotations.MultiField;
 
 @Document(indexName = DenormalizedProductEntity.INDEX)
 @Data
 public class DenormalizedProductEntity {
     public static final String INDEX = "products";
     @Id
+    @Field(type = FieldType.Long)
     private Long id;
 
     @Field(type = FieldType.Nested)
@@ -20,7 +23,8 @@ public class DenormalizedProductEntity {
     @Field(type = FieldType.Keyword)
     private String ean;
 
-    @Field(type = FieldType.Text)
+    @MultiField(mainField = @Field(type = FieldType.Text),
+            otherFields = { @InnerField(suffix = "keyword", type = FieldType.Keyword, ignoreAbove = 50) })
     private String name;
 
     @Field(type = FieldType.Long)

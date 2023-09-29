@@ -5,9 +5,11 @@ import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
+import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProviderRepository;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @SpringBootTest()
 public class ProductListServiceTest extends BaseFunctionalTest {
@@ -225,6 +228,36 @@ public class ProductListServiceTest extends BaseFunctionalTest {
         var res = productSearchService.getProducts(filter, PageRequest.of(2, 4))
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(2, res.getResults().size());
+    }
+
+    @Test
+    public void getProductsAllWithSortByName() {
+        var filter = getFilterableBuilder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.DESC, "name.keyword")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+        Assertions.assertEquals("Name for " + EAN6, res.getResults().get(0).getName());
+        Assertions.assertEquals("Name for " + EAN1, res.getResults().get(5).getName());
+    }
+
+    @Test
+    public void getProductsAllWithSortByCreatedAt() {
+        var filter = getFilterableBuilder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.DESC, "id")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+        
+        Assertions.assertEquals(res.getResults().get(0).getId(), res.getResults().stream()
+                .max(Comparator.comparingLong(ProductInfoDto::getId))
+                .map(ProductInfoDto::getId).orElse(0L));
+
+        Assertions.assertEquals(res.getResults().get(5).getId(), res.getResults().stream()
+                .min(Comparator.comparingLong(ProductInfoDto::getId))
+                .map(ProductInfoDto::getId).orElse(0L));
     }
 
     private Filterable.FilterableBuilder getFilterableBuilder() {

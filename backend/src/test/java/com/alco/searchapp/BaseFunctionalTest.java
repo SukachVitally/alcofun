@@ -4,6 +4,7 @@ import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.service.ProductService;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

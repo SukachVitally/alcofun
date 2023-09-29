@@ -6,7 +6,6 @@ import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
-import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.repository.CustomProductRepository;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
@@ -21,11 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -33,7 +30,6 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
-    private final ReactiveElasticsearchClient client;
     private final CustomProductRepository repository;
 
     private final DenormalizedProductRepository searchRepository;
@@ -51,7 +47,8 @@ public class ProductSearchService {
     }
 
     public Mono<ListResponseDto<ProductInfoDto>> getProducts(Filterable filterable, Pageable pageable) {
-        var internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize());
+        var internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(),
+                pageable.getSort());
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
