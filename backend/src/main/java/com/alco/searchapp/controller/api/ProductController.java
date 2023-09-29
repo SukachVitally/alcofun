@@ -33,4 +33,10 @@ public class ProductController {
     public Mono<ProductDto> getProduct(@PathVariable Long id) {
         return productService.getProduct(id);
     }
+
+    // todo: Temporary. Need check admin access to it.
+    @GetMapping("/refresh")
+    public Mono<Boolean> refreshElasticCache() {
+        return productSearchService.refresh();
+    }
 }

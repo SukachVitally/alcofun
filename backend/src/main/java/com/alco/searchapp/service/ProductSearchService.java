@@ -153,6 +153,7 @@ public class ProductSearchService {
                     .categoryId(entity.getCategoryId())
                     .characteristicIds(entity.getCharacteristicIds())
                     .price(price)
+                    .imageUrl(entity.getImageUrl())
                     .build();
         };
     }

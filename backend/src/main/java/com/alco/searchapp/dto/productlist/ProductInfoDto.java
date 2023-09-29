@@ -18,4 +18,6 @@ public class ProductInfoDto {
     private Long categoryId;
 
     private Double price;
+
+    private String imageUrl;
 }

@@ -94,7 +94,8 @@ public class CharacteristicService {
         entity.setValue(value);
         entity.setCreatedAt(LocalDateTime.now());
         return characteristicRepository.save(entity)
-                .onErrorResume(DuplicateKeyException.class, e -> characteristicRepository.findOneByTypeIdAndValue(type.getId(), value));
+                .onErrorResume(DuplicateKeyException.class, e -> characteristicRepository
+                        .findOneByTypeIdAndValue(type.getId(), value));
     }
 
 }

@@ -40,7 +40,7 @@ public class ImageService {
     }
 
     public Mono<String> getProductMainImageUrl(long productId) {
-        return repository.findOneByProductIdOrderByIdAsc(productId)
+        return repository.findDistinctFirstByProductIdOrderByIdAsc(productId)
                 .map(this::map)
                 .switchIfEmpty(Mono.just(""));
     }

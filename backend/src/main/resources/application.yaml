@@ -27,7 +27,7 @@ app:
 #      - OKWINE
 #      - MAUDAU
   scheduler:
-    enable: true
+    enable: false
     delay-sec: 1
 
 #logging:

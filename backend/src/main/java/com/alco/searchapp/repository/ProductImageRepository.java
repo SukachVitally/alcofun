@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProductImageRepository extends R2dbcRepository<ProductImageEntity, Long> {
     Flux<ProductImageEntity> findByProductId(long productId);
-    Mono<ProductImageEntity> findOneByProductIdOrderByIdAsc(long productId);
+
+    Mono<ProductImageEntity> findDistinctFirstByProductIdOrderByIdAsc(long productId);
 }
