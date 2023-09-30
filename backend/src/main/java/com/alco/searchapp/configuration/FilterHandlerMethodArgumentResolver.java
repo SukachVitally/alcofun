@@ -2,6 +2,7 @@ package com.alco.searchapp.configuration;
 
 import com.alco.searchapp.dto.Filterable;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
@@ -30,10 +31,10 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
         List<String> search = serverWebExchange.getRequest().getQueryParams().getOrDefault("search", List.of());
 
         Double priceMin = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_min", List.of())
-                .stream().map(Double::parseDouble).findAny().orElse(null);
+                .stream().filter(Objects::nonNull).map(Double::parseDouble).findAny().orElse(null);
 
         Double priceMax = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of())
-                .stream().map(Double::parseDouble).findAny().orElse(null);
+                .stream().filter(Objects::nonNull).map(Double::parseDouble).findAny().orElse(null);
 
         return Mono.just(
                 Filterable.builder()

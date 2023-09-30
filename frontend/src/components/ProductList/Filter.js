@@ -10,6 +10,7 @@ import queryString from "query-string";
 import { Spinner } from "react-bootstrap";
 import CharacteristicFilter from "./CharacteristicFilter";
 import "./Filter.css"
+import PriceFilter from "./PriceFilter";
 
 function Filter(props) {
   const location = useLocation();
@@ -20,6 +21,8 @@ function Filter(props) {
   const [providers, setProviders] = useState([]);
   const [isProvidersLoading, setIsProvidersLoading] = useState(false);
   const [characteristicsTypes, setCharacteristicsTypes] = useState([]);
+  const [minPrice, setMinPrice] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(null);
   const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
     useState(false);
 
@@ -81,6 +84,14 @@ function Filter(props) {
     if (params.characteristics !== undefined) {
       setEnabledCharacteristics([parseInt(params.characteristics)]);
     }
+
+    if (params.price_min !== undefined && params.price_min != null) {
+      setMinPrice([parseInt(params.price_min)])
+    }
+
+    if (params.price_max !== undefined && params.price_max != null) {
+      setMaxPrice([parseInt(params.price_max)])
+    }
   }
 
   useEffect(() => {
@@ -96,6 +107,8 @@ function Filter(props) {
       categories: enabledCategories,
       providers: enabledProviders,
       characteristics: enabledCharacteristics,
+      price_min: minPrice,
+      price_max: maxPrice
     });
 
     setShow(false);
@@ -112,6 +125,11 @@ function Filter(props) {
 
   const characterisitcsChangeHandler = (id, checked) => {
     setEnabledCharacteristics((ids) => updateList(ids, id, checked));
+  };
+
+  const priceRangeHandler = (range) => {
+    setMinPrice(range.min)
+    setMaxPrice(range.max)
   };
 
   return (
@@ -164,6 +182,12 @@ function Filter(props) {
                 enabledCharacteristics={enabledCharacteristics}
               />
             )}
+            <Accordion.Item eventKey="100">
+              <Accordion.Header>Price</Accordion.Header>
+              <Accordion.Body>
+                <PriceFilter onChange={priceRangeHandler} min={0} max={10000} minPrice={minPrice} maxPrice={maxPrice}/>
+              </Accordion.Body>
+            </Accordion.Item>
           </Accordion>
         </Offcanvas.Body>
       </Offcanvas>

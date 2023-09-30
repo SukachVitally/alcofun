@@ -74,7 +74,7 @@ public class ProductSearchService {
                                         .map(SearchHit::getContent)
                                         .map(this.map(filterable.getProviders()))
                                         .toList())
-                                .pageCount(result.getTotalPages())
+                                .pageCount(result.getTotalPages() - 1)
                                 .currentPage(pageable.getPageNumber())
                                 .build()
                         ));

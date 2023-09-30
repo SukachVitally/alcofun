@@ -26,7 +26,9 @@ function ProductListPage() {
           page: 1,
           categories: filters.categories,
           providers: filters.providers,
-          characteristics: filters.characteristics
+          characteristics: filters.characteristics,
+          price_min: filters.price_min,
+          price_max: filters.price_max
         })
     );
   };
