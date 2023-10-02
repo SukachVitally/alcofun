@@ -102,3 +102,19 @@ CREATE SEQUENCE IF NOT EXISTS product_characteristic_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+
+CREATE TABLE IF NOT EXISTS product_rating (
+    id SERIAL PRIMARY KEY,
+    rating float,
+    vote_count int,
+    product_id BIGINT NOT NULL REFERENCES product(id),
+    provider_id BIGINT NOT NULL REFERENCES provider(id),
+    created_at timestamp NOT NULL DEFAULT NOW()
+);
+
+CREATE SEQUENCE IF NOT EXISTS product_rating_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
