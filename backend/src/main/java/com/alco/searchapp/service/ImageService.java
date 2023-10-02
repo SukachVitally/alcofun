@@ -5,6 +5,7 @@ import com.alco.searchapp.image.FileDownloader;
 import com.alco.searchapp.image.StorageInterface;
 import com.alco.searchapp.properites.ImageServiceProperty;
 import com.alco.searchapp.repository.ProductImageRepository;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,10 @@ public class ImageService {
                 });
     }
 
-    public Flux<String> getProductImageUrls(long productId) {
+    public Mono<List<String>> getProductImageUrls(long productId) {
         return repository.findByProductId(productId)
                 .map(this::map)
-                .switchIfEmpty(Flux.just(""));
+                .collectList();
     }
 
     public Mono<String> getProductMainImageUrl(long productId) {

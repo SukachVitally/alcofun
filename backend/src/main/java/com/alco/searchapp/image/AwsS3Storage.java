@@ -10,8 +10,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-@ConditionalOnProperty(name = "app.image-service.storage", havingValue="S3")
-@Component
+@Deprecated
 @RequiredArgsConstructor
 public class AwsS3Storage implements StorageInterface {
     private final S3AsyncClient s3Client;

@@ -29,10 +29,10 @@ logging:
     io.r2dbc.postgresql.PARAM: INFO # for parameters
 
 minio:
-  access-key: QJ52quYkutsOMNLAPrNi
+  access-key: j3ehAGqWjN8bkrikjgCi
   bucket: images
   url: http://localhost:19000
-  secret-key: grZxZ1dH7iT2p3m3wBQ3LnlDnQWqV54KzqmueRsx
+  secret-key: ESLP5aEm3PM2iyz0xNLsFuGaGxsxj6g2DFblDT9f
 
 elasticsearch:
   url: "localhost:19200"

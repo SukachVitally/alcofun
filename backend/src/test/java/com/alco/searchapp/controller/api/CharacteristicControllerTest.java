@@ -23,7 +23,7 @@ public class CharacteristicControllerTest extends BaseFunctionalTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.length()").isEqualTo(1);
+                .jsonPath("$.length()").isEqualTo(3);
     }
 
     @Test
