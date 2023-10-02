@@ -1,5 +1,4 @@
 import MultiRangeSlider from "multi-range-slider-react";
-import { useState } from "react";
 
 const PriceFilter = (props) => {
   return (
@@ -13,12 +12,11 @@ const PriceFilter = (props) => {
             barInnerColor="blue"
             barRightColor="grey"
             ruler={false}
-			onInput={(e) => {
+			onInput={(r) => {
                 props.onChange({
-                    "min": e.minValue == props.min ? null : e.minValue,
-                    "max": e.maxValue == props.max ? null : e.maxValue
+                    "min": r.minValue == props.min ? null : r.minValue,
+                    "max": r.maxValue == props.max ? null : r.maxValue
                 })
-                console.log(e)
 			}}
 		/>
   );

@@ -9,9 +9,11 @@ import updateList from "../../utils/list-utils.js";
 import queryString from "query-string";
 import { Spinner } from "react-bootstrap";
 import CharacteristicFilter from "./CharacteristicFilter";
-import "./Filter.css"
+import "./Filter.css";
 import PriceFilter from "./PriceFilter";
+import Sorting from "./Sorting";
 
+// Todo: simplify it!
 function Filter(props) {
   const location = useLocation();
 
@@ -23,6 +25,8 @@ function Filter(props) {
   const [characteristicsTypes, setCharacteristicsTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
+  const [sortingField, setSortingField] = useState(null);
+  const [sortingOrder, setSortingOrder] = useState("asc");
   const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
     useState(false);
 
@@ -86,11 +90,17 @@ function Filter(props) {
     }
 
     if (params.price_min !== undefined && params.price_min != null) {
-      setMinPrice([parseInt(params.price_min)])
+      setMinPrice([parseInt(params.price_min)]);
     }
 
     if (params.price_max !== undefined && params.price_max != null) {
-      setMaxPrice([parseInt(params.price_max)])
+      setMaxPrice([parseInt(params.price_max)]);
+    }
+
+    if (params.sort !== undefined && params.sort != null) {
+      const pair = params.sort.split(",");
+      setSortingField(pair[0]);
+      setSortingOrder(pair[1]);
     }
   }
 
@@ -108,7 +118,9 @@ function Filter(props) {
       providers: enabledProviders,
       characteristics: enabledCharacteristics,
       price_min: minPrice,
-      price_max: maxPrice
+      price_max: maxPrice,
+      sort_field: sortingField,
+      sort_order: sortingOrder
     });
 
     setShow(false);
@@ -128,8 +140,13 @@ function Filter(props) {
   };
 
   const priceRangeHandler = (range) => {
-    setMinPrice(range.min)
-    setMaxPrice(range.max)
+    setMinPrice(range.min);
+    setMaxPrice(range.max);
+  };
+
+  const sortingHandler = (field, order) => {
+    setSortingField(field);
+    setSortingOrder(order);
   };
 
   return (
@@ -185,10 +202,21 @@ function Filter(props) {
             <Accordion.Item eventKey="100">
               <Accordion.Header>Price</Accordion.Header>
               <Accordion.Body>
-                <PriceFilter onChange={priceRangeHandler} min={0} max={10000} minPrice={minPrice} maxPrice={maxPrice}/>
+                <PriceFilter
+                  onChange={priceRangeHandler}
+                  min={0}
+                  max={10000}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                />
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
+          <Sorting
+            onChange={sortingHandler}
+            field={sortingField}
+            order={sortingOrder}
+          />
         </Offcanvas.Body>
       </Offcanvas>
     </div>
