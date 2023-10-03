@@ -260,6 +260,32 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
                 .map(ProductInfoDto::getId).orElse(0L));
     }
 
+    @Test
+    public void getProductsAllWithSortByRatingDesc() {
+        var filter = getFilterableBuilder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.DESC, "rating")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+
+        Assertions.assertEquals(res.getResults().get(0).getEan(), EAN1);
+        Assertions.assertEquals(res.getResults().get(5).getEan(), EAN2);
+    }
+
+    @Test
+    public void getProductsAllWithSortByRatingAsc() {
+        var filter = getFilterableBuilder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.ASC, "rating")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+
+        Assertions.assertEquals(res.getResults().get(0).getEan(), EAN2);
+        Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
+    }
+
     private Filterable.FilterableBuilder getFilterableBuilder() {
         return Filterable.builder()
                 .categories(List.of())

@@ -33,11 +33,13 @@ public class RatingService {
         });
     }
 
+    public Float getInternalRating(RatingDto compositeRating) {
+        var coefficient = (float) (compositeRating.rating() < 3 ? - 0.01 : 0.01);
+        return compositeRating.rating() + coefficient * compositeRating.rating() * compositeRating.votes();
+    }
+
     // todo: Add formula
     public Mono<Float> getInternalRating(Long productId) {
-        return getCompositeRating(productId).map(rating -> {
-            var coefficient = (float) (rating.rating() < 3 ? - 0.01 : 0.01);
-            return rating.rating() + coefficient * rating.rating() * rating.votes();
-        });
+        return getCompositeRating(productId).map(this::getInternalRating);
     }
 }

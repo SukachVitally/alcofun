@@ -1,5 +1,6 @@
 package com.alco.searchapp.entity;
 
+import com.alco.searchapp.dto.RatingDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,12 @@ public class DenormalizedProductEntity {
 
     @Field(type = FieldType.Keyword, index = false)
     private String imageUrl;
+
+    @Field(type = FieldType.Object, index = false)
+    private RatingDto rating;
+
+    @Field(type = FieldType.Float)
+    private Float internalRating;
 
     @Data
     @AllArgsConstructor

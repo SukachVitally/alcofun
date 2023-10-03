@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
+import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
@@ -50,8 +51,11 @@ public class ProductSearchService {
 
     private final ImageService imageService;
 
+    private final RatingService ratingService;
+
     private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
-            "created_at", "id");
+            "created_at", "id",
+            "rating", "internalRating");
 
     public Mono<Long> refresh() {
         var date = LocalDateTime.now().minusDays(1);
@@ -112,6 +116,13 @@ public class ProductSearchService {
                         .map(imageUrl -> {
                             entity.setImageUrl(imageUrl);
                             return entity;
+                        }))
+                .flatMap(entity -> ratingService.getCompositeRating(entity.getId())
+                        .map(compositeRating -> {
+                            entity.setRating(compositeRating);
+                            entity.setInternalRating(ratingService.getInternalRating(compositeRating));
+
+                            return entity;
                         }));
     }
 
@@ -158,6 +169,7 @@ public class ProductSearchService {
                     .characteristicIds(entity.getCharacteristicIds())
                     .price(price)
                     .imageUrl(entity.getImageUrl())
+                    .rating(entity.getRating())
                     .build();
         };
     }
