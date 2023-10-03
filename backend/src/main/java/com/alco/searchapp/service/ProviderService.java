@@ -4,8 +4,8 @@ import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.ProviderDto;
 import com.alco.searchapp.dto.ProviderProductDto;
 import com.alco.searchapp.entity.ProviderEntity;
-import com.alco.searchapp.entity.ProviderProductEntity;
-import com.alco.searchapp.repository.ProviderProductRepository;
+import com.alco.searchapp.entity.ProductProviderEntity;
+import com.alco.searchapp.repository.ProductProviderRepository;
 import com.alco.searchapp.repository.ProviderRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 public class ProviderService {
     private static final int DAY_INTERVAL = 1;
 
-    private final ProviderProductRepository providerProductRepository;
+    private final ProductProviderRepository productProviderRepository;
 
     private final ProviderRepository providerRepository;
 
@@ -38,15 +38,15 @@ public class ProviderService {
                 .sort(Comparator.comparing(providerDto -> providerDto.getType().getName()));
     }
 
-    public Mono<ProviderProductEntity> addProviderProduct(Long productId, Long providerId, Double price, String link ) {
-        var providerProductEntity = new ProviderProductEntity();
+    public Mono<ProductProviderEntity> addProviderProduct(Long productId, Long providerId, Double price, String link ) {
+        var providerProductEntity = new ProductProviderEntity();
         providerProductEntity.setProductId(productId);
         providerProductEntity.setProviderId(providerId);
         providerProductEntity.setPrice(price);
         providerProductEntity.setLink(link);
         providerProductEntity.setCreatedAt(LocalDateTime.now());
 
-        return providerProductRepository.save(providerProductEntity);
+        return productProviderRepository.save(providerProductEntity);
     }
 
     public Flux<ProviderProductDto> getRelevantProducts(Long id) {
@@ -61,10 +61,10 @@ public class ProviderService {
                                 .build()));
     }
 
-    private Flux<ProviderProductEntity> findRelevantProducts(Long id) {
+    private Flux<ProductProviderEntity> findRelevantProducts(Long id) {
         var date = LocalDateTime.now().minusDays(DAY_INTERVAL); // todo: Configure time interval
 
-        return providerProductRepository.findByProductIdAndCreatedAtAfter(id, date);
+        return productProviderRepository.findByProductIdAndCreatedAtAfter(id, date);
     }
 
     private Mono<ProviderEntity> createProvider(Integer typeId) {

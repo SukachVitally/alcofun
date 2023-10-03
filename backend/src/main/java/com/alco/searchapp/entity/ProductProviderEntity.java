@@ -6,9 +6,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("provider_product")
+@Table("product_provider")
 @Data
-public class ProviderProductEntity {
+public class ProductProviderEntity {
     @Id
     private Long id;
 

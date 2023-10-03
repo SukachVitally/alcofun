@@ -4,7 +4,7 @@ import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.dto.CharacteristicDto;
 import com.alco.searchapp.dto.ProductDto;
 import com.alco.searchapp.entity.ProductEntity;
-import com.alco.searchapp.entity.ProviderProductEntity;
+import com.alco.searchapp.entity.ProductProviderEntity;
 import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.repository.ProductRepository;
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public class ProductService {
                 .flatMap(this::map);
     }
 
-    public Mono<ProviderProductEntity> addProductInfo(Product product) {
+    public Mono<ProductProviderEntity> addProductInfo(Product product) {
         var providerType = product.getProviderType();
         return productRepository.findOneByEan(product.getEan())
                 .switchIfEmpty(createProduct(product))

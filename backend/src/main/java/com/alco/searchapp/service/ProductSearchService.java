@@ -4,14 +4,13 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
-import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.dto.productlist.ProductInfoDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
-import com.alco.searchapp.repository.ProviderProductRepository;
+import com.alco.searchapp.repository.ProductProviderRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import reactor.core.publisher.Mono;
 public class ProductSearchService {
     private final DenormalizedProductRepository searchRepository;
 
-    private final ProviderProductRepository providerProductRepository;
+    private final ProductProviderRepository productProviderRepository;
 
     private final ProductRepository productRepository;
 
@@ -94,7 +93,7 @@ public class ProductSearchService {
                         entity.setCategoryId(product.getCategoryId());
                         return entity;
                 })
-                .flatMap(entity -> providerProductRepository.findByProductIdAndCreatedAtAfter(entity.getId(), time)
+                .flatMap(entity -> productProviderRepository.findByProductIdAndCreatedAtAfter(entity.getId(), time)
                         .collectList()
                         .map(productProviders -> productProviders.stream()
                                 .map(providerProduct -> new DenormalizedProductEntity.Provider(

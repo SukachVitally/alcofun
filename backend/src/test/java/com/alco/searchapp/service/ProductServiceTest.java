@@ -6,14 +6,9 @@ import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.CharacteristicDto;
 import com.alco.searchapp.provider.dto.Product;
-import com.alco.searchapp.repository.CategoryRepository;
-import com.alco.searchapp.repository.CharacteristicRepository;
-import com.alco.searchapp.repository.ProviderProductRepository;
-import com.alco.searchapp.repository.ProviderRepository;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest()

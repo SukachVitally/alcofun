@@ -70,7 +70,7 @@ CREATE SEQUENCE IF NOT EXISTS product_image_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE TABLE IF NOT EXISTS provider_product (
+CREATE TABLE IF NOT EXISTS product_provider (
     id SERIAL PRIMARY KEY,
     product_id BIGINT NOT NULL REFERENCES product(id),
     provider_id BIGINT NOT NULL REFERENCES provider(id),
@@ -79,9 +79,9 @@ CREATE TABLE IF NOT EXISTS provider_product (
     created_at timestamp NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX provider_product_create_at_idx ON provider_product(created_at);
+CREATE INDEX product_provider_create_at_idx ON product_provider(created_at);
 
-CREATE SEQUENCE IF NOT EXISTS provider_product_seq
+CREATE SEQUENCE IF NOT EXISTS product_provider_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
