@@ -1,4 +1,4 @@
-package com.alco.searchapp.dto.productlist;
+package com.alco.searchapp.dto;
 
 import com.alco.searchapp.dto.RatingDto;
 import java.util.List;
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ProductInfoDto {
+public class ProductPreviewDto {
     private Long id;
 
     private String ean;

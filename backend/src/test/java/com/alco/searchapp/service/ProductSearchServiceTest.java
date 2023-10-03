@@ -5,7 +5,7 @@ import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
-import com.alco.searchapp.dto.productlist.ProductInfoDto;
+import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProviderRepository;
@@ -252,12 +252,12 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(6, res.getResults().size());
 
         Assertions.assertEquals(res.getResults().get(0).getId(), res.getResults().stream()
-                .max(Comparator.comparingLong(ProductInfoDto::getId))
-                .map(ProductInfoDto::getId).orElse(0L));
+                .max(Comparator.comparingLong(ProductPreviewDto::getId))
+                .map(ProductPreviewDto::getId).orElse(0L));
 
         Assertions.assertEquals(res.getResults().get(5).getId(), res.getResults().stream()
-                .min(Comparator.comparingLong(ProductInfoDto::getId))
-                .map(ProductInfoDto::getId).orElse(0L));
+                .min(Comparator.comparingLong(ProductPreviewDto::getId))
+                .map(ProductPreviewDto::getId).orElse(0L));
     }
 
     @Test

@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
-import com.alco.searchapp.dto.productlist.ProductInfoDto;
+import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.entity.DenormalizedProductEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
 import com.alco.searchapp.repository.DenormalizedProductRepository;
@@ -64,7 +64,7 @@ public class ProductSearchService {
                 .count();
     }
 
-    public Mono<ListResponseDto<ProductInfoDto>> getProducts(Filterable filterable, Pageable pageable) {
+    public Mono<ListResponseDto<ProductPreviewDto>> getProducts(Filterable filterable, Pageable pageable) {
         var internalPageable = mapToInternal(pageable);
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
@@ -72,7 +72,7 @@ public class ProductSearchService {
                         : characteristicService.spitByTypes(ids))
                 .flatMap(blocks -> template
                         .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), DenormalizedProductEntity.class)
-                        .map(result -> ListResponseDto.<ProductInfoDto>builder()
+                        .map(result -> ListResponseDto.<ProductPreviewDto>builder()
                                 .results(result.getContent().stream()
                                         .map(SearchHit::getContent)
                                         .map(this.map(filterable.getProviders()))
@@ -152,7 +152,7 @@ public class ProductSearchService {
         return new NativeQuery(builder);
     }
 
-    private Function<DenormalizedProductEntity, ProductInfoDto> map(List<Long> providers) {
+    private Function<DenormalizedProductEntity, ProductPreviewDto> map(List<Long> providers) {
         return entity -> {
             var price = entity.getProviders().stream()
                     .filter(provider -> providers.isEmpty() || providers.contains(provider.getId()))
@@ -160,7 +160,7 @@ public class ProductSearchService {
                     .min(Comparator.comparingDouble(value -> value))
                     .orElse(null);
 
-            return ProductInfoDto.builder()
+            return ProductPreviewDto.builder()
                     .id(entity.getId())
                     .ean(entity.getEan())
                     .name(entity.getName())
