@@ -109,6 +109,8 @@ public class RozetkaProvider implements IProvider {
                                     .map(AlcoholByVolumeUtil::parse)
                                     .orElse(null)
                             )
+                            .rating(data.getAggregateRating() != null ? data.getAggregateRating().getRatingValue() : null)
+                            .votes(data.getAggregateRating() != null ? data.getAggregateRating().getRatingCount() : null)
                             .build();
                 })
                 .orElse(null);

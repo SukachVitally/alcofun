@@ -1,6 +1,7 @@
 package com.alco.searchapp.provider.dto.rozetka;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.r2dbc.spi.Parameter;
 import java.util.List;
 import lombok.Data;
 
@@ -21,6 +22,8 @@ public class RozetkaData {
 
     private Brand brand;
 
+    private AggregateRating aggregateRating;
+
     @Data
     public static class Brand {
         private String name;
@@ -29,5 +32,12 @@ public class RozetkaData {
     @Data
     public static class Offer {
         private Double price;
+    }
+
+    @Data
+    public static class AggregateRating {
+        private Float ratingValue;
+
+        private Integer ratingCount;
     }
 }

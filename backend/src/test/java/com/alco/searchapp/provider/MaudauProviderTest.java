@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-// todo: fix tests
+// todo: Maudau api was changed. Need to fix it.
 public class MaudauProviderTest {
     @Disabled
     @Test

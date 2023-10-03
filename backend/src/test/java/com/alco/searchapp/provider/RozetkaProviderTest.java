@@ -35,6 +35,8 @@ public class RozetkaProviderTest {
         Assertions.assertEquals(link, product.getLink());
         Assertions.assertEquals(2, product.getImageUrls().size());
         Assertions.assertEquals(ProviderTypeEnum.ROZETKA, product.getProviderType());
+        Assertions.assertTrue(product.getRating() > 0);
+        Assertions.assertTrue(product.getVotes() > 0);
     }
 
     private RozetkaProvider getProvider() {
