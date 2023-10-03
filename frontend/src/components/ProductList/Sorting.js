@@ -39,6 +39,7 @@ function Sorting(props) {
               <option value="">---</option>
               <option value="name">Name</option>
               <option value="created_at">Created at</option>
+              <option value="rating">Rating</option>
             </Form.Select>
           </Col>
         </Form.Group>
