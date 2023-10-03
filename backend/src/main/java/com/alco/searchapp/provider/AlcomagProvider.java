@@ -122,6 +122,8 @@ public class AlcomagProvider implements IProvider {
                 .category(category)
                 .imageUrls(getImages(document))
                 .providerType(this.getType())
+                .rating(info.getAggregateRating().getRatingValue())
+                .votes(info.getAggregateRating().getReviewCount())
                 .build();
     }
 

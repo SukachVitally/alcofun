@@ -36,6 +36,8 @@ public class AlcomagProviderTest {
         Assertions.assertEquals(link, product.getLink());
         Assertions.assertEquals(2, product.getImageUrls().size());
         Assertions.assertEquals(ProviderTypeEnum.ALCOMAG, product.getProviderType());
+        Assertions.assertTrue(product.getRating() > 0);
+        Assertions.assertTrue(product.getVotes() > 0);
     }
 
     private AlcomagProvider getProvider() {

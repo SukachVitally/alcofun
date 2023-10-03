@@ -16,6 +16,8 @@ public class ProductData {
 
     private Offers offers;
 
+    private AggregateRating aggregateRating;
+
     @Data
     public static class Brand {
         private String name;
@@ -24,5 +26,12 @@ public class ProductData {
     @Data
     public static class Offers {
         private Double price;
+    }
+
+    @Data
+    public static class AggregateRating {
+        private Float ratingValue;
+
+        private Integer reviewCount;
     }
 }

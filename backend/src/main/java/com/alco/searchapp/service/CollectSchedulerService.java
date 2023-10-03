@@ -35,7 +35,7 @@ public class CollectSchedulerService {
                 .publishOn(scheduler)
                 .subscribe(product -> productService.addProductInfo(product)
                         .flatMap(entity -> {
-                            if (product.getRating() == null || product.getVotes() == null) {
+                            if (product.getRating() == null || product.getVotes() == null || product.getVotes() == 0) {
                                 return Mono.just(entity);
                             }
                             return ratingService.addRating(entity.getProductId(), entity.getProviderId(),
