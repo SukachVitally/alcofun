@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+// todo: Investigate database populate in reactive way
 @SpringBootTest()
 public class RatingServiceTest extends BaseFunctionalTest {
     @Autowired

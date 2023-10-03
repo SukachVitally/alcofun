@@ -51,4 +51,8 @@ public class Product {
     private List<String> imageUrls;
 
     private ProviderTypeEnum providerType;
+
+    private Float rating;
+
+    private Integer votes;
 }

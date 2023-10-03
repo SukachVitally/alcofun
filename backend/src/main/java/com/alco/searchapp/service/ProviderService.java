@@ -9,7 +9,6 @@ import com.alco.searchapp.repository.ProviderProductRepository;
 import com.alco.searchapp.repository.ProviderRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ProviderService {
-
-    private static final int DAY_INTERVAL=1;
+    private static final int DAY_INTERVAL = 1;
 
     private final ProviderProductRepository providerProductRepository;
 
