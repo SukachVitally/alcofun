@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BestPriceService {
     // todo: Inject from properties
-    public static Float coefficient = 0.1f;
+    public static Double minPercent = 10d;
 
     private final BestPriceRepository repository;
 
@@ -30,14 +30,23 @@ public class BestPriceService {
         return repository.findByProductId(productId)
                 .defaultIfEmpty(createNewEntity(productId, bestProvider))
                 .flatMap(entity -> {
-                    entity.setHot(isHotPrice(entity, bestProvider));
+                    if ((entity.getPrice().equals(bestProvider.getPrice()) && entity.getHot())) {
+                        return Mono.just(entity);
+                    }
+
+                    Double percent = Math.ceil((entity.getPrice() - bestProvider.getPrice()) / entity.getPrice() * 100);
+
+                    entity.setHot(percent > minPercent);
+                    entity.setPercent(percent);
                     entity.setPrice(bestProvider.getPrice());
                     entity.setUpdatedAt(LocalDateTime.now());
+
                     return repository.save(entity);
                 })
                 .map(entity -> BestPriceDto.builder()
                         .price(entity.getPrice())
                         .hot(entity.getHot())
+                        .percent(entity.getPercent())
                         .build());
     }
 
@@ -50,10 +59,5 @@ public class BestPriceService {
         entity.setHot(false);
 
         return entity;
-    }
-
-    private Boolean isHotPrice(BestPriceEntity oldBestPrice, ProductProviderDto bestProvider) {
-        return (oldBestPrice.getPrice().equals(bestProvider.getPrice()) && oldBestPrice.getHot())
-                || (oldBestPrice.getPrice() - bestProvider.getPrice()) / oldBestPrice.getPrice() > coefficient;
     }
 }

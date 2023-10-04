@@ -9,4 +9,6 @@ public class BestPriceDto {
     private Double price;
 
     private Boolean hot;
+
+    private Double percent;
 }

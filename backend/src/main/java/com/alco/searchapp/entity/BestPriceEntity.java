@@ -19,6 +19,8 @@ public class BestPriceEntity {
 
     private Boolean hot;
 
+    private Double percent;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

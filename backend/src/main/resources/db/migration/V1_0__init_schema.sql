@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS best_price (
     product_id BIGINT NOT NULL UNIQUE REFERENCES product(id) ,
     provider_id BIGINT NOT NULL REFERENCES provider(id),
     price numeric(10, 2),
+    percent numeric(10, 2),
     hot BOOLEAN DEFAULT FALSE,
     updated_at timestamp NOT NULL DEFAULT NOW(),
     created_at timestamp NOT NULL DEFAULT NOW()

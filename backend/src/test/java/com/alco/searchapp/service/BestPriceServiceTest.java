@@ -30,6 +30,7 @@ public class BestPriceServiceTest extends BaseFunctionalTest {
 
         Assertions.assertNotNull(bestPrice);
         Assertions.assertEquals(100d, bestPrice.getPrice());
+        Assertions.assertEquals(0d, bestPrice.getPercent());
         Assertions.assertFalse(bestPrice.getHot());
     }
 
@@ -54,6 +55,7 @@ public class BestPriceServiceTest extends BaseFunctionalTest {
 
         Assertions.assertNotNull(bestPrice);
         Assertions.assertEquals(50d, bestPrice.getPrice());
+        Assertions.assertEquals(50d, bestPrice.getPercent());
         Assertions.assertTrue(bestPrice.getHot());
     }
 
@@ -88,6 +90,7 @@ public class BestPriceServiceTest extends BaseFunctionalTest {
 
         Assertions.assertNotNull(bestPrice);
         Assertions.assertEquals(50d, bestPrice.getPrice());
+        Assertions.assertEquals(50d, bestPrice.getPercent());
         Assertions.assertTrue(bestPrice.getHot());
     }
 }
