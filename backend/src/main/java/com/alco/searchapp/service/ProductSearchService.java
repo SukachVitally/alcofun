@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 public class ProductSearchService {
     private final DenormalizedProductRepository searchRepository;
 
-    private final ProductProviderRepository productProviderRepository;
+    private final ProviderService providerService;
 
     private final ProductRepository productRepository;
 
@@ -51,6 +51,8 @@ public class ProductSearchService {
     private final ImageService imageService;
 
     private final RatingService ratingService;
+
+    private final BestPriceService bestPriceService;
 
     private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
             "created_at", "id",
@@ -93,13 +95,17 @@ public class ProductSearchService {
                         entity.setCategoryId(product.getCategoryId());
                         return entity;
                 })
-                .flatMap(entity -> productProviderRepository.findByProductIdAndCreatedAtAfter(entity.getId(), time)
-                        .collectList()
-                        .map(productProviders -> productProviders.stream()
-                                .map(providerProduct -> new DenormalizedProductEntity.Provider(
-                                        providerProduct.getProviderId(),
-                                        providerProduct.getPrice()))
-                                .toList())
+                .flatMap(entity -> providerService.getRelevantProducts(entity.getId())
+                        .flatMap(productProviders ->
+                                bestPriceService.getBestPrice(entity.getId(), productProviders)
+                                        .map(bestPrice ->
+                                                productProviders.stream()
+                                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(
+                                                            providerProduct.getProviderId(),
+                                                            providerProduct.getPrice(),
+                                                            bestPrice.getHot()
+                                                                    && bestPrice.getPrice().equals(providerProduct.getPrice())))
+                                                        .toList()))
                         .map(list -> {
                             entity.setProviders(list);
                             return entity;

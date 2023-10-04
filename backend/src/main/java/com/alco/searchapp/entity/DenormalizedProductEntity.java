@@ -52,5 +52,8 @@ public class DenormalizedProductEntity {
 
         @Field(type = FieldType.Float)
         private Double price;
+
+        @Field(type = FieldType.Boolean)
+        private Boolean hot;
     }
 }

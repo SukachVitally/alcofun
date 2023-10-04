@@ -1,5 +1,6 @@
 package com.alco.searchapp.service;
 
+import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.ProductProviderDto;
 import com.alco.searchapp.entity.BestPriceEntity;
 import com.alco.searchapp.repository.BestPriceRepository;
@@ -18,7 +19,7 @@ public class BestPriceService {
 
     private final BestPriceRepository repository;
 
-    public Mono<Void> addProductPrices(Long productId, List<ProductProviderDto> productProviders) {
+    public Mono<BestPriceDto> getBestPrice(Long productId, List<ProductProviderDto> productProviders) {
         var bestProvider = productProviders.stream()
                 .min(Comparator.comparingDouble(ProductProviderDto::getPrice))
                 .orElse(null);
@@ -27,17 +28,19 @@ public class BestPriceService {
         }
 
         return repository.findByProductId(productId)
-                    .switchIfEmpty(repository.save(createNewEntity(productId, bestProvider)))
-                    .map(entity -> {
-                            entity.setHot(isHotPrice(entity, bestProvider));
-                            entity.setUpdatedAt(LocalDateTime.now());
-                            return repository.save(entity);
-                    })
-                .then();
-
+                .switchIfEmpty(repository.save(createNewEntity(productId, bestProvider)))
+                .flatMap(entity -> {
+                    entity.setHot(isHotPrice(entity, bestProvider));
+                    entity.setUpdatedAt(LocalDateTime.now());
+                    return repository.save(entity);
+                })
+                .map(entity -> BestPriceDto.builder()
+                        .price(entity.getPrice())
+                        .hot(entity.getHot())
+                        .build());
     }
 
-    public BestPriceEntity createNewEntity(Long productId, ProductProviderDto productProvider) {
+    private BestPriceEntity createNewEntity(Long productId, ProductProviderDto productProvider) {
         var entity = new BestPriceEntity();
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
