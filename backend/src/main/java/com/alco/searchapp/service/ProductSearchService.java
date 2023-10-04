@@ -59,9 +59,8 @@ public class ProductSearchService {
             "rating", "internalRating");
 
     public Mono<Long> refresh() {
-        var date = LocalDateTime.now().minusDays(1);
         return searchRepository.deleteAll()
-                .thenMany(generateDenormalizedStructure(date))
+                .thenMany(generateDenormalizedStructure())
                 .flatMap(searchRepository::save)
                 .count();
     }
@@ -85,7 +84,7 @@ public class ProductSearchService {
                         ));
     }
 
-    private Flux<DenormalizedProductEntity> generateDenormalizedStructure(LocalDateTime time) {
+    private Flux<DenormalizedProductEntity> generateDenormalizedStructure() {
         return productRepository.findAll()
                 .map(product -> {
                         var entity = new DenormalizedProductEntity();
@@ -95,40 +94,56 @@ public class ProductSearchService {
                         entity.setCategoryId(product.getCategoryId());
                         return entity;
                 })
-                .flatMap(entity -> providerService.getRelevantProducts(entity.getId())
-                        .flatMap(productProviders ->
-                                bestPriceService.getBestPrice(entity.getId(), productProviders)
-                                        .map(bestPrice ->
-                                                productProviders.stream()
-                                                        .map(providerProduct -> new DenormalizedProductEntity.Provider(
-                                                            providerProduct.getProviderId(),
-                                                            providerProduct.getPrice(),
-                                                            bestPrice.getHot()
-                                                                    && bestPrice.getPrice().equals(providerProduct.getPrice())))
-                                                        .toList()))
-                        .map(list -> {
-                            entity.setProviders(list);
-                            return entity;
-                        }))
-                .flatMap(entity -> productCharacteristicRepository.findAllByProductId(entity.getId())
-                        .collectList()
-                        .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
-                        .map(ids -> {
-                            entity.setCharacteristicIds(ids);
-                            return entity;
-                        }))
-                .flatMap(entity -> imageService.getProductMainImageUrl(entity.getId())
-                        .map(imageUrl -> {
-                            entity.setImageUrl(imageUrl);
-                            return entity;
-                        }))
-                .flatMap(entity -> ratingService.getCompositeRating(entity.getId())
-                        .map(compositeRating -> {
-                            entity.setRating(compositeRating);
-                            entity.setInternalRating(ratingService.getInternalRating(compositeRating));
+                .flatMap(this::addProviders)
+                .flatMap(this::addCharacteristics)
+                .flatMap(this::addImageInfo)
+                .flatMap(this::addRating);
+    }
 
-                            return entity;
-                        }));
+    private Mono<DenormalizedProductEntity> addProviders(DenormalizedProductEntity entity) {
+        return providerService.getRelevantProducts(entity.getId())
+                .flatMap(productProviders ->
+                        bestPriceService.getBestPrice(entity.getId(), productProviders)
+                                .map(bestPrice ->
+                                        productProviders.stream()
+                                                .map(providerProduct -> new DenormalizedProductEntity.Provider(
+                                                        providerProduct.getProviderId(),
+                                                        providerProduct.getPrice(),
+                                                        bestPrice.getHot()
+                                                                && bestPrice.getPrice().equals(providerProduct.getPrice())))
+                                                .toList()))
+                .map(list -> {
+                    entity.setProviders(list);
+                    return entity;
+                });
+    }
+
+    private Mono<DenormalizedProductEntity> addCharacteristics(DenormalizedProductEntity entity) {
+        return productCharacteristicRepository.findAllByProductId(entity.getId())
+                .collectList()
+                .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
+                .map(ids -> {
+                    entity.setCharacteristicIds(ids);
+                    return entity;
+                });
+    }
+
+    private Mono<DenormalizedProductEntity> addImageInfo(DenormalizedProductEntity entity) {
+        return imageService.getProductMainImageUrl(entity.getId())
+                .map(imageUrl -> {
+                    entity.setImageUrl(imageUrl);
+                    return entity;
+                });
+    }
+
+    private Mono<DenormalizedProductEntity> addRating(DenormalizedProductEntity entity) {
+        return ratingService.getCompositeRating(entity.getId())
+                .map(compositeRating -> {
+                    entity.setRating(compositeRating);
+                    entity.setInternalRating(ratingService.getInternalRating(compositeRating));
+
+                    return entity;
+                });
     }
 
     private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
