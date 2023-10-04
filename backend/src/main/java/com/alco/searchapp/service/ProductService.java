@@ -97,7 +97,7 @@ public class ProductService {
 
         return categoryService.getCategory(entity.getCategoryId())
                 .flatMap(category -> imageService.getProductImageUrls(entity.getId())
-                        .flatMap(imageUrls -> providerService.getRelevantProducts(entity.getId()).collectList()
+                        .flatMap(imageUrls -> providerService.getRelevantProducts(entity.getId())
                                 .flatMap(providers -> characteristicsMono
                                         .map(characteristics -> ProductDto.builder()
                                                 .category(category.getType())

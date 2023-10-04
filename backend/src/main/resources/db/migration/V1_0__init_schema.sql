@@ -118,3 +118,19 @@ CREATE SEQUENCE IF NOT EXISTS product_rating_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+
+CREATE TABLE IF NOT EXISTS best_price (
+    id SERIAL PRIMARY KEY,
+    product_id BIGINT NOT NULL UNIQUE REFERENCES product(id) ,
+    provider_id BIGINT NOT NULL REFERENCES provider(id),
+    price numeric(10, 2),
+    updated_at timestamp NOT NULL DEFAULT NOW(),
+    created_at timestamp NOT NULL DEFAULT NOW()
+);
+
+CREATE SEQUENCE IF NOT EXISTS best_price_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;

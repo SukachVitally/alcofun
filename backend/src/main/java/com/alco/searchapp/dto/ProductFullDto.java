@@ -16,7 +16,7 @@ public class ProductFullDto {
 
     private String description;
 
-    private List<ProviderProductDto> providers;
+    private List<ProductProviderDto> providers;
 
     private List<String> imageUrls;
 

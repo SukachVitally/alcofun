@@ -2,7 +2,6 @@ package com.alco.searchapp.controller.api;
 
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
-import com.alco.searchapp.dto.ProductDto;
 import com.alco.searchapp.dto.ProductFullDto;
 import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.service.ProductSearchService;
@@ -51,7 +50,7 @@ public class ProductController {
                         ));
     }
 
-    // todo: Temporary. Need check admin access to it.
+    // todo: Temporary. Need to check admin access to it.
     @GetMapping(path = "/refresh")
     public Mono<Long> refreshElasticCache() {
         return productSearchService.refresh();

@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ProviderProductDto {
+public class ProductProviderDto {
     private Long providerId;
 
     private Double price;
