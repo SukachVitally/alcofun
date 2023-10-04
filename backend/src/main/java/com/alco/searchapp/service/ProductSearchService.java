@@ -2,17 +2,16 @@ package com.alco.searchapp.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.dto.ProductPreviewDto;
-import com.alco.searchapp.entity.DenormalizedProductEntity;
+import com.alco.searchapp.entity.ProductSearchEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
-import com.alco.searchapp.repository.DenormalizedProductRepository;
+import com.alco.searchapp.repository.ProductSearchRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
-import com.alco.searchapp.repository.ProductProviderRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +35,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class ProductSearchService {
-    private final DenormalizedProductRepository searchRepository;
+    private final ProductSearchRepository searchRepository;
 
     private final ProviderService providerService;
 
@@ -72,7 +71,7 @@ public class ProductSearchService {
                         ? Mono.just(List.<List<Long>>of())
                         : characteristicService.spitByTypes(ids))
                 .flatMap(blocks -> template
-                        .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), DenormalizedProductEntity.class)
+                        .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), ProductSearchEntity.class)
                         .map(result -> ListResponseDto.<ProductPreviewDto>builder()
                                 .results(result.getContent().stream()
                                         .map(SearchHit::getContent)
@@ -84,10 +83,10 @@ public class ProductSearchService {
                         ));
     }
 
-    private Flux<DenormalizedProductEntity> generateDenormalizedStructure() {
+    private Flux<ProductSearchEntity> generateDenormalizedStructure() {
         return productRepository.findAll()
                 .map(product -> {
-                        var entity = new DenormalizedProductEntity();
+                        var entity = new ProductSearchEntity();
                         entity.setId(product.getId());
                         entity.setName(product.getName());
                         entity.setEan(product.getEan());
@@ -100,17 +99,16 @@ public class ProductSearchService {
                 .flatMap(this::addRating);
     }
 
-    private Mono<DenormalizedProductEntity> addProviders(DenormalizedProductEntity entity) {
+    private Mono<ProductSearchEntity> addProviders(ProductSearchEntity entity) {
         return providerService.getRelevantProducts(entity.getId())
                 .flatMap(productProviders ->
                         bestPriceService.getBestPrice(entity.getId(), productProviders)
                                 .map(bestPrice ->
                                         productProviders.stream()
-                                                .map(providerProduct -> new DenormalizedProductEntity.Provider(
+                                                .map(providerProduct -> new ProductSearchEntity.Provider(
                                                         providerProduct.getProviderId(),
                                                         providerProduct.getPrice(),
-                                                        bestPrice.getHot()
-                                                                && bestPrice.getPrice().equals(providerProduct.getPrice())))
+                                                        isHot(bestPrice, providerProduct.getPrice())))
                                                 .toList()))
                 .map(list -> {
                     entity.setProviders(list);
@@ -118,7 +116,7 @@ public class ProductSearchService {
                 });
     }
 
-    private Mono<DenormalizedProductEntity> addCharacteristics(DenormalizedProductEntity entity) {
+    private Mono<ProductSearchEntity> addCharacteristics(ProductSearchEntity entity) {
         return productCharacteristicRepository.findAllByProductId(entity.getId())
                 .collectList()
                 .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
@@ -128,7 +126,7 @@ public class ProductSearchService {
                 });
     }
 
-    private Mono<DenormalizedProductEntity> addImageInfo(DenormalizedProductEntity entity) {
+    private Mono<ProductSearchEntity> addImageInfo(ProductSearchEntity entity) {
         return imageService.getProductMainImageUrl(entity.getId())
                 .map(imageUrl -> {
                     entity.setImageUrl(imageUrl);
@@ -136,7 +134,7 @@ public class ProductSearchService {
                 });
     }
 
-    private Mono<DenormalizedProductEntity> addRating(DenormalizedProductEntity entity) {
+    private Mono<ProductSearchEntity> addRating(ProductSearchEntity entity) {
         return ratingService.getCompositeRating(entity.getId())
                 .map(compositeRating -> {
                     entity.setRating(compositeRating);
@@ -173,11 +171,11 @@ public class ProductSearchService {
         return new NativeQuery(builder);
     }
 
-    private Function<DenormalizedProductEntity, ProductPreviewDto> map(List<Long> providers) {
+    private Function<ProductSearchEntity, ProductPreviewDto> map(List<Long> providers) {
         return entity -> {
             var price = entity.getProviders().stream()
                     .filter(provider -> providers.isEmpty() || providers.contains(provider.getId()))
-                    .map(DenormalizedProductEntity.Provider::getPrice)
+                    .map(ProductSearchEntity.Provider::getPrice)
                     .min(Comparator.comparingDouble(value -> value))
                     .orElse(null);
 
@@ -200,5 +198,9 @@ public class ProductSearchService {
                     .map(order -> new Sort.Order(order.getDirection(), SORT_PROPERTIES_MAP.get(order.getProperty())))
                     .toList());
         return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), sort);
+    }
+
+    private Boolean isHot(BestPriceDto bestPrice, Double price) {
+        return bestPrice.getHot() && bestPrice.getPrice().equals(price);
     }
 }

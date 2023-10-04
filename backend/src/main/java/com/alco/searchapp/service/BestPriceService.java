@@ -28,9 +28,10 @@ public class BestPriceService {
         }
 
         return repository.findByProductId(productId)
-                .switchIfEmpty(repository.save(createNewEntity(productId, bestProvider)))
+                .defaultIfEmpty(createNewEntity(productId, bestProvider))
                 .flatMap(entity -> {
                     entity.setHot(isHotPrice(entity, bestProvider));
+                    entity.setPrice(bestProvider.getPrice());
                     entity.setUpdatedAt(LocalDateTime.now());
                     return repository.save(entity);
                 })
@@ -43,7 +44,6 @@ public class BestPriceService {
     private BestPriceEntity createNewEntity(Long productId, ProductProviderDto productProvider) {
         var entity = new BestPriceEntity();
         entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
         entity.setPrice(productProvider.getPrice());
         entity.setProviderId(productProvider.getProviderId());
         entity.setProductId(productId);

@@ -11,9 +11,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.InnerField;
 import org.springframework.data.elasticsearch.annotations.MultiField;
 
-@Document(indexName = DenormalizedProductEntity.INDEX)
+@Document(indexName = ProductSearchEntity.INDEX)
 @Data
-public class DenormalizedProductEntity {
+public class ProductSearchEntity {
     public static final String INDEX = "products";
     @Id
     @Field(type = FieldType.Long)
