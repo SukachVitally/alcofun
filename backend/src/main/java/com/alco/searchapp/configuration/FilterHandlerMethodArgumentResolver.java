@@ -36,7 +36,7 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
         Double priceMax = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of())
                 .stream().filter(Objects::nonNull).map(Double::parseDouble).findAny().orElse(null);
 
-        Boolean isHot = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of()).stream()
+        Boolean isHot = serverWebExchange.getRequest().getQueryParams().getOrDefault("hot", List.of()).stream()
                 .findAny()
                 .map(Boolean::valueOf)
                 .orElse(false);
