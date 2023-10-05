@@ -55,7 +55,9 @@ public class ProductSearchService {
 
     private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
             "created_at", "id",
-            "rating", "internalRating");
+            "rating", "internalRating"
+//            "hot", "providers.percent" // todo: Add hot search sorting
+    );
 
     public Mono<Long> refresh() {
         return searchRepository.deleteAll()
