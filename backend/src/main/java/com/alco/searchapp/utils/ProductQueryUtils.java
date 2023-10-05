@@ -39,7 +39,7 @@ public class ProductQueryUtils {
                         .toList()));
     }
 
-    public Query createProviderQuery(List<Long> ids, Filterable.Price price) {
+    public Query createProviderQuery(List<Long> ids, Filterable.Price price, Boolean isHot) {
         ArrayList<Query> queries = new ArrayList<>();
         if (!ids.isEmpty()) {
             queries.add(QueryBuilders.terms(t -> t
@@ -57,6 +57,12 @@ public class ProductQueryUtils {
             queries.add(QueryBuilders.range(r -> r
                     .field("providers.price")
                     .lte(JsonData.of(price.max()))));
+        }
+
+        if (isHot) {
+            queries.add(QueryBuilders.term(t -> t
+                    .field("providers.hot")
+                    .value(true)));
         }
 
         return QueryBuilders.nested(n -> n

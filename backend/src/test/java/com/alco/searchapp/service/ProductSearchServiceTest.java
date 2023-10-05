@@ -6,6 +6,7 @@ import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ProductPreviewDto;
+import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProviderRepository;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import reactor.core.publisher.Flux;
 
 @SpringBootTest()
 public class ProductSearchServiceTest extends BaseFunctionalTest {
@@ -240,6 +242,24 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(6, res.getResults().size());
         Assertions.assertEquals("Name for " + EAN6, res.getResults().get(0).getName());
         Assertions.assertEquals("Name for " + EAN1, res.getResults().get(5).getName());
+    }
+
+    @Test
+    public void getProductsAllWithHotPrice() {
+        addProducts();
+        Flux.just(create(EAN1, ProviderTypeEnum.ALCOMAG, CategoryTypeEnum.RUM, 50d, "Scotland", 40f))
+                .flatMap(product -> productService.addProductInfo(product))
+                .collectList()
+                        .block();
+        productSearchService.refresh().block();
+
+        var filter = getFilterableBuilder()
+                .hot(true)
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(1, res.getResults().size());
+        Assertions.assertEquals(EAN1, res.getResults().get(0).getEan());
     }
 
     @Test

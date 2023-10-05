@@ -72,12 +72,12 @@ abstract public class BaseFunctionalTest extends BaseTest {
             .collectList()
             .block();
     }
-    private Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, double price,
+    protected Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, double price,
                            String country, float abv) {
         return create(ean, provider, category, price, country, abv, null, null);
     }
 
-    private Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, Double price,
+    protected Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, Double price,
                            String country, Float abv, Float rating, Integer votes) {
         return Product.builder()
                 .ean(ean)

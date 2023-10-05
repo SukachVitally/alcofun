@@ -17,5 +17,7 @@ public class Filterable {
 
     private List<Long> characteristics;
 
+    private Boolean hot;
+
     public record Price(Double min, Double max) {}
 }

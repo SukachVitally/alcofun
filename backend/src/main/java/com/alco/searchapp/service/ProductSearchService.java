@@ -164,8 +164,10 @@ public class ProductSearchService {
 
         if (!filterable.getProviders().isEmpty()
                 || filterable.getPrice().min() != null
-                || filterable.getPrice().max() != null) {
-            queries.add(ProductQueryUtils.createProviderQuery(filterable.getProviders(), filterable.getPrice()));
+                || filterable.getPrice().max() != null
+                || filterable.getHot()) {
+            queries.add(ProductQueryUtils.createProviderQuery(filterable.getProviders(), filterable.getPrice(),
+                    filterable.getHot()));
         }
 
         builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
