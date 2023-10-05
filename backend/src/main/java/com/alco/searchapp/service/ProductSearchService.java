@@ -179,11 +179,16 @@ public class ProductSearchService {
 
     private Function<ProductSearchEntity, ProductPreviewDto> map(List<Long> providers) {
         return entity -> {
-            var price = entity.getProviders().stream()
+            var availableProviders = entity.getProviders().stream()
                     .filter(provider -> providers.isEmpty() || providers.contains(provider.getId()))
+                    .toList();
+            var price = availableProviders.stream()
                     .map(ProductSearchEntity.Provider::getPrice)
                     .min(Comparator.comparingDouble(value -> value))
                     .orElse(null);
+
+            var hot = availableProviders.stream()
+                    .anyMatch(ProductSearchEntity.Provider::getHot);
 
             return ProductPreviewDto.builder()
                     .id(entity.getId())
@@ -194,6 +199,7 @@ public class ProductSearchService {
                     .price(price)
                     .imageUrl(entity.getImageUrl())
                     .rating(entity.getRating())
+                    .hot(hot)
                     .build();
         };
     }

@@ -1,6 +1,5 @@
 package com.alco.searchapp.dto;
 
-import com.alco.searchapp.dto.RatingDto;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,4 +22,6 @@ public class ProductPreviewDto {
     private String imageUrl;
 
     private RatingDto rating;
+
+    private Boolean hot;
 }
