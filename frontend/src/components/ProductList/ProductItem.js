@@ -24,7 +24,7 @@ function ProductItem(props) {
       />
       <Card.Body>
         <Card.Title
-          style={{color: product.hot ? "red": "black"}}
+          style={{ color: product.hot ? "red" : "black" }}
           title={product.name}
           data-toggle="tooltip"
           data-placement="top"
@@ -37,7 +37,7 @@ function ProductItem(props) {
             starRatedColor="#ebd834"
             numberOfStars={5}
             starDimension="25"
-            name='rating'
+            name="rating"
           />
         </Card.Subtitle>
         <Card.Body>

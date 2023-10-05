@@ -127,7 +127,7 @@ function Filter(props) {
       price_max: maxPrice,
       sort_field: sortingField,
       sort_order: sortingOrder,
-      hot: hot
+      hot: hot,
     });
 
     setShow(false);
