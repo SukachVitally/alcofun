@@ -7,17 +7,22 @@ import lombok.Getter;
 @Builder
 @Getter
 public class Filterable {
-    private List<Long> categories;
+    @Builder.Default
+    private List<Long> categories = List.of();
 
-    private List<Long> providers;
+    @Builder.Default
+    private List<Long> providers = List.of();
 
-    private Price price;
+    @Builder.Default
+    private Price price = new Price(null, null);
 
     private String search;
 
-    private List<Long> characteristics;
+    @Builder.Default
+    private List<Long> characteristics = List.of();
 
-    private Boolean hot;
+    @Builder.Default
+    private Boolean hot = false;
 
     public record Price(Double min, Double max) {}
 }

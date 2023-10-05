@@ -36,6 +36,11 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
         Double priceMax = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of())
                 .stream().filter(Objects::nonNull).map(Double::parseDouble).findAny().orElse(null);
 
+        Boolean isHot = serverWebExchange.getRequest().getQueryParams().getOrDefault("price_max", List.of()).stream()
+                .findAny()
+                .map(Boolean::valueOf)
+                .orElse(false);
+
         return Mono.just(
                 Filterable.builder()
                         .search(!search.isEmpty() ? search.get(0) : null)
@@ -43,6 +48,7 @@ public class FilterHandlerMethodArgumentResolver implements HandlerMethodArgumen
                         .providers(providers)
                         .characteristics(characteristics)
                         .price(new Filterable.Price(priceMin, priceMax))
+                        .hot(isHot)
                         .build()
         );
     }
