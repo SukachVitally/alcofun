@@ -28,9 +28,9 @@ public class BestPriceService {
         }
 
         return repository.findByProductId(productId)
-                .defaultIfEmpty(createNewEntity(productId, bestProvider))
+                .switchIfEmpty(repository.save(createNewEntity(productId, bestProvider)))
                 .flatMap(entity -> {
-                    if ((entity.getPrice().equals(bestProvider.getPrice()) && entity.getHot())) {
+                    if ((entity.getPrice().equals(bestProvider.getPrice()))) {
                         return Mono.just(entity);
                     }
 
@@ -56,6 +56,7 @@ public class BestPriceService {
         entity.setPrice(productProvider.getPrice());
         entity.setProviderId(productProvider.getProviderId());
         entity.setProductId(productId);
+        entity.setPercent(0d);
         entity.setHot(false);
 
         return entity;
