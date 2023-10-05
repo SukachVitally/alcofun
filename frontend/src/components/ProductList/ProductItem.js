@@ -35,7 +35,7 @@ function ProductItem(props) {
             rating={product.rating != null ? product.rating.rating : 0}
             starRatedColor="#ebd834"
             numberOfStars={5}
-            starDimension={25}
+            starDimension="25"
             name='rating'
           />
         </Card.Subtitle>

@@ -14,7 +14,7 @@ function ProductListPage() {
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryParams, setQueryParams] = useState({});
-  
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -22,23 +22,31 @@ function ProductListPage() {
     console.log("filters", filters);
     navigate(
       "/products/?" +
-        queryString.stringify(filterNullProperties({
-          ...queryParams,
-          page: 1,
-          categories: filters.categories,
-          providers: filters.providers,
-          characteristics: filters.characteristics,
-          price_min: filters.price_min,
-          price_max: filters.price_max,
-          sort: filters.sort_field != null && filters.sort_field != "" ? filters.sort_field + "," + filters.sort_order : null
-        }))
+        queryString.stringify(
+          filterNullProperties({
+            ...queryParams,
+            page: 1,
+            categories: filters.categories,
+            providers: filters.providers,
+            characteristics: filters.characteristics,
+            price_min: filters.price_min,
+            price_max: filters.price_max,
+            sort:
+              filters.sort_field != null && filters.sort_field != ""
+                ? filters.sort_field + "," + filters.sort_order
+                : null,
+            hot: filters.hot,
+          })
+        )
     );
   };
 
   async function fetchProducts(params) {
     setIsLoading(true);
     console.log(params);
-    const json = await fetchJson("product/?" + queryString.stringify(filterNullProperties(params)));
+    const json = await fetchJson(
+      "product/?" + queryString.stringify(filterNullProperties(params))
+    );
     setProducts(json.results);
     setPageCount(json.pageCount);
     setCurrentPage(json.currentPage);

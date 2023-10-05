@@ -12,6 +12,7 @@ import CharacteristicFilter from "./CharacteristicFilter";
 import "./Filter.css";
 import PriceFilter from "./PriceFilter";
 import Sorting from "./Sorting";
+import HotPriceFilter from "./HotPriceFilter";
 
 // Todo: simplify it!
 function Filter(props) {
@@ -25,6 +26,7 @@ function Filter(props) {
   const [characteristicsTypes, setCharacteristicsTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
+  const [hot, setHot] = useState(false);
   const [sortingField, setSortingField] = useState(null);
   const [sortingOrder, setSortingOrder] = useState("asc");
   const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
@@ -102,6 +104,10 @@ function Filter(props) {
       setSortingField(pair[0]);
       setSortingOrder(pair[1]);
     }
+
+    if (params.hot !== undefined) {
+      setHot(params.hot == "true");
+    }
   }
 
   useEffect(() => {
@@ -120,7 +126,8 @@ function Filter(props) {
       price_min: minPrice,
       price_max: maxPrice,
       sort_field: sortingField,
-      sort_order: sortingOrder
+      sort_order: sortingOrder,
+      hot: hot
     });
 
     setShow(false);
@@ -149,6 +156,10 @@ function Filter(props) {
     setSortingOrder(order);
   };
 
+  const hotHandler = (value) => {
+    setHot(value);
+  };
+
   return (
     <div className="filter">
       <div className="filter__button-block">
@@ -162,6 +173,7 @@ function Filter(props) {
           <Offcanvas.Title>Filters</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
+          <HotPriceFilter hot={hot} onChange={hotHandler} />
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Categories</Accordion.Header>
