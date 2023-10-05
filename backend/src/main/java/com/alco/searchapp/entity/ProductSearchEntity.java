@@ -3,7 +3,9 @@ package com.alco.searchapp.entity;
 import com.alco.searchapp.dto.RatingDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -44,8 +46,8 @@ public class ProductSearchEntity {
     @Field(type = FieldType.Float)
     private Float internalRating;
 
-    @Data
-    @AllArgsConstructor
+    @Getter
+    @Builder
     public static class Provider {
         @Field(type = FieldType.Long)
         private Long id;
@@ -55,5 +57,8 @@ public class ProductSearchEntity {
 
         @Field(type = FieldType.Boolean)
         private Boolean hot;
+
+        @Field(type = FieldType.Float)
+        private Double percent;
     }
 }

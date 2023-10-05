@@ -105,10 +105,12 @@ public class ProductSearchService {
                         bestPriceService.getBestPrice(entity.getId(), productProviders)
                                 .map(bestPrice ->
                                         productProviders.stream()
-                                                .map(providerProduct -> new ProductSearchEntity.Provider(
-                                                        providerProduct.getProviderId(),
-                                                        providerProduct.getPrice(),
-                                                        isHot(bestPrice, providerProduct.getPrice())))
+                                                .map(providerProduct -> ProductSearchEntity.Provider.builder()
+                                                        .id(providerProduct.getProviderId())
+                                                        .price(providerProduct.getPrice())
+                                                        .hot(isHot(bestPrice, providerProduct.getPrice()))
+                                                        .percent(isHot(bestPrice, providerProduct.getPrice()) ? bestPrice.getPercent() : null)
+                                                        .build())
                                                 .toList()))
                 .map(list -> {
                     entity.setProviders(list);
