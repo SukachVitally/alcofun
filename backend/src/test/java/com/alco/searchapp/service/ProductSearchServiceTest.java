@@ -246,7 +246,7 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
     @Test
     public void getProductsAllWithHotPrice() {
         Flux.just(create(EAN1, ProviderTypeEnum.ALCOMAG, CategoryTypeEnum.RUM, 50d, "Scotland", 40f))
-                .flatMap(product -> productService.addProductInfo(product))
+                .flatMap(product -> productService.addProduct(product))
                 .collectList()
                         .block();
         productSearchService.refresh().block();

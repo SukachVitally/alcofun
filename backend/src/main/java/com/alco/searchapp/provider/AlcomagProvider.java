@@ -3,7 +3,8 @@ package com.alco.searchapp.provider;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.provider.dto.LdJsonDto;
-import com.alco.searchapp.provider.dto.Product;
+import com.alco.searchapp.provider.dto.ProductInfo;
+import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.provider.dto.alcomag.ProductData;
 import com.alco.searchapp.utils.AlcoholByVolumeUtil;
 import com.alco.searchapp.utils.VolumeUtils;
@@ -20,8 +21,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-// todo: refactor it
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -52,7 +53,6 @@ public class AlcomagProvider implements IProvider {
 
     private static final String PROPERTY_COUNTRY_TITLE = "Країна";
 
-
     private final HtmlLinkParser linkParser;
 
     private final ObjectMapper mapper;
@@ -63,25 +63,30 @@ public class AlcomagProvider implements IProvider {
     }
 
     @Override
-    public Flux<Product> getList() {
+    public Flux<ProductPageDto> getProductPages() {
         return Flux.fromIterable(PATHS)
                 .flatMap(pair -> Flux
                         .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
                         .flatMap(Flux::fromIterable)
-                        .map(url -> URL + url)
-                        .flatMap(url -> linkParser.parse(url)
-                                .map(document -> this.parse(document, pair.getSecond(), url))
-                        )
-                );
+                        .map(url -> ProductPageDto.builder()
+                                .url(url)
+                                .provider(getType())
+                                .category(pair.getSecond())
+                                .build()));
     }
 
-    public Product parse(Document document, CategoryTypeEnum category, String url) {
+    @Override
+    public Mono<ProductInfo> parsePageInfo(String url) {
+        return linkParser.parse(url).map(this::parseDocument);
+    }
+
+    private ProductInfo parseDocument(Document document) {
         var info = document.select("script[type=application/ld+json]").stream()
                 .map(Element::data)
                 .filter(content -> {
                     try {
                         var dto = mapper.readValue(content, LdJsonDto.class);
-                        return dto.getContext().contains("schema.org") && dto.getType().equals("Product");
+                        return dto.getContext().contains("schema.org") && dto.getType().equals("ProductInfo");
                     } catch (JsonProcessingException e) {
                         return false;
                     }
@@ -109,19 +114,20 @@ public class AlcomagProvider implements IProvider {
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
-        return Product.builder()
+        return ProductInfo.builder()
                 .ean(info.getEan())
-                .link(url)
                 .name(info.getName())
                 .price(info.getOffers().getPrice())
                 .description(info.getDescription())
                 .brand(info.getBrand().getName())
-                .volume(properties.containsKey(PROPERTY_VOLUME_TITLE) ? VolumeUtils.parse(properties.get(PROPERTY_VOLUME_TITLE)) : null)
-                .abv(properties.containsKey(PROPERTY_ABV_TITLE) ? AlcoholByVolumeUtil.parse(properties.get(PROPERTY_ABV_TITLE)) : null)
+                .volume(properties.containsKey(PROPERTY_VOLUME_TITLE)
+                        ? VolumeUtils.parse(properties.get(PROPERTY_VOLUME_TITLE))
+                        : null)
+                .abv(properties.containsKey(PROPERTY_ABV_TITLE)
+                        ? AlcoholByVolumeUtil.parse(properties.get(PROPERTY_ABV_TITLE))
+                        : null)
                 .country(properties.getOrDefault(PROPERTY_COUNTRY_TITLE, null))
-                .category(category)
                 .imageUrls(getImages(document))
-                .providerType(this.getType())
                 .rating(info.getAggregateRating().getRatingValue())
                 .votes(info.getAggregateRating().getReviewCount())
                 .build();

@@ -13,6 +13,8 @@ spring:
     user: user
     password: password
     locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:29093
 
 app:
   image-service:

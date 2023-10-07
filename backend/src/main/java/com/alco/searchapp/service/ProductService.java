@@ -37,13 +37,13 @@ public class ProductService {
                 .flatMap(this::map);
     }
 
-    public Mono<ProductProviderEntity> addProductInfo(Product product) {
+    public Mono<ProductProviderEntity> addProduct(Product product) {
         var providerType = product.getProviderType();
-        return productRepository.findOneByEan(product.getEan())
+        return productRepository.findOneByEan(product.getInfo().getEan())
                 .switchIfEmpty(createProduct(product))
                 .flatMap(entity -> providerService.createProviderIfNotExist(providerType.getId())
                         .flatMap(provider -> providerService.addProviderProduct(entity.getId(), provider.getId(),
-                                product.getPrice(), product.getLink())));
+                                product.getInfo().getPrice(), product.getUrl())));
     }
 
     private Mono<ProductEntity> createProduct(Product product) {
@@ -51,9 +51,9 @@ public class ProductService {
                 .flatMap(category -> providerService.createProviderIfNotExist(product.getProviderType().getId())
                         .flatMap(provider -> {
                             var entity = new ProductEntity();
-                            entity.setDescription(product.getDescription());
-                            entity.setName(product.getName());
-                            entity.setEan(product.getEan());
+                            entity.setDescription(product.getInfo().getDescription());
+                            entity.setName(product.getInfo().getName());
+                            entity.setEan(product.getInfo().getEan());
                             entity.setCreatedAt(LocalDateTime.now());
                             entity.setCategoryId(category.getId());
                             entity.setProviderId(provider.getId());
@@ -65,19 +65,19 @@ public class ProductService {
                 )
                 .flatMap(entity -> {
                     Map<CharacteristicTypeEnum, String> map = new HashMap<>();
-                    if (product.getAbv() != null) {
-                        map.put(CharacteristicTypeEnum.ALCOHOL_BY_VOLUME, product.getAbv().toString());
+                    if (product.getInfo().getAbv() != null) {
+                        map.put(CharacteristicTypeEnum.ALCOHOL_BY_VOLUME, product.getInfo().getAbv().toString());
                     }
-                    if (product.getVolume() != null) {
-                        map.put(CharacteristicTypeEnum.VOLUME, product.getVolume().toString());
-                    }
-
-                    if (product.getCountry() != null) {
-                        map.put(CharacteristicTypeEnum.COUNTRY, product.getCountry());
+                    if (product.getInfo().getVolume() != null) {
+                        map.put(CharacteristicTypeEnum.VOLUME, product.getInfo().getVolume().toString());
                     }
 
-                    if (product.getBrand() != null) {
-                        map.put(CharacteristicTypeEnum.BRAND, product.getBrand());
+                    if (product.getInfo().getCountry() != null) {
+                        map.put(CharacteristicTypeEnum.COUNTRY, product.getInfo().getCountry());
+                    }
+
+                    if (product.getInfo().getBrand() != null) {
+                        map.put(CharacteristicTypeEnum.BRAND, product.getInfo().getBrand());
                     }
 
                     return Flux.fromStream(map.entrySet().stream())
@@ -87,7 +87,7 @@ public class ProductService {
                                     .build(), entity.getId()))
                             .then(Mono.just(entity));
                 })
-                .flatMap(entity -> Flux.fromIterable(product.getImageUrls())
+                .flatMap(entity -> Flux.fromIterable(product.getInfo().getImageUrls())
                         .flatMap(imageUrl -> imageService.addImage(imageUrl, entity.getId()))
                         .then(Mono.just(entity)));
     }

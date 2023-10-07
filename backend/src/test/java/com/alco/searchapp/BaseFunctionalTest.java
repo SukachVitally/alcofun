@@ -4,6 +4,7 @@ import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.provider.dto.Product;
+import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.service.ProductService;
 import com.alco.searchapp.service.RatingService;
 import java.util.List;
@@ -64,35 +65,38 @@ abstract public class BaseFunctionalTest extends BaseTest {
                 create(EAN6, ProviderTypeEnum.MAUDAU, CategoryTypeEnum.LIQUEUR, 610d, "Ukraine", 20f),
                 create(EAN6, ProviderTypeEnum.ROZETKA, CategoryTypeEnum.LIQUEUR, 620d, "Ukraine", 20f),
                 create(EAN6, ProviderTypeEnum.OKWINE, CategoryTypeEnum.LIQUEUR, 630d, "Ukraine", 20f))
-            .flatMap(product -> productService.addProductInfo(product)
-                    .filter(providerProduct -> product.getRating() != null)
+            .flatMap(product -> productService.addProduct(product)
+                    .filter(providerProduct -> product.getInfo().getRating() != null)
                     .flatMap(providerProduct -> ratingService.addRating(providerProduct.getProductId(),
                             providerProduct.getProviderId(),
-                            new RatingDto(product.getRating(), product.getVotes()))))
+                            new RatingDto(product.getInfo().getRating(), product.getInfo().getVotes()))))
             .collectList()
             .block();
     }
     protected Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, double price,
-                           String country, float abv) {
+                                 String country, float abv) {
         return create(ean, provider, category, price, country, abv, null, null);
     }
 
     protected Product create(String ean, ProviderTypeEnum provider, CategoryTypeEnum category, Double price,
-                           String country, Float abv, Float rating, Integer votes) {
+                             String country, Float abv, Float rating, Integer votes) {
         return Product.builder()
-                .ean(ean)
-                .name("Name for " + ean)
                 .category(category)
                 .providerType(provider)
-                .link("")
-                .imageUrls(List.of())
-                .price(price)
-                .volume(700)
-                .abv(abv)
-                .country(country)
-                .brand("Some brand")
-                .rating(rating)
-                .votes(votes)
+                .url("")
+                .info(ProductInfo.builder()
+                        .ean(ean)
+                        .name("Name for " + ean)
+                        .imageUrls(List.of())
+                        .price(price)
+                        .volume(700)
+                        .abv(abv)
+                        .country(country)
+                        .brand("Some brand")
+                        .rating(rating)
+                        .votes(votes)
+                        .build()
+                )
                 .build();
     }
 }

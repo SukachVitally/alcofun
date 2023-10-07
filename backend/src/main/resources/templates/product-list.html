@@ -12,7 +12,7 @@
             <h1>Welcome to My Website</h1>
             <p>This is a basic template using Bootstrap 5.</p>
 
-            <!-- Product List -->
+            <!-- ProductInfo List -->
             <div class="row mt-4">
                 <div class="col-md-4 mb-4" th:each="product : ${products}" th:insert="~{fragments/product-list-item :: product-list-item}" th:with="product=${product}"></div>
             </div>

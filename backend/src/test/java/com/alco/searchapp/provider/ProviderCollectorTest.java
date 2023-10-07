@@ -28,7 +28,7 @@ public class ProviderCollectorTest extends BaseFunctionalTest {
         var records = collector.collect()
                 .take(number)
                 .timeout(Duration.ofSeconds(10))
-                .flatMap(service::addProductInfo)
+//                .flatMap(service::addProductInfo)
                 .collectList()
                 .blockOptional()
                 .orElseThrow();

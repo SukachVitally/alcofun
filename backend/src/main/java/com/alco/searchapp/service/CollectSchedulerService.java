@@ -17,7 +17,7 @@ import reactor.core.scheduler.Schedulers;
 @ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
 @RequiredArgsConstructor
 public class CollectSchedulerService {
-    private static final String THREAD_NAME = "Product collector";
+    private static final String THREAD_NAME = "ProductInfo collector";
 
     private final ProductService productService;
 
@@ -31,18 +31,18 @@ public class CollectSchedulerService {
     public void init() {
         log.info("Start collecting products");
         Scheduler scheduler = Schedulers.newBoundedElastic(property.getThreadCap(), property.getQueueCap(), THREAD_NAME);
-        providerCollector.collect()
-                .publishOn(scheduler)
-                .subscribe(product -> productService.addProductInfo(product)
-                        .flatMap(entity -> {
-                            if (product.getRating() == null || product.getVotes() == null || product.getVotes() == 0) {
-                                return Mono.just(entity);
-                            }
-                            return ratingService.addRating(entity.getProductId(), entity.getProviderId(),
-                                    new RatingDto(product.getRating(), product.getVotes()))
-                                    .then(Mono.just(entity));
-                        })
-                        .subscribe(entity -> log.info(String.format("[%s]: product %s was added",
-                                product.getProviderType().toString(), product.getName()))));
+//        providerCollector.collect()
+//                .publishOn(scheduler)
+//                .subscribe(product -> productService.addProductInfo(product)
+//                        .flatMap(entity -> {
+//                            if (product.getRating() == null || product.getVotes() == null || product.getVotes() == 0) {
+//                                return Mono.just(entity);
+//                            }
+//                            return ratingService.addRating(entity.getProductId(), entity.getProviderId(),
+//                                    new RatingDto(product.getRating(), product.getVotes()))
+//                                    .then(Mono.just(entity));
+//                        })
+//                        .subscribe(entity -> log.info(String.format("[%s]: product %s was added",
+//                                product.getProviderType().toString(), product.getName()))));
     }
 }

@@ -1,28 +1,17 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.CategoryTypeEnum;
-import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.provider.dto.Product;
-import com.alco.searchapp.provider.dto.maudau.MaudauData;
 import com.alco.searchapp.utils.AlcoholByVolumeUtil;
-import com.alco.searchapp.utils.StringUtils;
 import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
-public class MaudauProvider implements IProvider {
+public class MaudauProvider {
     private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
             Pair.of("https://maudau.com.ua/category/viski/", CategoryTypeEnum.WHISKEY),
             Pair.of("https://maudau.com.ua/category/brendi-i-koniak", CategoryTypeEnum.COGNAC),
@@ -48,67 +37,67 @@ public class MaudauProvider implements IProvider {
 
     private final ObjectMapper mapper;
 
-    @Override
-    public Flux<Product> getList() {
-        return Flux.fromIterable(PATHS)
-                .flatMap(pair -> Flux
-                        .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, LIST_PAGE_GET_PARAMETER_SUFFIX))
-                        .flatMap(Flux::fromIterable)
-                        .map(url -> PRODUCT_PREFIX + url)
-                        .mapNotNull(url -> parse(pair.getSecond(), url)));
-    }
+//    @Override
+//    public Flux<ProductInfo> getProductPages() {
+//        return Flux.fromIterable(PATHS)
+//                .flatMap(pair -> Flux
+//                        .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, LIST_PAGE_GET_PARAMETER_SUFFIX))
+//                        .flatMap(Flux::fromIterable)
+//                        .map(url -> PRODUCT_PREFIX + url)
+//                        .mapNotNull(url -> parse(pair.getSecond(), url)));
+//    }
+//
+//    @Override
+//    public ProviderTypeEnum getType() {
+//        return ProviderTypeEnum.MAUDAU;
+//    }
 
-    @Override
-    public ProviderTypeEnum getType() {
-        return ProviderTypeEnum.MAUDAU;
-    }
-
-    public Product parse(CategoryTypeEnum category, String url) {
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            return doc.select(PAGE_DATA_SELECTOR).stream()
-                    .map(Element::data)
-                    .filter(data -> data.contains("window.__INITIAL_STATE__="))
-                    .findAny()
-                    .map(data -> data
-                            .replace("window.__INITIAL_STATE__=", "")
-                            .replace(":!1", ":null")
-                            .replace(":!0", ":null")
-                            .replaceAll(",function.*", ""))
-                    .map(StringUtils::removeAllHtmlTags)
-                    .map(content -> {
-                        try {
-                            return mapper.readValue(content, MaudauData.class);
-                        } catch (IOException e) {
-                            log.error(String.format("Cannot parse data on page %s", url), e);
-                            return null;
-                        }
-                    })
-                    .map(data -> {
-                        var productData = data.getProduct().getCurrent();
-
-                        return Product.builder()
-                                .providerType(getType())
-                                .link(url)
-                                .category(category)
-                                .name(productData.getName())
-                                .imageUrls(List.of(IMAGE_PREFIX + productData.getImage()))
-                                .ean(productData.getBarcode())
-                                .description(productData.getDescription())
-                                .price(productData.getPrice())
-                                .brand(productData.getBrand())
-                                .country(productData.getCountry())
-                                .volume(parseVolume(productData.getName()))
-                                .abv(parseAbvInfo(productData.getName()))
-                                .build();
-                    })
-                    .orElse(null);
-        } catch (IOException e) {
-            log.error(String.format("Cannot parse page %s", url), e);
-            return null;
-        }
-    }
+//    public ProductInfo parse(CategoryTypeEnum category, String url) {
+//        try {
+//            Document doc = Jsoup.connect(url).get();
+//
+//            return doc.select(PAGE_DATA_SELECTOR).stream()
+//                    .map(Element::data)
+//                    .filter(data -> data.contains("window.__INITIAL_STATE__="))
+//                    .findAny()
+//                    .map(data -> data
+//                            .replace("window.__INITIAL_STATE__=", "")
+//                            .replace(":!1", ":null")
+//                            .replace(":!0", ":null")
+//                            .replaceAll(",function.*", ""))
+//                    .map(StringUtils::removeAllHtmlTags)
+//                    .map(content -> {
+//                        try {
+//                            return mapper.readValue(content, MaudauData.class);
+//                        } catch (IOException e) {
+//                            log.error(String.format("Cannot parse data on page %s", url), e);
+//                            return null;
+//                        }
+//                    })
+//                    .map(data -> {
+//                        var productData = data.getProduct().getCurrent();
+//
+//                        return ProductInfo.builder()
+//                                .providerType(getType())
+//                                .link(url)
+//                                .category(category)
+//                                .name(productData.getName())
+//                                .imageUrls(List.of(IMAGE_PREFIX + productData.getImage()))
+//                                .ean(productData.getBarcode())
+//                                .description(productData.getDescription())
+//                                .price(productData.getPrice())
+//                                .brand(productData.getBrand())
+//                                .country(productData.getCountry())
+//                                .volume(parseVolume(productData.getName()))
+//                                .abv(parseAbvInfo(productData.getName()))
+//                                .build();
+//                    })
+//                    .orElse(null);
+//        } catch (IOException e) {
+//            log.error(String.format("Cannot parse page %s", url), e);
+//            return null;
+//        }
+//    }
 
     private Float parseAbvInfo(String name) {
         var info = name.split(", ");

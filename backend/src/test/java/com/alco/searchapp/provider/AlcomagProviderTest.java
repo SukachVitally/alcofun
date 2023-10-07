@@ -2,7 +2,6 @@ package com.alco.searchapp.provider;
 
 import com.alco.searchapp.configuration.HttpClientConfiguration;
 import com.alco.searchapp.configuration.ObjectMapperConfiguration;
-import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,19 +9,17 @@ import org.junit.jupiter.api.Test;
 public class AlcomagProviderTest {
     @Test
     public void getPathLinks() {
-        var product = getProvider().getList().blockFirst();
-        Assertions.assertNotNull(product);
-        Assertions.assertNotNull(product.getEan());
-        Assertions.assertNotNull(product.getPrice());
-        Assertions.assertFalse(product.getImageUrls().isEmpty());
+        var productPageDto = getProvider().getProductPages().blockFirst();
+        Assertions.assertNotNull(productPageDto);
+        Assertions.assertEquals(ProviderTypeEnum.ALCOMAG, productPageDto.getProvider());
+        Assertions.assertNotNull(productPageDto.getUrl());
+        Assertions.assertNotNull(productPageDto.getCategory());
     }
 
     @Test
     public void parseLink() {
         var link = "https://alcomag.ua/ua/rom-bacardi-oakheart-1-l/";
-        var product = getHtmlLinkParser().parse(link)
-                .map(document -> getProvider().parse(document, CategoryTypeEnum.RUM, link))
-                .block();
+        var product = getProvider().parsePageInfo(link).block();
 
         Assertions.assertNotNull(product);
         Assertions.assertEquals("Ром Bacardi Oakheart 1 л", product.getName());
@@ -33,9 +30,7 @@ public class AlcomagProviderTest {
         Assertions.assertEquals("Bacardi", product.getBrand());
         Assertions.assertEquals(35.0f, product.getAbv());
         Assertions.assertEquals("Великобританія", product.getCountry());
-        Assertions.assertEquals(link, product.getLink());
         Assertions.assertEquals(2, product.getImageUrls().size());
-        Assertions.assertEquals(ProviderTypeEnum.ALCOMAG, product.getProviderType());
         Assertions.assertTrue(product.getRating() > 0);
         Assertions.assertTrue(product.getVotes() > 0);
     }

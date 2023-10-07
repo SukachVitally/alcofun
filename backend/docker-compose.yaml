@@ -65,32 +65,32 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "8097:8097"
     depends_on:
       - zookeeper
-    ports:
-      - "29092:29092"
-    hostname: kafka
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8097,INTERNAL://kafka:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
 
   kafka2:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka2
+    ports:
+      - "8098:8098"
     depends_on:
       - zookeeper
-    ports:
-      - "29093:29092"
-    hostname: kafka2
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:29093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8098,INTERNAL://kafka2:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
 
   kafka-ui:
@@ -101,10 +101,11 @@ services:
     restart: always
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092,kafka2:29093
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092,kafka2:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     links:
       - kafka
+      - kafka2
 
 volumes:
   elasticsearch_data: {}
