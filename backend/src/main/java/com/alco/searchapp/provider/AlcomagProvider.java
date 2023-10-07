@@ -86,7 +86,7 @@ public class AlcomagProvider implements IProvider {
                 .filter(content -> {
                     try {
                         var dto = mapper.readValue(content, LdJsonDto.class);
-                        return dto.getContext().contains("schema.org") && dto.getType().equals("ProductInfo");
+                        return dto.getContext().contains("schema.org") && dto.getType().equals("Product");
                     } catch (JsonProcessingException e) {
                         return false;
                     }
