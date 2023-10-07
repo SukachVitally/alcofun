@@ -29,6 +29,7 @@ import reactor.core.publisher.Mono;
 public class AlcomagProvider implements IProvider {
     private static final String URL = "https://alcomag.ua";
 
+    // todo: Move to config
     private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
             Pair.of("https://alcomag.ua/ua/krepkie-napitki/rom/filter/in_stock-is-y/apply/", CategoryTypeEnum.RUM),
             Pair.of("https://alcomag.ua/ua/vino/filter/in_stock-is-y/apply/", CategoryTypeEnum.VINE),
