@@ -1,19 +1,35 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.CategoryTypeEnum;
+import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.exception.ProviderException;
+import com.alco.searchapp.provider.dto.ProductInfo;
+import com.alco.searchapp.provider.dto.ProductPageDto;
+import com.alco.searchapp.provider.dto.okwine.ListResponse;
+import com.alco.searchapp.provider.dto.okwine.ProductData;
 import com.alco.searchapp.utils.AlcoholByVolumeUtil;
+import com.alco.searchapp.utils.VolumeUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.nodes.Document;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
-public class OkWineProvider {
+public class OkWineProvider implements IProvider {
+    // todo: move to provider config property
     private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
             Pair.of("https://okwine.ua/api/v1/filter/products?14=826&city=61e159f3ab2700007200435f", CategoryTypeEnum.ABSENT),
             Pair.of("https://okwine.ua/api/v1/filter/products?14=1404&city=61e159f3ab2700007200435f", CategoryTypeEnum.CHACHA),
@@ -47,105 +63,110 @@ public class OkWineProvider {
 
     private final HtmlLinkParser linkParser;
 
-//    @Override
-//    public Flux<ProductInfo> getProductPages() {
-//        return Flux.fromIterable(PATHS)
-//                .flatMap(pair -> getContent(pair.getFirst())
-//                        .flatMapMany(content -> {
-//                            try {
-//                                var response = mapper.readValue(content, ListResponse.class);
-//                                return Flux.fromStream(IntStream.range(1, response.getData().getMaxPage())
-//                                        .boxed());
-//                            } catch (IOException e) {
-//                                return Flux.empty();
-//                            }
-//                        })
-//                        .flatMap(page -> getContent(String.format("%s&page=%s", pair.getFirst(), page)))
-//                        .flatMap(content -> {
-//                            try {
-//                                var response = mapper.readValue(content, ListResponse.class);
-//                                Stream<String> stream = response.getData().getData()
-//                                    .stream()
-//                                    .map(product -> PRODUCT_URL_PREFIX + product.getUrl());
-//                                return Flux.fromStream(stream);
-//                            } catch (IOException e) {
-//                                return Flux.empty();
-//                            }
-//                        })
-//                        .flatMap(url -> linkParser.parse(url)
-//                                .map(document -> this.parse(document, pair.getSecond(), url))));
-//    }
-//
-//    @Override
-//    public ProviderTypeEnum getType() {
-//        return ProviderTypeEnum.OKWINE;
-//    }
 
-//    private Mono<String> getContent(String url) {
-//        return client.get()
-//                .uri(url)
-//                .retrieve()
-//                .onStatus(
-//                        HttpStatusCode::isError,
-//                        response -> {
-//                            if (response.statusCode().is4xxClientError()) {
-//                                return Mono.error(new ProviderException("Custom 4xx error message"));
-//                            } else if (response.statusCode().is5xxServerError()) {
-//                                return Mono.error(new ProviderException("Custom 5xx error message"));
-//                            } else {
-//                                return Mono.error(new ProviderException("Custom error message"));
-//                            }
-//                        }
-//                )
-//                .bodyToMono(String.class);
-//    }
-//
-//    public ProductInfo parse(Document document, CategoryTypeEnum category, String url) {
-//            var element  = document.selectFirst("#__NEXT_DATA__");
-//            if (element == null) {
-//                log.error(String.format("Cannot find product info for page %s", url));
-//                return null;
-//            }
-//            var content = element.data();
-//            try {
-//                var data = mapper.readValue(content, ProductData.class);
-//                var productData = data.getProps().getPageProps().getHydrationData().getProductPageStore().getProduct();
-//
-//                return ProductInfo.builder()
-//                        .providerType(getType())
-//                        .link(url)
-//                        .category(category)
-//                        .name(productData.getMeta().getName())
-//                        .imageUrls(productData.getImages().stream().map(path -> IMAGE_URL_PREFIX + path).toList())
-//                        .ean(productData.getBarcodes().get(0))
-//                        .description(productData.getMeta().getDescription())
-//                        .price(productData.getPrices().getPrice())
-//                        .abv(parseAbv(productData.getMeta().getName()))
-//                        .volume(productData.getCharacteristics().stream()
-//                                .filter(characteristic -> characteristic.getKey().getName().equals("Об'єм"))
-//                                .map(characteristic -> {
-//                                    var rawValue = characteristic.getValues().get(0).getValue().getUa();
-//                                    return VolumeUtils.parse(rawValue);
-//                                })
-//                                .findAny()
-//                                .orElse(null))
-//                        .country(productData.getCharacteristics().stream()
-//                                .filter(characteristic -> characteristic.getKey().getName().equals("Країна"))
-//                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
-//                                .findAny()
-//                                .orElse(null))
-//                        .brand(productData.getCharacteristics().stream()
-//                                .filter(characteristic -> characteristic.getKey().getName().equals("Виробник"))
-//                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
-//                                .findAny()
-//                                .orElse(null))
-//                        .build();
-//            } catch (JsonProcessingException e) {
-//                log.error(String.format("Cannot parse link content %s", url), e);
-//                return null;
-//            }
-//    }
+    @Override
+    public Flux<ProductPageDto> getProductPages() {
+        return Flux.fromIterable(PATHS)
+            .flatMap(pair -> getContent(pair.getFirst())
+                    .flatMapMany(content -> {
+                        try {
+                            var response = mapper.readValue(content, ListResponse.class);
+                            return Flux.fromStream(IntStream.range(1, response.getData().getMaxPage())
+                                    .boxed());
+                        } catch (IOException e) {
+                            return Flux.empty();
+                        }
+                    })
+                    .flatMap(page -> getContent(String.format("%s&page=%s", pair.getFirst(), page)))
+                    .flatMap(content -> {
+                        try {
+                            var response = mapper.readValue(content, ListResponse.class);
+                            Stream<String> stream = response.getData().getData()
+                                .stream()
+                                .map(product -> PRODUCT_URL_PREFIX + product.getUrl());
+                            return Flux.fromStream(stream);
+                        } catch (IOException e) {
+                            return Flux.empty();
+                        }
+                    })
+                    .map(url -> ProductPageDto.builder()
+                            .url(url)
+                            .provider(getType())
+                            .category(pair.getSecond())
+                            .build()));
+    }
 
+    @Override
+    public ProviderTypeEnum getType() {
+        return ProviderTypeEnum.OKWINE;
+    }
+
+    private Mono<String> getContent(String url) {
+        return client.get()
+                .uri(url)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response -> {
+                            if (response.statusCode().is4xxClientError()) {
+                                return Mono.error(new ProviderException("Custom 4xx error message"));
+                            } else if (response.statusCode().is5xxServerError()) {
+                                return Mono.error(new ProviderException("Custom 5xx error message"));
+                            } else {
+                                return Mono.error(new ProviderException("Custom error message"));
+                            }
+                        }
+                )
+                .bodyToMono(String.class);
+    }
+
+    @Override
+    public Mono<ProductInfo> parsePageInfo(String url) {
+        return linkParser.parse(url).map(this::parseDocument);
+    }
+
+    public ProductInfo parseDocument(Document document) {
+            var element  = document.selectFirst("#__NEXT_DATA__");
+            if (element == null) {
+                return ProductInfo.builder().build();
+            }
+            var content = element.data();
+            try {
+                var data = mapper.readValue(content, ProductData.class);
+                var productData = data.getProps().getPageProps().getHydrationData().getProductPageStore().getProduct();
+
+                return ProductInfo.builder()
+                        .name(productData.getMeta().getName())
+                        .imageUrls(productData.getImages().stream().map(path -> IMAGE_URL_PREFIX + path).toList())
+                        .ean(productData.getBarcodes().get(0))
+                        .description(productData.getMeta().getDescription())
+                        .price(productData.getPrices().getPrice())
+                        .abv(parseAbv(productData.getMeta().getName()))
+                        .volume(productData.getCharacteristics().stream()
+                                .filter(characteristic -> characteristic.getKey().getName().equals("Об'єм"))
+                                .map(characteristic -> {
+                                    var rawValue = characteristic.getValues().get(0).getValue().getUa();
+                                    return VolumeUtils.parse(rawValue);
+                                })
+                                .findAny()
+                                .orElse(null))
+                        .country(productData.getCharacteristics().stream()
+                                .filter(characteristic -> characteristic.getKey().getName().equals("Країна"))
+                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
+                                .findAny()
+                                .orElse(null))
+                        .brand(productData.getCharacteristics().stream()
+                                .filter(characteristic -> characteristic.getKey().getName().equals("Виробник"))
+                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
+                                .findAny()
+                                .orElse(null))
+                        .build();
+            } catch (JsonProcessingException e) {
+                return ProductInfo.builder().build();
+            }
+    }
+
+    // todo: Move to common utils
     private Float parseAbv(String name) {
         Matcher matcher = ABV_NAME_PATTERN.matcher(name);
         if (matcher.find()) {
