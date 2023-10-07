@@ -18,6 +18,7 @@ public class QueueService {
 
     private final ObjectMapper mapper;
 
+    // Move product topic name to config
     public Mono<RecordMetadata> sendProductPage(ProductPageDto pageDto) {
         return send("products", pageDto);
     }

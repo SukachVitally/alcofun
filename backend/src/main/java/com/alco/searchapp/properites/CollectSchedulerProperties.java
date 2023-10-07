@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("app.scheduler")
 @Data
-public class CollectSchedulerProperty {
+public class CollectSchedulerProperties {
     private Boolean enable = false;
 
     private Integer threadCap = 1;

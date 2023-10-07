@@ -1,14 +1,12 @@
 package com.alco.searchapp.service;
 
-import com.alco.searchapp.dto.RatingDto;
-import com.alco.searchapp.properites.CollectSchedulerProperty;
+import com.alco.searchapp.properites.CollectSchedulerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -25,12 +23,12 @@ public class CollectSchedulerService {
 
     private final ProviderCollector providerCollector;
 
-    private final CollectSchedulerProperty property;
+    private final CollectSchedulerProperties properties;
 
     @Scheduled(fixedDelay = 1000000)
     public void init() {
         log.info("Start collecting products");
-        Scheduler scheduler = Schedulers.newBoundedElastic(property.getThreadCap(), property.getQueueCap(), THREAD_NAME);
+        Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);
 //        providerCollector.collect()
 //                .publishOn(scheduler)
 //                .subscribe(product -> productService.addProductInfo(product)

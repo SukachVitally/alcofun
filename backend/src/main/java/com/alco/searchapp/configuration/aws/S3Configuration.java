@@ -1,6 +1,6 @@
 package com.alco.searchapp.configuration.aws;
 
-import com.alco.searchapp.properites.AwsS3Property;
+import com.alco.searchapp.properites.AwsS3Properties;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Configuration
 @RequiredArgsConstructor
 public class S3Configuration {
-    private final AwsS3Property s3ConfigProperties;
+    private final AwsS3Properties s3ConfigProperties;
 
     @Bean
     public S3AsyncClient s3AsyncClient() {

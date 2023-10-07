@@ -3,13 +3,12 @@ package com.alco.searchapp.service;
 import com.alco.searchapp.entity.ProductImageEntity;
 import com.alco.searchapp.image.FileDownloader;
 import com.alco.searchapp.image.StorageInterface;
-import com.alco.searchapp.properites.ImageServiceProperty;
+import com.alco.searchapp.properites.ImageServiceProperties;
 import com.alco.searchapp.repository.ProductImageRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -21,7 +20,7 @@ public class ImageService {
 
     private final ProductImageRepository repository;
 
-    private final ImageServiceProperty property;
+    private final ImageServiceProperties properties;
 
     public Mono<ProductImageEntity> addImage(String url, long productId) {
         return downloader.download(url)
@@ -29,7 +28,7 @@ public class ImageService {
                     var entity = new ProductImageEntity();
                     entity.setProductId(productId);
                     entity.setPath(String.format("%s-%s.jpeg", productId, UUID.randomUUID()));
-                    return storage.save(property.getBucket(), entity.getPath(), content)
+                    return storage.save(properties.getBucket(), entity.getPath(), content)
                             .flatMap(res -> repository.save(entity));
                 });
     }
@@ -47,6 +46,6 @@ public class ImageService {
     }
 
     private String map(ProductImageEntity entity) {
-        return property.getBaseUrl() + entity.getPath();
+        return properties.getBaseUrl() + entity.getPath();
     }
 }

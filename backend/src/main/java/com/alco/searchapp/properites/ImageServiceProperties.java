@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("app.image-service")
-public class ImageServiceProperty {
+public class ImageServiceProperties {
     private String baseUrl;
 
     private StorageEnum storage;
