@@ -70,7 +70,7 @@ public class AlcomagProvider implements IProvider {
                         .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
-                                .url(url)
+                                .url(URL + url)
                                 .provider(getType())
                                 .category(pair.getSecond())
                                 .build()));

@@ -3,10 +3,12 @@ package com.alco.searchapp.provider.dto;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
+@Jacksonized
 @Builder
-@Getter
+@Data
 public class ProductPageDto {
     private String url;
 

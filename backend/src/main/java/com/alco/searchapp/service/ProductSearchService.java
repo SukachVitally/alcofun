@@ -194,7 +194,6 @@ public class ProductSearchService {
                     .id(entity.getId())
                     .ean(entity.getEan())
                     .name(entity.getName())
-                    .categoryId(entity.getCategoryId())
                     .characteristicIds(entity.getCharacteristicIds())
                     .price(price)
                     .imageUrl(entity.getImageUrl())

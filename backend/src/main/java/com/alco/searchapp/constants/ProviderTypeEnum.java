@@ -1,13 +1,9 @@
 package com.alco.searchapp.constants;
 
-import com.alco.searchapp.serializer.CharacteristicTypeEnumSerializer;
-import com.alco.searchapp.serializer.ProviderTypeEnumSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@JsonSerialize(using = ProviderTypeEnumSerializer.class)
 @RequiredArgsConstructor
 @Getter
 public enum ProviderTypeEnum {

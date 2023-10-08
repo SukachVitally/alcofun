@@ -15,8 +15,6 @@ public class ProductPreviewDto {
 
     private List<Long> characteristicIds;
 
-    private Long categoryId;
-
     private Double price;
 
     private String imageUrl;

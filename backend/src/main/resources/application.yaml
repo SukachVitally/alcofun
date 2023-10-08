@@ -14,7 +14,24 @@ spring:
     password: password
     locations: classpath:db/migration
   kafka:
-    bootstrap-servers: localhost:29092,localhost:29093
+    bootstrap-servers: localhost:8097,localhost:8098
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.alco.searchapp.provider.dto.ProductPageDto
 
 app:
   image-service:
@@ -29,7 +46,7 @@ app:
 #      - OKWINE
 #      - MAUDAU
   scheduler:
-    enable: false
+    enable: true
     delay-sec: 1
 
 #logging:

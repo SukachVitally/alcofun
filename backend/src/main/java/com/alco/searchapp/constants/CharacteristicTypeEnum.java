@@ -1,12 +1,9 @@
 package com.alco.searchapp.constants;
 
-import com.alco.searchapp.serializer.CharacteristicTypeEnumSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@JsonSerialize(using = CharacteristicTypeEnumSerializer.class)
 @RequiredArgsConstructor
 @Getter
 public enum CharacteristicTypeEnum {

@@ -1,12 +1,15 @@
 package com.alco.searchapp.service;
 
+import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.properites.CollectSchedulerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -21,26 +24,43 @@ public class CollectSchedulerService {
 
     private final RatingService ratingService;
 
-    private final ProviderCollector providerCollector;
+    private final ProviderCollector collector;
 
     private final CollectSchedulerProperties properties;
+
+    private final QueueService queueService;
 
     @Scheduled(fixedDelay = 1000000)
     public void init() {
         log.info("Start collecting products");
         Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);
-//        providerCollector.collect()
-//                .publishOn(scheduler)
-//                .subscribe(product -> productService.addProductInfo(product)
-//                        .flatMap(entity -> {
-//                            if (product.getRating() == null || product.getVotes() == null || product.getVotes() == 0) {
-//                                return Mono.just(entity);
-//                            }
-//                            return ratingService.addRating(entity.getProductId(), entity.getProviderId(),
-//                                    new RatingDto(product.getRating(), product.getVotes()))
-//                                    .then(Mono.just(entity));
-//                        })
-//                        .subscribe(entity -> log.info(String.format("[%s]: product %s was added",
-//                                product.getProviderType().toString(), product.getName()))));
+        collector.collect()
+                .publishOn(scheduler)
+                .flatMap(queueService::sendProductPage)
+                .subscribe(i -> log.info("Added url to queue {}", i.topic()));
+
+    }
+
+    @PostConstruct
+    public void subscribe() {
+        log.info("Start add product subscription");
+        queueService.receiveProductPages()
+                .flatMap(collector::parse)
+                .flatMap(product -> productService.addProduct(product)
+                        .flatMap(entity -> {
+                            if (product.getInfo().getRating() == null
+                                    || product.getInfo().getVotes() == null
+                                    || product.getInfo().getVotes() == 0) {
+                                return Mono.just(entity);
+                            }
+                            var rating = new RatingDto(product.getInfo().getRating(), product.getInfo().getVotes());
+                            return ratingService.addRating(entity.getProductId(), entity.getProviderId(), rating)
+                                .then(Mono.just(entity));
+                        })
+                        .thenReturn(product))
+                .subscribe(product -> log
+                        .info("[{}]: product {} was added", product.getProviderType().getName(),
+                                product.getInfo().getName()));
+
     }
 }
