@@ -1,8 +1,8 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.exception.ProviderException;
+import com.alco.searchapp.properites.OkWineProperties;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.provider.dto.okwine.ListResponse;
@@ -12,7 +12,6 @@ import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -20,37 +19,16 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class OkWineProvider implements IProvider {
-    // todo: move to provider config property
-    private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=826&city=61e159f3ab2700007200435f", CategoryTypeEnum.ABSENT),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=1404&city=61e159f3ab2700007200435f", CategoryTypeEnum.CHACHA),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=1406&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=2618&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=2780&city=61e159f3ab2700007200435f", CategoryTypeEnum.TEQUILA),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=6604&city=61e159f3ab2700007200435f", CategoryTypeEnum.COGNAC),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=712&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=717&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=779&city=61e159f3ab2700007200435f", CategoryTypeEnum.WHISKEY),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=786&city=61e159f3ab2700007200435f", CategoryTypeEnum.COGNAC),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=808&city=61e159f3ab2700007200435f", CategoryTypeEnum.ARMAGNAC),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=818&city=61e159f3ab2700007200435f", CategoryTypeEnum.RUM),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=824&city=61e159f3ab2700007200435f", CategoryTypeEnum.VODKA),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=829&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=836&city=61e159f3ab2700007200435f", CategoryTypeEnum.GIN),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=842&city=61e159f3ab2700007200435f", CategoryTypeEnum.TEQUILA),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=878&city=61e159f3ab2700007200435f", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://okwine.ua/api/v1/filter/products?14=948&city=61e159f3ab2700007200435f", CategoryTypeEnum.GRAPPA)
-            );
-
     private static final String PRODUCT_URL_PREFIX = "https://okwine.ua/ua/product/";
 
     private static final String IMAGE_URL_PREFIX = "https://content.okwine.ua/files/";
@@ -63,21 +41,22 @@ public class OkWineProvider implements IProvider {
 
     private final HtmlLinkParser linkParser;
 
+    private final OkWineProperties properties;
 
     @Override
     public Flux<ProductPageDto> getProductPages() {
-        return Flux.fromIterable(PATHS)
-            .flatMap(pair -> getContent(pair.getFirst())
+        return Flux.fromIterable(properties.getBlocks())
+            .flatMap(block -> getContent(block.getUrl())
                     .flatMapMany(content -> {
                         try {
                             var response = mapper.readValue(content, ListResponse.class);
-                            return Flux.fromStream(IntStream.range(1, response.getData().getMaxPage())
+                            return Flux.fromStream(IntStream.range(1, response.getData().getMaxPage() + 1)
                                     .boxed());
                         } catch (IOException e) {
                             return Flux.empty();
                         }
                     })
-                    .flatMap(page -> getContent(String.format("%s&page=%s", pair.getFirst(), page)))
+                    .flatMap(page -> getContent(String.format("%s&page=%s", block.getUrl(), page)))
                     .flatMap(content -> {
                         try {
                             var response = mapper.readValue(content, ListResponse.class);
@@ -92,7 +71,7 @@ public class OkWineProvider implements IProvider {
                     .map(url -> ProductPageDto.builder()
                             .url(url)
                             .provider(getType())
-                            .category(pair.getSecond())
+                            .category(block.getType())
                             .build()));
     }
 

@@ -37,6 +37,7 @@ spring:
     import:
     - providers/alcomag.yaml
     - providers/rozetka.yaml
+    - providers/okwine.yaml
 
 app:
   image-service:
@@ -45,9 +46,9 @@ app:
     bucket: test-images
   provider:
     list:
-      - ALCOMAG
-      - ROZETKA
-#      - OKWINE
+#      - ALCOMAG
+#      - ROZETKA
+      - OKWINE
 #      - MAUDAU
 
 logging:

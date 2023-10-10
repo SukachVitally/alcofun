@@ -1,0 +1,39 @@
+providers:
+  okwine:
+    blocks:
+      - type: ABSENT
+        url: https://okwine.ua/api/v1/filter/products?14=826&city=61e159f3ab2700007200435f
+      - type: CHACHA
+        url: https://okwine.ua/api/v1/filter/products?14=1404&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=1406&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=2618&city=61e159f3ab2700007200435f
+      - type: TEQUILA
+        url: https://okwine.ua/api/v1/filter/products?14=2780&city=61e159f3ab2700007200435f
+      - type: COGNAC
+        url: https://okwine.ua/api/v1/filter/products?14=6604&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=712&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=717&city=61e159f3ab2700007200435f
+      - type: WHISKEY
+        url: https://okwine.ua/api/v1/filter/products?14=779&city=61e159f3ab2700007200435f
+      - type: COGNAC
+        url: https://okwine.ua/api/v1/filter/products?14=786&city=61e159f3ab2700007200435f
+      - type: ARMAGNAC
+        url: https://okwine.ua/api/v1/filter/products?14=808&city=61e159f3ab2700007200435f
+      - type: RUM
+        url: https://okwine.ua/api/v1/filter/products?14=818&city=61e159f3ab2700007200435f
+      - type: VODKA
+        url: https://okwine.ua/api/v1/filter/products?14=824&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=829&city=61e159f3ab2700007200435f
+      - type: GIN
+        url: https://okwine.ua/api/v1/filter/products?14=836&city=61e159f3ab2700007200435f
+      - type: TEQUILA
+        url: https://okwine.ua/api/v1/filter/products?14=842&city=61e159f3ab2700007200435f
+      - type: LIQUEUR
+        url: https://okwine.ua/api/v1/filter/products?14=878&city=61e159f3ab2700007200435f
+      - type: GRAPPA
+        url: https://okwine.ua/api/v1/filter/products?14=948&city=61e159f3ab2700007200435f
