@@ -3,11 +3,8 @@ package com.alco.searchapp.configuration;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +16,6 @@ import reactor.kafka.sender.SenderOptions;
 
 @Configuration
 @RequiredArgsConstructor
-//@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
 @EnableConfigurationProperties(KafkaProperties.class)
 public class KafkaConfiguration {
     @Bean

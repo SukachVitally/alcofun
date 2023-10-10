@@ -48,14 +48,16 @@ app:
 
   provider:
     list:
-#      - ALCOMAG
+      - ALCOMAG
       - ROZETKA
       - OKWINE
 #      - MAUDAU
-  scheduler:
-    enable: false
-    delay-sec: 1
-    enable-subscription: true
+  product:
+    subscriber:
+      enabled: false
+    producer:
+      enabled: false
+      delay-sec: 1
   queue:
     product-topic: products
 #logging:

@@ -1,28 +1,26 @@
-package com.alco.searchapp.service;
+package com.alco.searchapp.product;
 
-import com.alco.searchapp.dto.RatingDto;
-import com.alco.searchapp.properites.CollectSchedulerProperties;
+import com.alco.searchapp.properites.ProductProducerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
-import jakarta.annotation.PostConstruct;
+import com.alco.searchapp.service.QueueService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import org.springframework.stereotype.Component;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-@Service
 @Slf4j
-@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
+@Component
+@ConditionalOnProperty(name = "app.product.producer.enabled", havingValue = "true")
 @RequiredArgsConstructor
-public class CollectSchedulerService {
+public class ProductProducer {
     private static final String THREAD_NAME = "ProductInfo collector";
 
     private final ProviderCollector collector;
 
-    private final CollectSchedulerProperties properties;
+    private final ProductProducerProperties properties;
 
     private final QueueService queueService;
 

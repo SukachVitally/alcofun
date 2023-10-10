@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import reactor.kafka.sender.SenderResult;
 
 @Slf4j
 @Service
-//@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
 @RequiredArgsConstructor
 public class QueueService {
     private final ReactiveKafkaProducerTemplate<String, ProductPageDto> producerTemplate;
@@ -31,7 +29,7 @@ public class QueueService {
     }
 
     public Flux<ProductPageDto> receiveProductPages() {
-        return receive(properties.getProductTopic()).map(record -> (ProductPageDto) record);
+        return receive(properties.getProductTopic());
     }
 
     private Mono<RecordMetadata> send(String topic, ProductPageDto message) {

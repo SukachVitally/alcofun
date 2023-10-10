@@ -1,17 +1,20 @@
-package com.alco.searchapp.service;
+package com.alco.searchapp.product;
 
 import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.provider.ProviderCollector;
+import com.alco.searchapp.service.ProductService;
+import com.alco.searchapp.service.QueueService;
+import com.alco.searchapp.service.RatingService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-@Service
 @Slf4j
-@ConditionalOnProperty(name = "app.scheduler.enable-subscription", havingValue = "true")
+@Component
+@ConditionalOnProperty(name = "app.product.subscriber.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class ProductSubscriber {
     private final QueueService queueService;

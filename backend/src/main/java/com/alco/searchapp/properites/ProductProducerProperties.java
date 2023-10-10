@@ -5,10 +5,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties("app.scheduler")
+@ConfigurationProperties("app.product.producer")
 @Data
-public class CollectSchedulerProperties {
-    private Boolean enable = false;
+public class ProductProducerProperties {
+    private Boolean enabled = false;
 
     private Integer threadCap = 1;
 
@@ -17,6 +17,4 @@ public class CollectSchedulerProperties {
     private Integer delaySec = 5;
 
     private Integer intervalSec = 24 * 3600;
-
-    private Boolean enableSubscription = false;
 }
