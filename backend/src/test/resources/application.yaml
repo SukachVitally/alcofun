@@ -34,7 +34,9 @@ spring:
 #        trusted:
 #          packages: "*"
   config:
-    import: providers/alcomag.yaml
+    import:
+    - providers/alcomag.yaml
+    - providers/rozetka.yaml
 
 app:
   image-service:
@@ -44,7 +46,7 @@ app:
   provider:
     list:
       - ALCOMAG
-#      - ROZETKA
+      - ROZETKA
 #      - OKWINE
 #      - MAUDAU
 

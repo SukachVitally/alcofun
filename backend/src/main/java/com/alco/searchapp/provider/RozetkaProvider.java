@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.properites.RozetkaProperties;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.provider.dto.rozetka.RozetkaData;
@@ -10,7 +10,6 @@ import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,38 +38,22 @@ public class RozetkaProvider implements IProvider  {
     private static final String CHARACTERISTIC_ABV = "Міцність";
     private static final String CHARACTERISTIC_COUNTRY = "Країна";
 
-    // todo: Move to config
-    private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
-            Pair.of("https://rozetka.com.ua/ua/viski/c4649130/", CategoryTypeEnum.WHISKEY),
-            Pair.of("https://rozetka.com.ua/ua/tihoe-vino/c4649052/", CategoryTypeEnum.VINE),
-            Pair.of("https://rozetka.com.ua/ua/shampanskoe-i-igristoe-vino/c4649058/", CategoryTypeEnum.CHAMPAGNE),
-            Pair.of("https://rozetka.com.ua/ua/vermut/c4649064/", CategoryTypeEnum.VERMOUTH),
-            Pair.of("https://rozetka.com.ua/ua/rom/c4649142/", CategoryTypeEnum.RUM),
-            Pair.of("https://rozetka.com.ua/ua/liquor-vermouth-syrup/c4625409/", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://rozetka.com.ua/ua/vodka/c4649154/", CategoryTypeEnum.VODKA),
-            Pair.of("https://rozetka.com.ua/ua/dgin/c4649166/", CategoryTypeEnum.GIN),
-            Pair.of("https://rozetka.com.ua/ua/tekila-i-meskal/c4649148/", CategoryTypeEnum.TEQUILA),
-            Pair.of("https://rozetka.com.ua/ua/konyak-i-brendi/c4649136/", CategoryTypeEnum.COGNAC),
-            Pair.of("https://rozetka.com.ua/ua/absent/c4649172/", CategoryTypeEnum.ABSENT),
-            Pair.of("https://rozetka.com.ua/ua/sake/c4674322/", CategoryTypeEnum.SAKE),
-            Pair.of("https://rozetka.com.ua/ua/chacha/c4649160/", CategoryTypeEnum.CHACHA),
-            Pair.of("https://rozetka.com.ua/ua/grappa-i-kalvados/c4649178/", CategoryTypeEnum.GRAPPA)
-            );
-
     private final ObjectMapper mapper;
 
     private final HtmlLinkParser linkParser;
 
+    private final RozetkaProperties properties;
+
     @Override
     public Flux<ProductPageDto> getProductPages() {
-        return Flux.fromIterable(PATHS)
-                .flatMap(pair -> Flux
-                        .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
+        return Flux.fromIterable(properties.getBlocks())
+                .flatMap(block -> Flux
+                        .fromIterable(new ProductLinkCollector(block.getUrl(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
                                 .url(url)
                                 .provider(getType())
-                                .category(pair.getSecond())
+                                .category(block.getType())
                                 .build()));
     }
 

@@ -1,0 +1,31 @@
+providers:
+  rozetka:
+    blocks:
+      - type: WHISKEY
+        url: https://rozetka.com.ua/ua/viski/c4649130/
+      - type: VINE
+        url: https://rozetka.com.ua/ua/tihoe-vino/c4649052/
+      - type: CHAMPAGNE
+        url: https://rozetka.com.ua/ua/shampanskoe-i-igristoe-vino/c4649058/
+      - type: VERMOUTH
+        url: https://rozetka.com.ua/ua/vermut/c4649064/
+      - type: RUM
+        url: https://rozetka.com.ua/ua/rom/c4649142/
+      - type: LIQUEUR
+        url: https://rozetka.com.ua/ua/liquor-vermouth-syrup/c4625409/
+      - type: VODKA
+        url: https://rozetka.com.ua/ua/vodka/c4649154/
+      - type: GIN
+        url: https://rozetka.com.ua/ua/dgin/c4649166/
+      - type: TEQUILA
+        url: https://rozetka.com.ua/ua/tekila-i-meskal/c4649148/
+      - type: COGNAC
+        url: https://rozetka.com.ua/ua/konyak-i-brendi/c4649136/
+      - type: ABSENT
+        url: https://rozetka.com.ua/ua/absent/c4649172/
+      - type: SAKE
+        url: https://rozetka.com.ua/ua/sake/c4674322/
+      - type: CHACHA
+        url: https://rozetka.com.ua/ua/chacha/c4649160/
+      - type: GRAPPA
+        url: https://rozetka.com.ua/ua/grappa-i-kalvados/c4649178/

@@ -2,7 +2,11 @@ package com.alco.searchapp.provider;
 
 import com.alco.searchapp.configuration.HttpClientConfiguration;
 import com.alco.searchapp.configuration.ObjectMapperConfiguration;
+import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.properites.ProviderBlock;
+import com.alco.searchapp.properites.RozetkaProperties;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +38,17 @@ public class RozetkaProviderTest {
         Assertions.assertTrue(product.getVotes() > 0);
     }
 
+    private RozetkaProperties getProperties() {
+        var block = new ProviderBlock();
+        block.setType(CategoryTypeEnum.WHISKEY);
+        block.setUrl("https://rozetka.com.ua/ua/viski/c4649130/");
+        var properties = new RozetkaProperties();
+        properties.setBlocks(List.of(block));
+        return properties;
+    }
+
     private RozetkaProvider getProvider() {
-        return new RozetkaProvider(new ObjectMapperConfiguration().objectMapper(), getLinkParser());
+        return new RozetkaProvider(new ObjectMapperConfiguration().objectMapper(), getLinkParser(), getProperties());
     }
 
     private HtmlLinkParser getLinkParser() {
