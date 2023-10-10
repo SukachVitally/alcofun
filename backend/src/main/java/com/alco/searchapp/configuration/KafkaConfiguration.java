@@ -3,6 +3,9 @@ package com.alco.searchapp.configuration;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -16,7 +19,7 @@ import reactor.kafka.sender.SenderOptions;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
+//@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
 @EnableConfigurationProperties(KafkaProperties.class)
 public class KafkaConfiguration {
     @Bean
@@ -26,9 +29,11 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ReactiveKafkaConsumerTemplate<String, ProductPageDto> kafkaConsumerTemplate(KafkaProperties properties) {
-        ReceiverOptions<String, ProductPageDto> options = ReceiverOptions.create(properties.buildConsumerProperties());
-        options = options.subscription(Collections.singleton("products"));
-        return new ReactiveKafkaConsumerTemplate<>(options);
+    public Function<String, ReactiveKafkaConsumerTemplate<String, ProductPageDto>> consumerTemplateFactory(KafkaProperties properties) {
+        return (String topic) -> {
+            ReceiverOptions<String, ProductPageDto> options = ReceiverOptions.create(properties.buildConsumerProperties());
+            options = options.subscription(Collections.singleton(topic));
+            return new ReactiveKafkaConsumerTemplate<>(options);
+        };
     }
 }

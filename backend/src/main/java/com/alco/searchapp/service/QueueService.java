@@ -1,7 +1,8 @@
 package com.alco.searchapp.service;
 
+import com.alco.searchapp.properites.QueueProperties;
 import com.alco.searchapp.provider.dto.ProductPageDto;
-import java.util.UUID;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,38 +17,38 @@ import reactor.kafka.sender.SenderResult;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
+//@ConditionalOnProperty(name = "app.scheduler.enable", havingValue = "true")
 @RequiredArgsConstructor
 public class QueueService {
     private final ReactiveKafkaProducerTemplate<String, ProductPageDto> producerTemplate;
 
-    private final ReactiveKafkaConsumerTemplate<String, ProductPageDto> consumerTemplate;
+    private final Function<String, ReactiveKafkaConsumerTemplate<String, ProductPageDto>> consumerFactory;
 
-    // Move product topic name to config
+    private final QueueProperties properties;
+
     public Mono<RecordMetadata> sendProductPage(ProductPageDto pageDto) {
-        return send("products", pageDto);
+        return send(properties.getProductTopic(), pageDto);
     }
 
     public Flux<ProductPageDto> receiveProductPages() {
-        return receive("products").map(record -> (ProductPageDto) record);
+        return receive(properties.getProductTopic()).map(record -> (ProductPageDto) record);
     }
 
     private Mono<RecordMetadata> send(String topic, ProductPageDto message) {
-        String key = UUID.randomUUID().toString();
         return producerTemplate
-                .send(topic, 1, key, message)
+                .send(topic, message)
                 .map(SenderResult::recordMetadata);
 
     }
 
-    // todo: Configure topic in service!!!
-    private Flux<Object> receive(String topic) {
-        return consumerTemplate.receiveAutoAck()
+    private Flux<ProductPageDto> receive(String topic) {
+        return consumerFactory.apply(topic).receiveAutoAck()
                 .doOnNext(consumerRecord -> log.info("received key={}, value={} from topic={}, offset={}",
                         consumerRecord.key(),
                         consumerRecord.value(),
                         consumerRecord.topic(),
                         consumerRecord.offset())
-                ).map(ConsumerRecord::value);
+                )
+                .map(ConsumerRecord::value);
     }
 }

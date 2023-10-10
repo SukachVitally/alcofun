@@ -35,7 +35,11 @@ spring:
               default:
                 type: com.alco.searchapp.provider.dto.ProductPageDto
   config:
-    import: providers/alcomag.yaml
+    import:
+      - providers/alcomag.yaml
+      - providers/rozetka.yaml
+      - providers/okwine.yaml
+
 app:
   image-service:
     base-url: http://localhost:19000/images/
@@ -44,14 +48,16 @@ app:
 
   provider:
     list:
-      - ALCOMAG
+#      - ALCOMAG
       - ROZETKA
       - OKWINE
 #      - MAUDAU
   scheduler:
-    enable: true
+    enable: false
     delay-sec: 1
-
+    enable-subscription: true
+  queue:
+    product-topic: products
 #logging:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
@@ -73,5 +79,3 @@ aws:
 springdoc:
   swagger-ui:
     path: /swagger/
-elasticsearch:
-  url: "localhost:19200"

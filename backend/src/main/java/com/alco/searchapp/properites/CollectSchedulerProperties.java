@@ -17,4 +17,6 @@ public class CollectSchedulerProperties {
     private Integer delaySec = 5;
 
     private Integer intervalSec = 24 * 3600;
+
+    private Boolean enableSubscription = false;
 }
