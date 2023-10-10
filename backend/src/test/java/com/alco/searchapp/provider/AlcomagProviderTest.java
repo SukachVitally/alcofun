@@ -2,7 +2,11 @@ package com.alco.searchapp.provider;
 
 import com.alco.searchapp.configuration.HttpClientConfiguration;
 import com.alco.searchapp.configuration.ObjectMapperConfiguration;
+import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.properites.AlcomagProperties;
+import com.alco.searchapp.properites.ProviderBlock;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +40,16 @@ public class AlcomagProviderTest {
     }
 
     private AlcomagProvider getProvider() {
-        return new AlcomagProvider(getHtmlLinkParser(), new ObjectMapperConfiguration().objectMapper());
+        return new AlcomagProvider(getHtmlLinkParser(), new ObjectMapperConfiguration().objectMapper(), getProperties());
+    }
+
+    private AlcomagProperties getProperties() {
+        var block = new ProviderBlock();
+        block.setType(CategoryTypeEnum.RUM);
+        block.setUrl("https://alcomag.ua/ua/krepkie-napitki/rom/filter/in_stock-is-y/apply/");
+        var properties = new AlcomagProperties();
+        properties.setBlocks(List.of(block));
+        return properties;
     }
 
     private HtmlLinkParser getHtmlLinkParser() {

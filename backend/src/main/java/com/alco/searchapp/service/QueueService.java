@@ -1,7 +1,6 @@
 package com.alco.searchapp.service;
 
 import com.alco.searchapp.provider.dto.ProductPageDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,6 @@ public class QueueService {
     private final ReactiveKafkaProducerTemplate<String, ProductPageDto> producerTemplate;
 
     private final ReactiveKafkaConsumerTemplate<String, ProductPageDto> consumerTemplate;
-
-    private final ObjectMapper mapper;
 
     // Move product topic name to config
     public Mono<RecordMetadata> sendProductPage(ProductPageDto pageDto) {

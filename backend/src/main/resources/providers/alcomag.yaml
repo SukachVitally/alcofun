@@ -1,0 +1,25 @@
+providers:
+  alcomag:
+    blocks:
+      - type: RUM
+        url: https://alcomag.ua/ua/krepkie-napitki/rom/filter/in_stock-is-y/apply/
+      - type: VINE
+        url: https://alcomag.ua/ua/vino/filter/in_stock-is-y/apply/
+      - type: CHAMPAGNE
+        url: https://alcomag.ua/ua/vino/shampanskoe/filter/in_stock-is-y/apply/
+      - type: COGNAC
+        url: https://alcomag.ua/ua/krepkie-napitki/konyak/filter/in_stock-is-y/apply/
+      - type: WHISKEY
+        url: https://alcomag.ua/ua/krepkie-napitki/viski/filter/in_stock-is-y/apply/
+      - type: VODKA
+        url: https://alcomag.ua/ua/krepkie-napitki/vodka/filter/in_stock-is-y/apply/
+      - type: LIQUEUR
+        url: https://alcomag.ua/ua/likery-vermuty/liker/filter/in_stock-is-y/apply/
+      - type: TEQUILA
+        url: https://alcomag.ua/ua/krepkie-napitki/tekila/filter/in_stock-is-y/apply/
+      - type: BRANDY
+        url: https://alcomag.ua/ua/krepkie-napitki/brendi/filter/in_stock-is-y/apply/
+      - type: BEER
+        url: https://alcomag.ua/ua/pivo/filter/in_stock-is-y/apply/
+      - type: VERMOUTH
+        url: https://alcomag.ua/ua/likery-vermuty/vermut/filter/in_stock-is-y/apply/

@@ -33,6 +33,8 @@ spring:
 #      spring:
 #        trusted:
 #          packages: "*"
+  config:
+    import: providers/alcomag.yaml
 
 app:
   image-service:

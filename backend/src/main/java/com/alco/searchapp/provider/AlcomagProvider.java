@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.properites.AlcomagProperties;
 import com.alco.searchapp.provider.dto.LdJsonDto;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
@@ -29,21 +29,6 @@ import reactor.core.publisher.Mono;
 public class AlcomagProvider implements IProvider {
     private static final String URL = "https://alcomag.ua";
 
-    // todo: Move to config
-    private static final List<Pair<String, CategoryTypeEnum>> PATHS = List.of(
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/rom/filter/in_stock-is-y/apply/", CategoryTypeEnum.RUM),
-            Pair.of("https://alcomag.ua/ua/vino/filter/in_stock-is-y/apply/", CategoryTypeEnum.VINE),
-            Pair.of("https://alcomag.ua/ua/vino/shampanskoe/filter/in_stock-is-y/apply/", CategoryTypeEnum.CHAMPAGNE),
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/konyak/filter/in_stock-is-y/apply/", CategoryTypeEnum.COGNAC),
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/viski/filter/in_stock-is-y/apply/", CategoryTypeEnum.WHISKEY),
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/vodka/filter/in_stock-is-y/apply/", CategoryTypeEnum.VODKA),
-            Pair.of("https://alcomag.ua/ua/likery-vermuty/liker/filter/in_stock-is-y/apply/", CategoryTypeEnum.LIQUEUR),
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/tekila/filter/in_stock-is-y/apply/", CategoryTypeEnum.TEQUILA),
-            Pair.of("https://alcomag.ua/ua/krepkie-napitki/brendi/filter/in_stock-is-y/apply/", CategoryTypeEnum.BRANDY),
-            Pair.of("https://alcomag.ua/ua/pivo/filter/in_stock-is-y/apply/", CategoryTypeEnum.BEER),
-            Pair.of("https://alcomag.ua/ua/likery-vermuty/vermut/filter/in_stock-is-y/apply/", CategoryTypeEnum.VERMOUTH)
-    );
-
     private static final String LIST_PAGE_GET_PARAMETER = "PAGEN_1";
 
     private static final String LIST_LINK_SELECTOR = ".inner_wrap a.thumb";
@@ -58,6 +43,8 @@ public class AlcomagProvider implements IProvider {
 
     private final ObjectMapper mapper;
 
+    private final AlcomagProperties properties;
+
     @Override
     public ProviderTypeEnum getType() {
         return ProviderTypeEnum.ALCOMAG;
@@ -65,14 +52,14 @@ public class AlcomagProvider implements IProvider {
 
     @Override
     public Flux<ProductPageDto> getProductPages() {
-        return Flux.fromIterable(PATHS)
-                .flatMap(pair -> Flux
-                        .fromIterable(new ProductLinkCollector(pair.getFirst(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
+        return Flux.fromIterable(properties.getBlocks())
+                .flatMap(block -> Flux
+                        .fromIterable(new ProductLinkCollector(block.getUrl(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
                                 .url(URL + url)
                                 .provider(getType())
-                                .category(pair.getSecond())
+                                .category(block.getType())
                                 .build()));
     }
 

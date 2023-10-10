@@ -32,7 +32,8 @@ spring:
             value:
               default:
                 type: com.alco.searchapp.provider.dto.ProductPageDto
-
+  config:
+    import: providers/alcomag.yaml
 app:
   image-service:
     base-url: http://localhost:19000/images/
@@ -42,8 +43,8 @@ app:
   provider:
     list:
       - ALCOMAG
-#      - ROZETKA
-#      - OKWINE
+      - ROZETKA
+      - OKWINE
 #      - MAUDAU
   scheduler:
     enable: true
