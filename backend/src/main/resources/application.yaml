@@ -2,6 +2,8 @@ server:
   port: 7080
 
 spring:
+  elasticsearch:
+    uris: "localhost:19200"
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/alcosearch
     username: user

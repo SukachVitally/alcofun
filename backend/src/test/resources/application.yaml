@@ -1,4 +1,6 @@
 spring:
+  elasticsearch:
+    uris: "localhost:19200"
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/test_alcosearch
     username: user
@@ -61,6 +63,3 @@ minio:
   bucket: images
   url: http://localhost:19000
   secret-key: ESLP5aEm3PM2iyz0xNLsFuGaGxsxj6g2DFblDT9f
-
-elasticsearch:
-  url: "localhost:19200"

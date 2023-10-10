@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  elasticsearch:
+    uris: "localhost:19200"
   r2dbc:
     url: r2dbc:postgresql://alcofun.ck6hx19ltf0z.eu-north-1.rds.amazonaws.com:5432/alcofun
     username: alcofun
