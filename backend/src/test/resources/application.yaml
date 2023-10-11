@@ -52,6 +52,9 @@ app:
 #      - ROZETKA
       - OKWINE
 #      - MAUDAU
+  product:
+    search:
+      index: products-test
 
 logging:
   level:

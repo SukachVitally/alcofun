@@ -12,10 +12,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.InnerField;
 import org.springframework.data.elasticsearch.annotations.MultiField;
 
-@Document(indexName = ProductSearchEntity.INDEX)
+@Document(indexName = "#{@environment.getProperty('app.product.search.index')}")
 @Data
 public class ProductSearchEntity {
-    public static final String INDEX = "products";
     @Id
     @Field(type = FieldType.Long)
     private Long id;
@@ -39,7 +38,7 @@ public class ProductSearchEntity {
     @Field(type = FieldType.Long)
     private Long categoryId;
 
-    @Field(type = FieldType.Object, index = false)
+    @Field(type = FieldType.Keyword, index = false)
     private List<String> imageUrls;
 
     @Field(type = FieldType.Object, index = false)

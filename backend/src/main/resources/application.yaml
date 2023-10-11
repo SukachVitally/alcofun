@@ -58,6 +58,8 @@ app:
       delay-sec: 5
     producer:
       enabled: false
+    search:
+      index: products
   queue:
     product-topic: products
 #logging:
