@@ -11,14 +11,12 @@ import com.alco.searchapp.repository.ProductSearchRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
+import com.alco.searchapp.utils.PageableUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
@@ -50,12 +48,6 @@ public class ProductSearchService {
 
     private final BestPriceService bestPriceService;
 
-    private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
-            "created_at", "id",
-            "rating", "internalRating"
-//            "hot", "providers.percent" // todo: Add hot search sorting
-    );
-
     public Mono<Long> refresh() {
         return searchRepository.deleteAll()
                 .thenMany(generateDenormalizedStructure())
@@ -64,7 +56,7 @@ public class ProductSearchService {
     }
 
     public Mono<ListResponseDto<ProductSearchEntity>> getProducts(Filterable filterable, Pageable pageable) {
-        var internalPageable = mapToInternal(pageable);
+        var internalPageable = PageableUtils.mapToInternal(pageable);
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
                         ? Mono.just(List.<List<Long>>of())
@@ -172,14 +164,6 @@ public class ProductSearchService {
         builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
 
         return new NativeQuery(builder);
-    }
-    
-    private Pageable mapToInternal(Pageable pageable) {
-        var sort = Sort.by(pageable.getSort().stream()
-                    .filter(order -> SORT_PROPERTIES_MAP.containsKey(order.getProperty()))
-                    .map(order -> new Sort.Order(order.getDirection(), SORT_PROPERTIES_MAP.get(order.getProperty())))
-                    .toList());
-        return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), sort);
     }
 
     private Boolean isHot(BestPriceDto bestPrice, Double price) {
