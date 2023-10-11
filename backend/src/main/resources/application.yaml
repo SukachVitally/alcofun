@@ -51,13 +51,12 @@ app:
       - ALCOMAG
       - ROZETKA
       - OKWINE
-#      - MAUDAU
+#      - MAUDAU // broken
   product:
     subscriber:
-      enabled: false
+      enabled: true
     producer:
-      enabled: false
-      delay-sec: 1
+      enabled: true
   queue:
     product-topic: products
 #logging:

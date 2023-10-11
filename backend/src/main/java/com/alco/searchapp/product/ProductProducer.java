@@ -30,7 +30,8 @@ public class ProductProducer {
         Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);
         collector.collect()
                 .publishOn(scheduler)
-                .flatMap(queueService::sendProductPage)
-                .subscribe(i -> log.info("Added url to queue {}", i.topic()));
+                .flatMap(productPage -> queueService.sendProductPage(productPage)
+                        .thenReturn(productPage))
+                .subscribe(productPage -> log.info("Added url to queue {}", productPage.getUrl()));
     }
 }

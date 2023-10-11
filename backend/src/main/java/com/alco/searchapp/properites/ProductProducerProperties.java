@@ -13,8 +13,4 @@ public class ProductProducerProperties {
     private Integer threadCap = 1;
 
     private Integer queueCap = 1;
-
-    private Integer delaySec = 5;
-
-    private Integer intervalSec = 24 * 3600;
 }
