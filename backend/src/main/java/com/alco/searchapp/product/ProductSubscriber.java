@@ -1,11 +1,13 @@
 package com.alco.searchapp.product;
 
 import com.alco.searchapp.dto.RatingDto;
+import com.alco.searchapp.properites.ProductSubscriberProperties;
 import com.alco.searchapp.provider.ProviderCollector;
 import com.alco.searchapp.service.ProductService;
 import com.alco.searchapp.service.QueueService;
 import com.alco.searchapp.service.RatingService;
 import jakarta.annotation.PostConstruct;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,11 +27,19 @@ public class ProductSubscriber {
 
     private final ProviderCollector collector;
 
+    private final ProductSubscriberProperties properties;
+
+    /**
+     * Start subscription method
+     *
+     * Configure global delay value just not to produce too many requests.
+     */
     @PostConstruct
     public void subscribe() {
         log.info("Start add product subscription");
         queueService.receiveProductPages()
-                .flatMap(collector::parse)
+                .delayElements(Duration.ofSeconds(properties.getDelaySec()))
+                .concatMap(collector::parse)
                 .flatMap(product -> productService.addProduct(product)
                         .flatMap(entity -> {
                             if (product.getInfo().getRating() == null

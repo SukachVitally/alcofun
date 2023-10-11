@@ -9,4 +9,5 @@ import org.springframework.stereotype.Component;
 @Data
 public class ProductSubscriberProperties {
     private Boolean enabled = false;
+    private Integer delaySec = 0;
 }
