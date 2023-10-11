@@ -5,7 +5,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
-import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.entity.ProductSearchEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
 import com.alco.searchapp.repository.ProductSearchRepository;
@@ -13,10 +12,8 @@ import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -66,7 +63,7 @@ public class ProductSearchService {
                 .count();
     }
 
-    public Mono<ListResponseDto<ProductPreviewDto>> getProducts(Filterable filterable, Pageable pageable) {
+    public Mono<ListResponseDto<ProductSearchEntity>> getProducts(Filterable filterable, Pageable pageable) {
         var internalPageable = mapToInternal(pageable);
         return Mono.just(filterable.getCharacteristics())
                 .flatMap(ids -> ids.isEmpty()
@@ -74,10 +71,9 @@ public class ProductSearchService {
                         : characteristicService.spitByTypes(ids))
                 .flatMap(blocks -> template
                         .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), ProductSearchEntity.class)
-                        .map(result -> ListResponseDto.<ProductPreviewDto>builder()
+                        .map(result -> ListResponseDto.<ProductSearchEntity>builder()
                                 .results(result.getContent().stream()
                                         .map(SearchHit::getContent)
-                                        .map(this.map(filterable.getProviders()))
                                         .toList())
                                 .pageCount(result.getTotalPages())
                                 .currentPage(pageable.getPageNumber())
@@ -91,6 +87,7 @@ public class ProductSearchService {
                         var entity = new ProductSearchEntity();
                         entity.setId(product.getId());
                         entity.setName(product.getName());
+                        entity.setDescription(product.getDescription());
                         entity.setEan(product.getEan());
                         entity.setCategoryId(product.getCategoryId());
                         return entity;
@@ -131,9 +128,9 @@ public class ProductSearchService {
     }
 
     private Mono<ProductSearchEntity> addImageInfo(ProductSearchEntity entity) {
-        return imageService.getProductMainImageUrl(entity.getId())
-                .map(imageUrl -> {
-                    entity.setImageUrl(imageUrl);
+        return imageService.getProductImageUrls(entity.getId())
+                .map(urls -> {
+                    entity.setImageUrls(urls);
                     return entity;
                 });
     }
@@ -176,33 +173,7 @@ public class ProductSearchService {
 
         return new NativeQuery(builder);
     }
-
-    private Function<ProductSearchEntity, ProductPreviewDto> map(List<Long> providers) {
-        return entity -> {
-            var availableProviders = entity.getProviders().stream()
-                    .filter(provider -> providers.isEmpty() || providers.contains(provider.getId()))
-                    .toList();
-            var price = availableProviders.stream()
-                    .map(ProductSearchEntity.Provider::getPrice)
-                    .min(Comparator.comparingDouble(value -> value))
-                    .orElse(null);
-
-            var hot = availableProviders.stream()
-                    .anyMatch(ProductSearchEntity.Provider::getHot);
-
-            return ProductPreviewDto.builder()
-                    .id(entity.getId())
-                    .ean(entity.getEan())
-                    .name(entity.getName())
-                    .characteristicIds(entity.getCharacteristicIds())
-                    .price(price)
-                    .imageUrl(entity.getImageUrl())
-                    .rating(entity.getRating())
-                    .hot(hot)
-                    .build();
-        };
-    }
-
+    
     private Pageable mapToInternal(Pageable pageable) {
         var sort = Sort.by(pageable.getSort().stream()
                     .filter(order -> SORT_PROPERTIES_MAP.containsKey(order.getProperty()))

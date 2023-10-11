@@ -39,12 +39,6 @@ public class ImageService {
                 .collectList();
     }
 
-    public Mono<String> getProductMainImageUrl(long productId) {
-        return repository.findDistinctFirstByProductIdOrderByIdAsc(productId)
-                .map(this::map)
-                .switchIfEmpty(Mono.just(""));
-    }
-
     private String map(ProductImageEntity entity) {
         return properties.getBaseUrl() + entity.getPath();
     }

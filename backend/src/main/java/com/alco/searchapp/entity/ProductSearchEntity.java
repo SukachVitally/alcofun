@@ -2,7 +2,6 @@ package com.alco.searchapp.entity;
 
 import com.alco.searchapp.dto.RatingDto;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -31,14 +30,17 @@ public class ProductSearchEntity {
             otherFields = { @InnerField(suffix = "keyword", type = FieldType.Keyword, ignoreAbove = 50) })
     private String name;
 
+    @Field(type = FieldType.Text, index = false)
+    private String description;
+
     @Field(type = FieldType.Long)
     private List<Long> characteristicIds;
 
     @Field(type = FieldType.Long)
     private Long categoryId;
 
-    @Field(type = FieldType.Keyword, index = false)
-    private String imageUrl;
+    @Field(type = FieldType.Object, index = false)
+    private List<String> imageUrls;
 
     @Field(type = FieldType.Object, index = false)
     private RatingDto rating;

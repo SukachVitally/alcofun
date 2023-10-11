@@ -48,16 +48,16 @@ app:
 
   provider:
     list:
-#      - ALCOMAG
-#      - ROZETKA
+      - ALCOMAG
+      - ROZETKA
       - OKWINE
 #      - MAUDAU // broken
   product:
     subscriber:
-      enabled: true
+      enabled: false
       delay-sec: 5
     producer:
-      enabled: true
+      enabled: false
   queue:
     product-topic: products
 #logging:
