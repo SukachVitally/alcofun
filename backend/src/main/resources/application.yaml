@@ -59,7 +59,7 @@ app:
     producer:
       enabled: false
     search:
-      index: products
+      index: products1
   queue:
     product-topic: products
 #logging:

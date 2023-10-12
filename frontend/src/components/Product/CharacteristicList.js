@@ -7,7 +7,7 @@ const CharacteristicList = (props) => {
       <h3>Characteristics</h3>
       <Container>
         {props.characteristics.map((item) => (
-          <CharacteristicItem name={item.type} value={item.value} key={item.id} id={item.id}/>
+          <CharacteristicItem name={item.name} value={item.value} key={item.id} id={item.id}/>
         ))}
       </Container>
     </>
