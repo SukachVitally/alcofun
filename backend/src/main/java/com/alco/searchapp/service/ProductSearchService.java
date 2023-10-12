@@ -1,24 +1,17 @@
 package com.alco.searchapp.service;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.entity.ProductSearchEntity;
-import com.alco.searchapp.entity.ProductCharacteristicEntity;
 import com.alco.searchapp.repository.ProductSearchRepository;
-import com.alco.searchapp.repository.ProductCharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
 import com.alco.searchapp.utils.PageableUtils;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
@@ -38,8 +31,6 @@ public class ProductSearchService {
 
     private final ReactiveElasticsearchTemplate template;
 
-    private final ProductCharacteristicRepository productCharacteristicRepository;
-
     private final CharacteristicService characteristicService;
 
     private final ImageService imageService;
@@ -48,11 +39,17 @@ public class ProductSearchService {
 
     private final BestPriceService bestPriceService;
 
+    private final CategoryService categoryService;
+
     public Mono<Long> refresh() {
         return searchRepository.deleteAll()
                 .thenMany(generateDenormalizedStructure())
                 .flatMap(searchRepository::save)
                 .count();
+    }
+
+    public Mono<ProductSearchEntity> getProduct(Long id) {
+        return template.get(id.toString(), ProductSearchEntity.class);
     }
 
     public Mono<ListResponseDto<ProductSearchEntity>> getProducts(Filterable filterable, Pageable pageable) {
@@ -62,7 +59,7 @@ public class ProductSearchService {
                         ? Mono.just(List.<List<Long>>of())
                         : characteristicService.spitByTypes(ids))
                 .flatMap(blocks -> template
-                        .searchForPage(createQuery(filterable, blocks).setPageable(internalPageable), ProductSearchEntity.class)
+                        .searchForPage(ProductQueryUtils.createQuery(filterable, blocks).setPageable(internalPageable), ProductSearchEntity.class)
                         .map(result -> ListResponseDto.<ProductSearchEntity>builder()
                                 .results(result.getContent().stream()
                                         .map(SearchHit::getContent)
@@ -84,37 +81,55 @@ public class ProductSearchService {
                         entity.setCategoryId(product.getCategoryId());
                         return entity;
                 })
+                .flatMap(this::addCategory)
                 .flatMap(this::addProviders)
                 .flatMap(this::addCharacteristics)
                 .flatMap(this::addImageInfo)
                 .flatMap(this::addRating);
     }
 
+    private Mono<ProductSearchEntity> addCategory(ProductSearchEntity entity) {
+        return categoryService.getCategory(entity.getCategoryId()).map(categoryDto -> {
+            entity.setCategoryName(categoryDto.getType().getName());
+            return entity;
+        });
+    }
+
     private Mono<ProductSearchEntity> addProviders(ProductSearchEntity entity) {
         return providerService.getRelevantProducts(entity.getId())
                 .flatMap(productProviders ->
                         bestPriceService.getBestPrice(entity.getId(), productProviders)
-                                .map(bestPrice ->
-                                        productProviders.stream()
-                                                .map(providerProduct -> ProductSearchEntity.Provider.builder()
-                                                        .id(providerProduct.getProviderId())
-                                                        .price(providerProduct.getPrice())
-                                                        .hot(isHot(bestPrice, providerProduct.getPrice()))
-                                                        .percent(isHot(bestPrice, providerProduct.getPrice()) ? bestPrice.getPercent() : null)
-                                                        .build())
-                                                .toList()))
-                .map(list -> {
-                    entity.setProviders(list);
-                    return entity;
-                });
+                                .map(bestPrice -> {
+                                    var providers = productProviders.stream()
+                                            .map(providerProduct -> ProductSearchEntity.Provider.builder()
+                                                    .id(providerProduct.getProviderId())
+                                                    .price(providerProduct.getPrice())
+                                                    .name(providerProduct.getProviderType().getName())
+                                                    .hot(isHot(bestPrice, providerProduct.getPrice()))
+                                                    .build())
+                                            .toList();
+                                    entity.setProviders(providers);
+                                    entity.setPrice(bestPrice.getPrice());
+                                    entity.setPercent(bestPrice.getPercent());
+                                    entity.setHot(bestPrice.getHot());
+                                    return entity;
+                                }));
     }
 
     private Mono<ProductSearchEntity> addCharacteristics(ProductSearchEntity entity) {
-        return productCharacteristicRepository.findAllByProductId(entity.getId())
+        return characteristicService.getAllForProduct(entity.getId())
                 .collectList()
-                .map(list -> list.stream().map(ProductCharacteristicEntity::getCharacteristicId).toList())
-                .map(ids -> {
-                    entity.setCharacteristicIds(ids);
+                .map(list -> list.stream()
+                        .map(dto -> ProductSearchEntity.Characteristic.builder()
+                                .id(dto.getId())
+                                .name(dto.getType().getName())
+                                .unitOfMeasurement(dto.getType().getUnitOfMeasurement())
+                                .value(dto.getValue())
+                                .build()
+                        )
+                        .toList())
+                .map(list -> {
+                    entity.setCharacteristics(list);
                     return entity;
                 });
     }
@@ -130,40 +145,12 @@ public class ProductSearchService {
     private Mono<ProductSearchEntity> addRating(ProductSearchEntity entity) {
         return ratingService.getCompositeRating(entity.getId())
                 .map(compositeRating -> {
-                    entity.setRating(compositeRating);
+                    entity.setCompositeRating(compositeRating.rating());
+                    entity.setVotes(compositeRating.votes());
                     entity.setInternalRating(ratingService.getInternalRating(compositeRating));
 
                     return entity;
                 });
-    }
-
-    private NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
-        NativeQueryBuilder builder = new NativeQueryBuilder();
-        ArrayList<Query> queries = new ArrayList<>();
-
-        if (!filterable.getCategories().isEmpty()) {
-            queries.add(ProductQueryUtils.createCategoriesQuery(filterable.getCategories()));
-        }
-
-        if (filterable.getSearch() != null) {
-            queries.add(ProductQueryUtils.createSearchQuery(filterable.getSearch()));
-        }
-
-        if (!characteristicBlocks.isEmpty()) {
-            queries.add(ProductQueryUtils.createCharacteristicsQuery(characteristicBlocks));
-        }
-
-        if (!filterable.getProviders().isEmpty()
-                || filterable.getPrice().min() != null
-                || filterable.getPrice().max() != null
-                || filterable.getHot()) {
-            queries.add(ProductQueryUtils.createProviderQuery(filterable.getProviders(), filterable.getPrice(),
-                    filterable.getHot()));
-        }
-
-        builder.withFilter(QueryBuilders.bool(b -> b.filter(queries)));
-
-        return new NativeQuery(builder);
     }
 
     private Boolean isHot(BestPriceDto bestPrice, Double price) {

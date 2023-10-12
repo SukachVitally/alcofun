@@ -9,17 +9,54 @@ import com.alco.searchapp.dto.Filterable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 
 @UtilityClass
 public class ProductQueryUtils {
-    public Query createCategoriesQuery(List<Long> ids) {
+    public NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
+        NativeQueryBuilder builder = new NativeQueryBuilder();
+        ArrayList<Query> queries = new ArrayList<>();
+
+        if (!filterable.getCategories().isEmpty()) {
+            queries.add(ProductQueryUtils.createCategoriesQuery(filterable.getCategories()));
+        }
+
+        if (filterable.getSearch() != null) {
+            queries.add(ProductQueryUtils.createSearchQuery(filterable.getSearch()));
+        }
+
+        if (!characteristicBlocks.isEmpty()) {
+            queries.add(ProductQueryUtils.createCharacteristicsQuery(characteristicBlocks));
+        }
+
+        if (!filterable.getProviders().isEmpty()) {
+            queries.add(ProductQueryUtils.createProviderQuery(filterable.getProviders()));
+        }
+
+        if (filterable.getPrice().min() != null) {
+            queries.add(ProductQueryUtils.createMinPriceQuery(filterable.getPrice().min()));
+        }
+
+        if (filterable.getPrice().max() != null) {
+            queries.add(ProductQueryUtils.createMaxPriceQuery(filterable.getPrice().max()));
+        }
+
+        if (filterable.getHot()) {
+            queries.add(ProductQueryUtils.createHotQuery());
+        }
+
+        return new NativeQuery(builder.withFilter(QueryBuilders.bool(b -> b.filter(queries))));
+    }
+
+    private Query createCategoriesQuery(List<Long> ids) {
         var values = ids.stream().map(FieldValue::of).toList();
         return QueryBuilders.terms(t -> t
                         .field("categoryId")
                         .terms(tt -> tt.value(values)));
     }
 
-    public Query createSearchQuery(String search) {
+    private Query createSearchQuery(String search) {
         return QueryBuilders.bool(b -> b
                 .should(List.of(
                     QueryBuilders.term(m -> m.field("ean").value(search)),
@@ -28,45 +65,40 @@ public class ProductQueryUtils {
             ));
     }
 
-    public Query createCharacteristicsQuery(List<List<Long>> characteristicBlocks) {
+    private Query createCharacteristicsQuery(List<List<Long>> characteristicBlocks) {
         return QueryBuilders.bool(b -> b
                 .filter(characteristicBlocks.stream()
                         .map(ids -> QueryBuilders
                                 .terms(t -> t
-                                        .field("characteristicIds")
+                                        .field("characteristics.id")
                                         .terms(tt -> tt
                                                 .value(ids.stream().map(FieldValue::of).toList()))))
                         .toList()));
     }
 
-    public Query createProviderQuery(List<Long> ids, Filterable.Price price, Boolean isHot) {
-        ArrayList<Query> queries = new ArrayList<>();
-        if (!ids.isEmpty()) {
-            queries.add(QueryBuilders.terms(t -> t
+
+
+    private Query createProviderQuery(List<Long> ids) {
+        return QueryBuilders.terms(t -> t
                     .field("providers.id")
-                    .terms(v -> v.value(ids.stream().map(FieldValue::of).toList()))));
-        }
+                    .terms(v -> v.value(ids.stream().map(FieldValue::of).toList())));
+    }
 
-        if (price.min() != null) {
-            queries.add(QueryBuilders.range(r -> r
-                    .field("providers.price")
-                    .gte(JsonData.of(price.min()))));
-        }
+    private Query createMinPriceQuery(Double minPrice) {
+        return QueryBuilders.range(r -> r
+                    .field("price")
+                    .gte(JsonData.of(minPrice)));
+    }
 
-        if (price.max() != null) {
-            queries.add(QueryBuilders.range(r -> r
-                    .field("providers.price")
-                    .lte(JsonData.of(price.max()))));
-        }
+    private Query createMaxPriceQuery(Double maxPrice) {
+        return QueryBuilders.range(r -> r
+                .field("price")
+                .lte(JsonData.of(maxPrice)));
+    }
 
-        if (isHot) {
-            queries.add(QueryBuilders.term(t -> t
-                    .field("providers.hot")
-                    .value(true)));
-        }
-
-        return QueryBuilders.nested(n -> n
-                .path("providers")
-                .query(q -> q.bool(b -> b.filter(queries))));
+    private Query createHotQuery() {
+        return QueryBuilders.term(t -> t
+                    .field("hot")
+                    .value(true));
     }
 }

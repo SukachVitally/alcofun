@@ -184,7 +184,7 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
 
         var filter = Filterable.builder()
                 .providers(List.of(entity.getId()))
-                .price(new Filterable.Price(305d, 315d))
+                .price(new Filterable.Price(290d, 315d))
                 .build();
 
         var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
@@ -204,7 +204,7 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
 
         var res = productSearchService.getProducts(filter, PageRequest.of(1, 6))
                 .blockOptional().orElseThrow();
-        Assertions.assertEquals(4, res.getResults().size());
+        Assertions.assertEquals(3, res.getResults().size());
     }
 
     @Test

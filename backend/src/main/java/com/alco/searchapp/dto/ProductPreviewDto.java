@@ -1,6 +1,5 @@
 package com.alco.searchapp.dto;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,8 +11,6 @@ public class ProductPreviewDto {
     private String ean;
 
     private String name;
-
-    private List<Long> characteristicIds;
 
     private Double price;
 

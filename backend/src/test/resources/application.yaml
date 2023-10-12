@@ -54,7 +54,7 @@ app:
 #      - MAUDAU
   product:
     search:
-      index: products-test
+      index: products-test5
 
 logging:
   level:

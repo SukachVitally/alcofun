@@ -1,8 +1,6 @@
 package com.alco.searchapp.dto;
 
-import com.alco.searchapp.constants.CategoryTypeEnum;
-import com.alco.searchapp.serializer.CategoryTypeEnumSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.alco.searchapp.entity.ProductSearchEntity;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,14 +16,15 @@ public class ProductFullDto {
 
     private String description;
 
-    private List<ProductProviderDto> providers;
+    private List<ProductSearchEntity.Provider> providers;
 
     private List<String> imageUrls;
 
-    @JsonSerialize(using = CategoryTypeEnumSerializer.class)
-    private CategoryTypeEnum category;
+    private Long categoryId;
 
-    private List<CharacteristicDto> characteristics;
+    private String categoryName;
+
+    private List<ProductSearchEntity.Characteristic> characteristics;
 
     private RatingDto rating;
 }
