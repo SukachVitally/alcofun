@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+//TODO: Do we need this service. It should be responsible only for product repository
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class ProductService {
 
     private final CharacteristicService characteristicService;
 
+    @Deprecated
     public Mono<ProductDto> getProduct(Long id) {
         return productRepository.findById(id)
                 .flatMap(this::map);
@@ -81,7 +83,7 @@ public class ProductService {
                     }
 
                     return Flux.fromStream(map.entrySet().stream())
-                            .flatMap(entry -> characteristicService.add(CharacteristicDto.<String>builder()
+                            .flatMap(entry -> characteristicService.add(CharacteristicDto.builder()
                                     .type(entry.getKey())
                                     .value(entry.getValue())
                                     .build(), entity.getId()))
@@ -92,6 +94,7 @@ public class ProductService {
                         .then(Mono.just(entity)));
     }
 
+    @Deprecated
     private Mono<ProductDto> map(ProductEntity entity) {
         Mono<List<CharacteristicDto>> characteristicsMono = characteristicService.getAllForProduct(entity.getId()).collectList();
 
