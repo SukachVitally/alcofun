@@ -22,6 +22,4 @@ public class BestPriceEntity {
     private Double percent;
 
     private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

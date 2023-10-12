@@ -27,7 +27,7 @@ public class BestPriceService {
             return Mono.empty();
         }
 
-        return repository.findByProductId(productId)
+        return repository.findFirstByProductIdOrderByIdDesc(productId)
                 .switchIfEmpty(repository.save(createNewEntity(productId, bestProvider)))
                 .flatMap(entity -> {
                     if ((entity.getPrice().equals(bestProvider.getPrice()))) {
@@ -36,12 +36,11 @@ public class BestPriceService {
 
                     Double percent = Math.ceil((entity.getPrice() - bestProvider.getPrice()) / entity.getPrice() * 100);
 
-                    entity.setHot(percent > minPercent);
-                    entity.setPercent(percent);
-                    entity.setPrice(bestProvider.getPrice());
-                    entity.setUpdatedAt(LocalDateTime.now());
+                    var newEntity = createNewEntity(productId, bestProvider);
+                    newEntity.setHot(percent > minPercent);
+                    newEntity.setPercent(percent);
 
-                    return repository.save(entity);
+                    return repository.save(newEntity);
                 })
                 .map(entity -> BestPriceDto.builder()
                         .price(entity.getPrice())
