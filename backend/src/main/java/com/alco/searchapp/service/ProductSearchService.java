@@ -106,6 +106,7 @@ public class ProductSearchService {
                                                     .price(providerProduct.getPrice())
                                                     .name(providerProduct.getProviderType().getName())
                                                     .hot(isHot(bestPrice, providerProduct.getPrice()))
+                                                    .link(providerProduct.getLink())
                                                     .build())
                                             .toList();
                                     entity.setProviders(providers);

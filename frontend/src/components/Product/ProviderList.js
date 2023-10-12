@@ -9,11 +9,11 @@ const ProviderList = (props) => {
       <Container>
         {props.providers.map((item) => (
           <ProviderItem
-            name={item.providerType}
+            name={item.name}
             price={item.price}
             link={item.link}
-            key={item.providerId}
-            providerId={item.providerId}
+            key={item.id}
+            providerId={item.id}
           />
         ))}
       </Container>

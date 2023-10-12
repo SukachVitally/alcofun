@@ -73,6 +73,9 @@ public class ProductSearchEntity {
         @Field(type = FieldType.Keyword, index = false)
         private String name;
 
+        @Field(type = FieldType.Keyword, index = false)
+        private String link;
+
         @Field(type = FieldType.Boolean, index = false)
         private Boolean hot;
     }

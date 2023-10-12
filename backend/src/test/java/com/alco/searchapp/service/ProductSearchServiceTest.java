@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +38,7 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
     @BeforeEach
     public void setup() {
         cleanDatabase();
-        addProducts();
+        addProducts(); //todo: Just populate elasticsearch without database here.
         productSearchService.refresh().block();
     }
 
@@ -301,6 +302,34 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(6, res.getResults().size());
 
         Assertions.assertEquals(res.getResults().get(0).getEan(), EAN2);
+        Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
+    }
+
+    @Test
+    public void getProductsAllWithSortByPriceDesc() {
+        var filter = Filterable.builder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.DESC, "price")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+
+        Assertions.assertEquals(res.getResults().get(0).getEan(), EAN6);
+        Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
+    }
+
+    // todo: Implement this test
+    @Disabled
+    @Test
+    public void getProductsAllWithSortByHotDesc() {
+        var filter = Filterable.builder()
+                .build();
+        var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
+                        Sort.by(Sort.Direction.DESC, "price")))
+                .blockOptional().orElseThrow();
+        Assertions.assertEquals(6, res.getResults().size());
+
+        Assertions.assertEquals(res.getResults().get(0).getEan(), EAN6);
         Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
     }
 }

@@ -10,8 +10,9 @@ import org.springframework.data.domain.Sort;
 public class PageableUtils {
     private final Map<String, String> SORT_PROPERTIES_MAP = Map.of("name", "name.keyword",
             "created_at", "id",
-            "rating", "internalRating"
-//            "hot", "providers.percent" // todo: Add hot search sorting
+            "rating", "internalRating",
+            "price", "price",
+            "hot", "percent" // todo: Add hot search sorting
     );
 
     public Pageable mapToInternal(Pageable pageable) {

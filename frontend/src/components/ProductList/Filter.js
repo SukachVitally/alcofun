@@ -28,7 +28,7 @@ function Filter(props) {
   const [maxPrice, setMaxPrice] = useState(null);
   const [hot, setHot] = useState(false);
   const [sortingField, setSortingField] = useState(null);
-  const [sortingOrder, setSortingOrder] = useState("asc");
+  const [sortingOrder, setSortingOrder] = useState("desc");
   const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
     useState(false);
 

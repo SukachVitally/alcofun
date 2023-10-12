@@ -39,7 +39,8 @@ function Sorting(props) {
               <option value="">---</option>
               <option value="name">Name</option>
               <option value="created_at">Created at</option>
-              <option value="rating">Rating</option>
+              <option value="price">Price</option>
+              <option value="hot">Hot</option>
             </Form.Select>
           </Col>
         </Form.Group>
@@ -49,8 +50,8 @@ function Sorting(props) {
           </Form.Label>
           <Col sm="10">
             <Form.Select aria-label="Order" value={order} onChange={orderChangeHandler}>
-              <option value="asc">ASC</option>
-              <option value="desc">DESC</option>
+              <option value="desc">Descending</option>
+              <option value="asc">Asceding</option>
             </Form.Select>
           </Col>
         </Form.Group>
