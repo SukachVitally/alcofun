@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties("app.queue")
-public class QueueProperties {
-    private String productTopic;
+@ConfigurationProperties("app.provider-topic")
+public class ProviderTopicProperties {
+    private String topic;
+
+    private int partitions = 1;
+
+    private short replicationFactor = 1;
 }

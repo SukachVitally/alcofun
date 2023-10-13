@@ -54,14 +54,22 @@ app:
 #      - MAUDAU // broken
   product:
     subscriber:
-      enabled: false
-      delay-sec: 5
+      enabled: true
+      providers:
+        - type: ALCOMAG
+          delay-sec: 3
+        - type: ROZETKA
+          delay-sec: 3
+        - type: OKWINE
+          delay-sec: 10
     producer:
-      enabled: false
+      enabled: true
     search:
       index: products1
-  queue:
-    product-topic: products
+  provider-topic:
+    topic: products
+    replication-factor: 2
+    partitions: 2
 #logging:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries

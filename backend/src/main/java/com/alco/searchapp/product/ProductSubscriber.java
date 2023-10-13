@@ -1,5 +1,6 @@
 package com.alco.searchapp.product;
 
+import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.properites.ProductSubscriberProperties;
 import com.alco.searchapp.provider.ProviderCollector;
@@ -29,16 +30,16 @@ public class ProductSubscriber {
 
     private final ProductSubscriberProperties properties;
 
-    /**
-     * Start subscription method
-     *
-     * Configure global delay value just not to produce too many requests.
-     */
     @PostConstruct
     public void subscribe() {
-        log.info("Start add product subscription");
-        queueService.receiveProductPages()
-                .delayElements(Duration.ofSeconds(properties.getDelaySec()))
+        properties.getProviders().forEach(provider -> subscribeToProviderTopic(provider.getType(),
+                provider.getDelaySec()));
+    }
+
+    private void subscribeToProviderTopic(ProviderTypeEnum providerType, Integer delaySec) {
+        log.info("Start add product subscription for {}", providerType);
+        queueService.receiveProductPage(providerType)
+                .delayElements(Duration.ofSeconds(delaySec))
                 .concatMap(collector::parse)
                 .flatMap(product -> productService.addProduct(product)
                         .flatMap(entity -> {
@@ -55,6 +56,5 @@ public class ProductSubscriber {
                 .subscribe(product -> log
                         .info("[{}]: product {} was added", product.getProviderType().getName(),
                                 product.getInfo().getName()));
-
     }
 }

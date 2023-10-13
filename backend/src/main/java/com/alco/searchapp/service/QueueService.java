@@ -1,6 +1,7 @@
 package com.alco.searchapp.service;
 
-import com.alco.searchapp.properites.QueueProperties;
+import com.alco.searchapp.configuration.KafkaConfiguration;
+import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -22,25 +23,16 @@ public class QueueService {
 
     private final Function<String, ReactiveKafkaConsumerTemplate<String, ProductPageDto>> consumerFactory;
 
-    private final QueueProperties properties;
+    private final KafkaConfiguration.ProviderTopic providerTopic;
 
-    public Mono<RecordMetadata> sendProductPage(ProductPageDto pageDto) {
-        return send(properties.getProductTopic(), pageDto);
-    }
-
-    public Flux<ProductPageDto> receiveProductPages() {
-        return receive(properties.getProductTopic());
-    }
-
-    private Mono<RecordMetadata> send(String topic, ProductPageDto message) {
+    public Mono<RecordMetadata> sendProductPage(ProductPageDto message) {
         return producerTemplate
-                .send(topic, message)
+                .send(providerTopic.getTopic(message.getProvider()), message)
                 .map(SenderResult::recordMetadata);
-
     }
 
-    private Flux<ProductPageDto> receive(String topic) {
-        return consumerFactory.apply(topic).receiveAutoAck()
+    public Flux<ProductPageDto> receiveProductPage(ProviderTypeEnum provider) {
+        return consumerFactory.apply(providerTopic.getTopic(provider)).receiveAutoAck()
                 .doOnNext(consumerRecord -> log.info("received key={}, value={} from topic={}, offset={}",
                         consumerRecord.key(),
                         consumerRecord.value(),
