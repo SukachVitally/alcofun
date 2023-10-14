@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -44,11 +45,15 @@ public class RozetkaProvider implements IProvider  {
 
     private final RozetkaProperties properties;
 
+    public Function<Integer, String> createLinkFunction(String url) {
+        return (Integer page) -> String.format("%spage=%s;sell_status=available,limited,out_of_stock/", url, page);
+    }
+
     @Override
     public Flux<ProductPageDto> getProductPages() {
         return Flux.fromIterable(properties.getBlocks())
                 .flatMap(block -> Flux
-                        .fromIterable(new ProductLinkCollector(block.getUrl(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
+                        .fromIterable(new ProductLinkCollector(createLinkFunction(block.getUrl()), LIST_LINK_SELECTOR))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
                                 .url(url)

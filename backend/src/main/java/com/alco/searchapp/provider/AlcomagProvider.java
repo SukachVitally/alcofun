@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,11 +51,15 @@ public class AlcomagProvider implements IProvider {
         return ProviderTypeEnum.ALCOMAG;
     }
 
+    public Function<Integer, String> createLinkFunction(String url) {
+        return (Integer page) -> String.format("%s?PAGEN_1=%s", url, page);
+    }
+
     @Override
     public Flux<ProductPageDto> getProductPages() {
         return Flux.fromIterable(properties.getBlocks())
                 .flatMap(block -> Flux
-                        .fromIterable(new ProductLinkCollector(block.getUrl(), LIST_LINK_SELECTOR, LIST_PAGE_GET_PARAMETER, ""))
+                        .fromIterable(new ProductLinkCollector(createLinkFunction(block.getUrl()), LIST_LINK_SELECTOR))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
                                 .url(URL + url)
