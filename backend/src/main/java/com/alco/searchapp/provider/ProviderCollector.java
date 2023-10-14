@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
+import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.exception.ProductProviderNotSupport;
-import com.alco.searchapp.properites.ProviderProperties;
 import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
@@ -20,17 +20,15 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ProviderCollector {
-    private final ProviderProperties properties;
-
     private final List<IProvider> providers;
 
     private final Validator validator;
 
     private final ObjectMapper mapper;
 
-    public Flux<ProductPageDto> collect() {
+    public Flux<ProductPageDto> collect(List<ProviderTypeEnum> providerTypes) {
         return Flux.fromIterable(providers)
-                .filter(provider -> properties.getList().contains(provider.getType()))
+                .filter(provider -> providerTypes.contains(provider.getType()))
                 .flatMap(IProvider::getProductPages);
     }
 

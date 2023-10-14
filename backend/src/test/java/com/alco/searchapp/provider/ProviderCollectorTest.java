@@ -1,7 +1,9 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.BaseFunctionalTest;
+import com.alco.searchapp.constants.ProviderTypeEnum;
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,7 @@ public class ProviderCollectorTest extends BaseFunctionalTest {
     @Test
     public void collect() {
         var number = 5;
-        var records = collector.collect()
+        var records = collector.collect(List.of(ProviderTypeEnum.ALCOMAG))
                 .take(number)
                 .timeout(Duration.ofSeconds(10))
                 .collectList()

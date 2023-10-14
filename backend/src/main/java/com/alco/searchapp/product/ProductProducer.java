@@ -28,7 +28,7 @@ public class ProductProducer {
     public void init() {
         log.info("Start collecting products");
         Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);
-        collector.collect()
+        collector.collect(properties.getProviders())
                 .publishOn(scheduler)
                 .flatMap(productPage -> queueService.sendProductPage(productPage)
                         .thenReturn(productPage))

@@ -10,6 +10,8 @@ import com.alco.searchapp.utils.AlcoholByVolumeUtil;
 import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.data.util.Pair;
@@ -29,10 +32,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AlcomagProvider implements IProvider {
     private static final String URL = "https://alcomag.ua";
-
-    private static final String LIST_PAGE_GET_PARAMETER = "PAGEN_1";
-
-    private static final String LIST_LINK_SELECTOR = ".inner_wrap a.thumb";
 
     private static final String PROPERTY_ABV_TITLE = "Міцність";
 
@@ -59,7 +58,7 @@ public class AlcomagProvider implements IProvider {
     public Flux<ProductPageDto> getProductPages() {
         return Flux.fromIterable(properties.getBlocks())
                 .flatMap(block -> Flux
-                        .fromIterable(new ProductLinkCollector(createLinkFunction(block.getUrl()), LIST_LINK_SELECTOR))
+                        .fromIterable(new ProductLinkCollector(createLinkFunction(block.getUrl())))
                         .flatMap(Flux::fromIterable)
                         .map(url -> ProductPageDto.builder()
                                 .url(URL + url)
@@ -133,4 +132,44 @@ public class AlcomagProvider implements IProvider {
                 .map(path -> URL + path)
                 .toList();
     }
+
+    @RequiredArgsConstructor
+    public static class ProductLinkCollector implements Iterable<List<String>> {
+        private final Function<Integer, String> createLink;
+
+        @Override
+        public Iterator<List<String>> iterator() {
+            return new Iterator<>() {
+                private int currentIteration = 1;
+                private List<String> previousLinks = List.of();
+                private List<String> links;
+
+                @Override
+                public boolean hasNext() {
+                    try {
+                        Document doc = Jsoup.connect(createLink.apply(currentIteration)).get();
+                        links = doc.select(".inner_wrap").stream()
+                                .filter(element -> element.selectFirst(".item-stock span.stock") != null)
+                                .map(element -> element.selectFirst("a.thumb"))
+                                .filter(Objects::nonNull)
+                                .map(element -> element.attr("href"))
+                                .toList();
+
+                        return !links.isEmpty() && links.stream().noneMatch(previousLinks::contains);
+                    } catch (IOException e) {
+                        return false;
+                    }
+                }
+
+                @Override
+                public List<String> next() {
+                    currentIteration++;
+                    previousLinks = links;
+
+                    return links;
+                }
+            };
+        }
+    }
+
 }

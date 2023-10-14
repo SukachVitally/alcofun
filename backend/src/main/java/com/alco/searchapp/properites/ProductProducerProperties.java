@@ -1,5 +1,7 @@
 package com.alco.searchapp.properites;
 
+import com.alco.searchapp.constants.ProviderTypeEnum;
+import java.util.List;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -13,4 +15,6 @@ public class ProductProducerProperties {
     private Integer threadCap = 1;
 
     private Integer queueCap = 1;
+
+    private List<ProviderTypeEnum> providers;
 }

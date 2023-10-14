@@ -46,15 +46,9 @@ app:
     storage: MINIO
     bucket: images
 
-  provider:
-    list:
-      - ALCOMAG
-      - ROZETKA
-      - OKWINE
-#      - MAUDAU // broken
   product:
     subscriber:
-      enabled: true
+      enabled: false
       providers:
         - type: ALCOMAG
           delay-sec: 3
@@ -63,7 +57,12 @@ app:
         - type: OKWINE
           delay-sec: 10
     producer:
-      enabled: true
+      enabled: false
+      providers:
+      - ALCOMAG
+      - ROZETKA
+      - OKWINE
+    #      - MAUDAU // broken
     search:
       index: products1
   provider-topic:
