@@ -25,7 +25,7 @@ public class RozetkaProviderTest {
         var product = getProvider().parsePageInfo(link).block();
 
         Assertions.assertNotNull(product);
-        Assertions.assertEquals("Віскі Glenmorangie Original 10 років витримки 0.7 л 40% в подарунковій упаковці (5010494560282)", product.getName());
+        Assertions.assertEquals("Віскі Glenmorangie Original 10 років витримки 0.7 л 40% в подарунковій упаковці", product.getName());
         Assertions.assertEquals("5010494560282", product.getEan());
         Assertions.assertNotNull(product.getPrice());
         Assertions.assertNotNull(product.getDescription());

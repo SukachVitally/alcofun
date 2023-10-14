@@ -86,7 +86,7 @@ public class RozetkaProvider implements IProvider  {
                     var characteristics = getCharacteristics(document);
 
                     return ProductInfo.builder()
-                            .name(data.getName())
+                            .name(data.getName().replaceAll("\\(.*?\\)", "").trim())
                             .imageUrls(data.getImage())
                             .ean(data.getEan())
                             .description(data.getDescription())
