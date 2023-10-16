@@ -5,7 +5,6 @@
 microk8s kubectl get all --all-namespaces
 ```
 
-
 ## Run kubernetes dashboard
 ```sh
 microk8s dashboard-proxy

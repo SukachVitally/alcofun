@@ -1,19 +1,14 @@
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: production
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: production
+  namespace: prod
   name: nginx-deployment
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: nginx
-  replicas: 1
   template:
     metadata:
       labels:
@@ -21,18 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.25
+        image: nginx:latest
         ports:
         - containerPort: 80
----
-apiVersion: apps/v1
-kind: Service
-metadata:
-  name: nginx-service
-  namespace: production
-spec:
-  selector: nginx
-  ports:
-  - port: 80
-    targetPort: 80
-  type: LoadBalancer
+
