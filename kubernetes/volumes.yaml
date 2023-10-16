@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: prod
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/sukach/volumes/postgres
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: prod
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
