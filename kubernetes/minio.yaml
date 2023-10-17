@@ -1,0 +1,96 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: prod
+  name: minio-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/sukach/volumes/minio
+  claimRef:
+    name: minio-pvc
+    namespace: prod
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: prod
+  name: minio-pvc
+spec:
+  volumeName: minio-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: minio-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name:  minio-volume
+          persistentVolumeClaim:
+            claimName: minio-pvc
+      containers:
+      - name: minio
+        image: quay.io/minio/minio
+        env:
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        command:
+        - /bin/bash
+        - -c
+        args: 
+        - minio server /data --console-address :9001
+        volumeMounts:
+        - name: minio-volume
+          mountPath: /data
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2048Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: minio-service
+spec:
+  type: NodePort
+  selector:
+    app: minio
+  ports:
+    - protocol: TCP
+      name: api
+      port: 9000
+      targetPort: 9000
+      nodePort: 31900
+    - protocol: TCP
+      name: dashboard
+      port: 9001
+      targetPort: 9001
+      nodePort: 31901
