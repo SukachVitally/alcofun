@@ -20,9 +20,6 @@ spec:
         ports:
         - containerPort: 80
         resources:
-          requests:
-            cpu: "100m"
-            memory: "64Mi"
           limits:
             cpu: "500m"
             memory: "128Mi"
@@ -63,11 +60,50 @@ spec:
         ports:
         - containerPort: 5432
         resources:
-          requests:
-            cpu: "1"
-            memory: "1024Mi"
           limits:
             cpu: "2"
             memory: "2048Mi"
         
-
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: minio-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name:  minio-volume
+          persistentVolumeClaim:
+            claimName: minio-pvc
+      containers:
+      - name: minio
+        image: quay.io/minio/minio
+        env:
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        command:
+        - /bin/bash
+        - -c
+        args: 
+        - minio server /data --console-address :9001
+        volumeMounts:
+        - name: minio-volume
+          mountPath: /data
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2048Mi"

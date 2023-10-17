@@ -24,3 +24,30 @@ spec:
   resources:
     requests:
       storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: prod
+  name: minio-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/sukach/volumes/postgres
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: prod
+  name: minio-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
