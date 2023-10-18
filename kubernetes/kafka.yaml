@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: kafka-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka1
+        image: confluentinc/cp-kafka:latest
+        env:
+        - name: KAFKA_BROKER_ID
+          value: "1"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zookeeper-service:31181"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: EXTERNAL://localhost:8097,INTERNAL://kafka-service:8097
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: INTERNAL
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "2"
+        ports:
+        - containerPort: 8097
+        resources:
+          limits:
+            #cpu: "4" # todo: insufficient CPU
+            memory: "1000Mi"
+      - name: kafka2
+        image: confluentinc/cp-kafka:latest
+        env:
+        - name: KAFKA_BROKER_ID
+          value: "1"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "zookeeper-service:31181"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: EXTERNAL://localhost:8098,INTERNAL://kafka-service:8098
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: INTERNAL
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "2"
+        ports:
+        - containerPort: 8098
+        resources:
+          limits:
+            #cpu: "4" # todo: insufficient CPU
+            memory: "1000Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: kafka-service
+spec:
+  type: NodePort
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      name: kafka1
+      port: 8097
+      targetPort: 8097
+      nodePort: 31097
+    - protocol: TCP
+      name: kafka2
+      port: 8098
+      targetPort: 8098
+      nodePort: 31098
