@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: confluentinc/cp-zookeeper:latest
+        env:
+        - name: ZOOKEEPER_CLIENT_PORT
+          value: "2181"
+        - name: ZOOKEEPER_TICK_TIME
+          value: "2000"
+        ports:
+        - containerPort: 2181
+        - containerPort: 2000
+        resources:
+          limits:
+            #cpu: "4" # todo: insufficient CPU
+            memory: "1000Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: zookeeper-service
+spec:
+  type: NodePort
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      name: client
+      port: 2181
+      targetPort: 2181
+      nodePort: 31181
+    - protocol: TCP
+      name: tick-time
+      port: 2000
+      targetPort: 2000
+      nodePort: 31000
