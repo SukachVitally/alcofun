@@ -45,10 +45,10 @@ spec:
       labels:
         app: elasticsearch
     spec:
-      # volumes:
-      #   - name:  elasticsearch-volume
-      #     persistentVolumeClaim:
-      #       claimName: elasticsearch-pvc
+      volumes:
+        - name:  elasticsearch-volume
+          persistentVolumeClaim:
+            claimName: elasticsearch-pvc
       containers:
       - name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
@@ -59,22 +59,14 @@ spec:
             value: single-node
           - name: ES_JAVA_OPTS
             value: -Xms3g -Xmx3g
-        # volumeMounts:
-        # - name: elasticsearch-volume
-        #   mountPath: /usr/share/elasticsearch/data
+        volumeMounts:
+        - name: elasticsearch-volume
+          mountPath: /usr/share/elasticsearch/data
         ports:
         - containerPort: 9200
-        # resources: // todo: Insuffcient CPU
-        #   limits:
-        #     cpu: "4"
-        #     memory: "7000Mi" 
-      - name: kibana
-        image: docker.elastic.co/kibana/kibana:8.10.2
-        ports: 
-        - containerPort: 5601
-        env: 
-        - name: ELASTICSEARCH_HOSTS
-          value: http://elasticsearch-service:9200
+        resources:
+          limits: # todo: not enough CPU for start container)
+            memory: 6Gi 
 
 ---
 apiVersion: v1
@@ -92,8 +84,3 @@ spec:
       port: 9200
       targetPort: 9200
       nodePort: 31200
-    - protocol: TCP
-      name: kibana
-      port: 5601
-      targetPort: 5601
-      nodePort: 31601

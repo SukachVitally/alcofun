@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: prod
+  name: kibana-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/sukach/volumes/kibana
+  claimRef:
+    name: kibana-pvc
+    namespace: prod
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: prod
+  name: kibana-pvc
+spec:
+  volumeName: kibana-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: kibana-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      volumes:
+        - name:  kibana-volume
+          persistentVolumeClaim:
+            claimName: kibana-pvc
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.10.2
+        volumeMounts:
+        - name: kibana-volume
+          mountPath: /usr/share/kibana/data
+        ports: 
+        - containerPort: 5601
+        env: 
+        - name: ELASTICSEARCH_HOSTS
+          value: http://elasticsearch-service:9200
+        resources:
+          limits:
+            # cpu: "1000m" # todo: not enough CPU 
+            memory: "1Gi" 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: kibana-service
+spec:
+  type: NodePort
+  selector:
+    app: kibana
+  ports:
+    - protocol: TCP
+      name: kibana
+      port: 5601
+      targetPort: 5601
+      nodePort: 31601
