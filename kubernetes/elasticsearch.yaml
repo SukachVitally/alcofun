@@ -68,6 +68,13 @@ spec:
         #   limits:
         #     cpu: "4"
         #     memory: "7000Mi" 
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.10.2
+        ports: 
+        - containerPort: 5601
+        env: 
+        - name: ELASTICSEARCH_HOSTS
+          value: http://elasticsearch-service:9200
 
 ---
 apiVersion: v1
@@ -81,6 +88,12 @@ spec:
     app: elasticsearch
   ports:
     - protocol: TCP
+      name: elasticsearch
       port: 9200
       targetPort: 9200
       nodePort: 31200
+    - protocol: TCP
+      name: kibana
+      port: 5601
+      targetPort: 5601
+      nodePort: 31601
