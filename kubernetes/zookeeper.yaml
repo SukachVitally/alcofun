@@ -39,7 +39,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    app: postgres
+    app: zookeeper
   ports:
     - protocol: TCP
       name: client

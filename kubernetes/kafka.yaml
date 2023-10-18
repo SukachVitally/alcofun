@@ -21,11 +21,11 @@ spec:
         - name: KAFKA_BROKER_ID
           value: "1"
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper-service:31181"
+          value: "zookeeper-service:2181"
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: EXTERNAL://localhost:8097,INTERNAL://kafka-service:8097
+          value: EXTERNAL://virusx:31097,INTERNAL://kafka-service:8097
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INTERNAL
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
@@ -42,17 +42,17 @@ spec:
         - name: KAFKA_BROKER_ID
           value: "2"
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper-service:31181"
+          value: "zookeeper-service:2181"
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: EXTERNAL://localhost:8098,INTERNAL://kafka-service:8098
+          value: EXTERNAL://virusx:31098,INTERNAL://kafka-service:8098
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INTERNAL
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "2"
         ports:
-        - containerPort: 8080
+        - containerPort: 8098
         resources:
           limits:
             #cpu: "4" # todo: insufficient CPU
@@ -67,7 +67,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    app: postgres
+    app: kafka
   ports:
     - protocol: TCP
       name: kafka1
