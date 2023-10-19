@@ -1,7 +1,7 @@
 FROM amazoncorretto:17.0.5
 
-COPY target/intake-0.0.1-SNAPSHOT.jar /intake.jar
+COPY target/searchapp-0.0.1-SNAPSHOT.jar /searchapp.jar
 
-EXPOSE 8888
+EXPOSE 80
 
-CMD ["java", "-jar", "/intake.jar"]
+CMD ["java", "-jar", "/searchapp.jar"]

@@ -32,10 +32,14 @@ mvn clean flyway:migrate -Dflyway.user=user -Dflyway.password=password -Dflyway.
 mvn package -DskipTests
 ```
 
-### Run app from jar
+### Run app from jar (prod env)
 ```shell
 java -jar target/searchapp-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=prod
+```
 
+### Run app from jar (local)
+```shell
+java -Duser.timezone=Europe/Zaporozhye -jar target/searchapp-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=prod
 ```
 
 ## Deploy with ansible
