@@ -46,3 +46,10 @@ java -Duser.timezone=Europe/Zaporozhye -jar target/searchapp-0.0.1-SNAPSHOT.jar 
 ```shell
 ansible-playbook -i ansible/hosts.ini ansible/deploy_dev.yaml
 ```
+
+
+## Deploy docker image to private registry
+```shell
+docker build . -t virusx:32000/alcosearch
+docker pull virusx:32000/alcosearch
+```
