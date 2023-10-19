@@ -21,7 +21,7 @@ spec:
         - name: KAFKA_CLUSTERS_0_NAME
           value: local
         - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-          value: kafka-service:8097,kafka-service:8098
+          value: kafka1-service:8097,kafka2-service:8098
         - name: KAFKA_CLUSTERS_0_ZOOKEEPER
           value: zookeeper-service:31181
         ports:
