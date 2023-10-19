@@ -1,0 +1,92 @@
+server:
+  port: 7080
+
+spring:
+  elasticsearch:
+    uris: "elasticsearch-service.prod:9200"
+  r2dbc:
+    url: r2dbc:postgresql://postgres-service.prod:5432/alcosearch
+    username: user
+    password: password
+  thymeleaf:
+    cache: false
+  flyway:
+    url: jdbc:postgresql://postgres-service.prod:5432/alcosearch
+    user: user
+    password: password
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: kafka1-service.prod:8097,kafka2-service.prod:8098
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.alco.searchapp.provider.dto.ProductPageDto
+  config:
+    import:
+      - providers/alcomag.yaml
+      - providers/rozetka.yaml
+      - providers/okwine.yaml
+
+app:
+  image-service:
+    base-url: http://minio-service.prod:9000/images/
+    storage: MINIO
+    bucket: images
+
+  product:
+    subscriber:
+      enabled: false
+      providers:
+        - type: ALCOMAG
+          delay-sec: 3
+        - type: ROZETKA
+          delay-sec: 3
+        - type: OKWINE
+          delay-sec: 10
+    producer:
+      enabled: false
+      providers:
+      - ALCOMAG
+      - ROZETKA
+      - OKWINE
+    #      - MAUDAU // broken
+    search:
+      index: products1
+  provider-topic:
+    topic: products
+    replication-factor: 2
+    partitions: 2
+#logging:
+#  level:
+#    io.r2dbc.postgresql.QUERY: DEBUG # for queries
+#    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+
+minio:
+  access-key: JkPjTAe4DzqmF6hYKKGo
+  bucket: images
+  url: http://minio-service.prod:9000
+  secret-key: L0j9FtUeXDiB0kFOfOT1WxikbwOPs7t2lQdUVC36
+
+aws:
+  s3:
+    accessKey: AKIAYMBPWFAHSAJN3H42
+    secretKey: 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
+    region: eu-north-1
+    bucket: dev-alcofun-images
+
+springdoc:
+  swagger-ui:
+    path: /swagger/

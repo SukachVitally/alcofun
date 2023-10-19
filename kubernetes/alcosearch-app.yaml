@@ -17,12 +17,15 @@ spec:
       containers:
       - name: alcosearch
         image: localhost:32000/alcosearch:latest
+        env:
+        - name: spring_profiles_active
+          value: prod
         ports:
         - containerPort: 7080
         # resources:
-          # limits:
-          #   # cpu: "4"
-          #   memory: "10Gi"
+        #   limits:
+        #     # cpu: "4"
+        #     memory: "6Gi"
 
 ---
 apiVersion: v1
@@ -38,4 +41,4 @@ spec:
     - protocol: TCP
       port: 7080
       targetPort: 7080
-      nodePort: 30080
+      nodePort: 30088
