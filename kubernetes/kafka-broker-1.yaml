@@ -70,10 +70,10 @@ spec:
         volumeMounts:
         - name: kafka1-volume
           mountPath: /var/lib/kafka/data
-        resources:
-          limits:
-            #cpu: "4" # todo: insufficient CPU
-            memory: "1000Mi"
+        # resources:
+        #   limits:
+        #     #cpu: "4" # todo: insufficient CPU
+        #     memory: "4000Mi"
 
 ---
 apiVersion: v1
