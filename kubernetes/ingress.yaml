@@ -5,13 +5,12 @@ metadata:
   name: main-ingress
   namespace: prod
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: $uri
 spec:
   rules:
-    - host: virusx
-      http:
+    - http:
         paths:
-          - path: /api/
+          - path: /api
             pathType: Prefix
             backend:
               service:
