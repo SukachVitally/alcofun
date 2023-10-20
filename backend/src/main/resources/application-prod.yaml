@@ -58,6 +58,7 @@ app:
           delay-sec: 10
     producer:
       enabled: false
+      cron: 0 30 15 * * ?
       providers:
       - ALCOMAG
       - ROZETKA

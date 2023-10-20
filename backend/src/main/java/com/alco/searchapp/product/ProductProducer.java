@@ -4,6 +4,7 @@ import com.alco.searchapp.properites.ProductProducerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
 import com.alco.searchapp.service.QueueService;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +25,7 @@ public class ProductProducer {
 
     private final QueueService queueService;
 
-    @Scheduled(fixedDelay = 1000000)
+    @Scheduled(cron = "${app.product.producer.cron}")
     public void init() {
         log.info("Start collecting products");
         Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);

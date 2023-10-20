@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 public class ProductProducerProperties {
     private Boolean enabled = false;
 
+    private String cron = "";
+
     private Integer threadCap = 1;
 
     private Integer queueCap = 1;
