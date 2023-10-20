@@ -42,13 +42,13 @@ spring:
 
 app:
   image-service:
-    base-url: http://minio-service.prod:9000/images/
+    base-url: /images/
     storage: MINIO
     bucket: images
 
   product:
     subscriber:
-      enabled: false
+      enabled: true
       providers:
         - type: ALCOMAG
           delay-sec: 3
@@ -57,8 +57,8 @@ app:
         - type: OKWINE
           delay-sec: 10
     producer:
-      enabled: false
-      cron: 0 30 15 * * ?
+      enabled: true
+      cron: 0 05 13 * * ?
       providers:
       - ALCOMAG
       - ROZETKA

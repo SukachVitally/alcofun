@@ -17,6 +17,13 @@ spec:
                 name: alcosearch-service
                 port:
                   number: 7080
+          - path: /images
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9000
           - path: /
             pathType: Prefix
             backend:
