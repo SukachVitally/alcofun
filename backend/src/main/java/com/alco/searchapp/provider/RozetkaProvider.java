@@ -127,7 +127,9 @@ public class RozetkaProvider implements IProvider  {
                                         Spliterators.spliteratorUnknownSize(options.elements(), Spliterator.ORDERED), false))
                                 .collect(Collectors.toMap(
                                         node -> node.get("title").asText(),
-                                        node -> node.get("values").get(0).get("title").asText()));
+                                        node -> node.get("values").get(0).get("title").asText(),
+                                        (existValue, newValue) -> existValue
+                                ));
                     } catch (IOException e) {
                         log.error("Cannot get characteristics", e);
                         return null;
