@@ -1,35 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  namespace: prod
-  name: kafka1-pv
-spec:
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /home/sukach/volumes/kafka1
-  claimRef:
-    name: kafka1-pvc
-    namespace: prod
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: prod
-  name: kafka1-pvc
-spec:
-  volumeName: kafka1-pv
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,10 +14,6 @@ spec:
       labels:
         app: kafka1
     spec:
-      volumes:
-      - name:  kafka1-volume
-        persistentVolumeClaim:
-          claimName: kafka1-pvc
       containers:
       - name: kafka1
         image: confluentinc/cp-kafka:latest
@@ -67,9 +32,6 @@ spec:
           value: "2"
         ports:
         - containerPort: 8097
-        volumeMounts:
-        - name: kafka1-volume
-          mountPath: /var/lib/kafka/data
         # resources:
         #   limits:
         #     #cpu: "4" # todo: insufficient CPU
