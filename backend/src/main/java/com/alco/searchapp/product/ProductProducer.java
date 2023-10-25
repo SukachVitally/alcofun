@@ -4,7 +4,6 @@ import com.alco.searchapp.properites.ProductProducerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
 import com.alco.searchapp.service.QueueService;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;

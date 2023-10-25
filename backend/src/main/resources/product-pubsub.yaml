@@ -1,0 +1,19 @@
+app:
+  product:
+    subscriber:
+      enabled: true
+      providers:
+        ALCOMAG:
+          delay-sec: 3
+        ROZETKA:
+          delay-sec: 3
+        OKWINE:
+          delay-sec: 10
+    producer:
+      enabled: true
+      cron: 0 35 17 * * ?
+      providers:
+        - ALCOMAG
+        - ROZETKA
+        - OKWINE
+    #      - MAUDAU // broken

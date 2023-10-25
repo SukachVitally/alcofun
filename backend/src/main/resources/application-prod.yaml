@@ -39,6 +39,7 @@ spring:
       - providers/alcomag.yaml
       - providers/rozetka.yaml
       - providers/okwine.yaml
+      - product-pubsub.yaml
 
 app:
   image-service:
@@ -47,27 +48,9 @@ app:
     bucket: images
 
   product:
-    subscriber:
-      enabled: true
-      providers:
-        - type: ALCOMAG
-          delay-sec: 3
-        - type: ROZETKA
-          delay-sec: 3
-        - type: OKWINE
-          delay-sec: 10
-    producer:
-      enabled: true
-      cron: 0 05 13 * * ?
-      providers:
-      - ALCOMAG
-      - ROZETKA
-      - OKWINE
-    #      - MAUDAU // broken
     search:
       index: products1
   provider-topic:
-    topic: products
     replication-factor: 2
     partitions: 2
 #logging:

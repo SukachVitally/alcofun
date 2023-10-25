@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("app.provider-topic")
 public class ProviderTopicProperties {
-    private String topic;
-
     private int partitions = 1;
 
     private short replicationFactor = 1;

@@ -1,7 +1,7 @@
 package com.alco.searchapp.properites;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -12,14 +12,10 @@ import org.springframework.stereotype.Component;
 public class ProductSubscriberProperties {
     private Boolean enabled = false;
 
-    private Integer delaySec = 0;
-
-    private List<Provider> providers;
+    private Map<ProviderTypeEnum, ProviderConfiguration> providers;
 
     @Data
-    public static class Provider {
-        private ProviderTypeEnum type;
-
+    public static class ProviderConfiguration {
         private Integer delaySec = 0;
     }
 }
