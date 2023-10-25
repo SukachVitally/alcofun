@@ -13,7 +13,7 @@ public class AwsS3Properties {
 
     private String secretKey;
 
-    private String bucket;
+    private String region = "eu-north-1";
 
-    private String region;
+    private String url;
 }

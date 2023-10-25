@@ -8,9 +8,11 @@ import com.alco.searchapp.repository.ProductImageRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -25,11 +27,16 @@ public class ImageService {
     public Mono<ProductImageEntity> addImage(String url, long productId) {
         return downloader.download(url)
                 .flatMap(content -> {
+                    var path = (String.format("%s-%s.jpeg", productId, UUID.randomUUID()));
+                    return storage.save(properties.getBucket(), path, content)
+                            .thenReturn(path);
+                })
+                .doOnNext(path -> log.info("File {} was saved to storage", path))
+                .flatMap(path -> {
                     var entity = new ProductImageEntity();
                     entity.setProductId(productId);
-                    entity.setPath(String.format("%s-%s.jpeg", productId, UUID.randomUUID()));
-                    return storage.save(properties.getBucket(), entity.getPath(), content)
-                            .flatMap(res -> repository.save(entity));
+                    entity.setPath(path);
+                    return repository.save(entity);
                 });
     }
 

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-//TODO: Do we need this service. It should be responsible only for product repository
+//TODO: Do we need this service? It should be responsible only for product repository
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -90,7 +90,7 @@ public class ProductService {
                             .then(Mono.just(entity));
                 })
                 .flatMap(entity -> Flux.fromIterable(product.getInfo().getImageUrls())
-                        .flatMap(imageUrl -> imageService.addImage(imageUrl, entity.getId()))
+                        .concatMap(imageUrl -> imageService.addImage(imageUrl, entity.getId()))
                         .then(Mono.just(entity)));
     }
 

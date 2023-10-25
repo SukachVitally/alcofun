@@ -44,7 +44,7 @@ spring:
 app:
   image-service:
     base-url: http://localhost:19000/test-images/
-    storage: MINIO
+    storage: S3
     bucket: test-images
   provider:
     list:
@@ -61,8 +61,8 @@ logging:
     io.r2dbc.postgresql.QUERY: INFO # for queries
     io.r2dbc.postgresql.PARAM: INFO # for parameters
 
-minio:
-  access-key: j3ehAGqWjN8bkrikjgCi
-  bucket: images
-  url: http://localhost:19000
-  secret-key: ESLP5aEm3PM2iyz0xNLsFuGaGxsxj6g2DFblDT9f
+aws:
+  s3:
+    accessKey: j3ehAGqWjN8bkrikjgCi
+    secretKey: ESLP5aEm3PM2iyz0xNLsFuGaGxsxj6g2DFblDT9f
+    url: http://localhost:19000

@@ -39,12 +39,12 @@ spring:
       - providers/alcomag.yaml
       - providers/rozetka.yaml
       - providers/okwine.yaml
-      - product-pubsub.yaml
+      - providers/product-pubsub.yaml
 
 app:
   image-service:
     base-url: /images/
-    storage: MINIO
+    storage: S3
     bucket: images
 
   product:
@@ -58,18 +58,11 @@ app:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
 #    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
 
-minio:
-  access-key: JkPjTAe4DzqmF6hYKKGo
-  bucket: images
-  url: http://minio-service.prod:9000
-  secret-key: L0j9FtUeXDiB0kFOfOT1WxikbwOPs7t2lQdUVC36
-
 aws:
   s3:
-    accessKey: AKIAYMBPWFAHSAJN3H42
-    secretKey: 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
-    region: eu-north-1
-    bucket: dev-alcofun-images
+    accessKey: JkPjTAe4DzqmF6hYKKGo
+    secretKey: L0j9FtUeXDiB0kFOfOT1WxikbwOPs7t2lQdUVC36
+    url: http://minio-service.prod:9000
 
 springdoc:
   swagger-ui:

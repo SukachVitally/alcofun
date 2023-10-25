@@ -1,7 +1,6 @@
 package com.alco.searchapp.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -12,7 +11,6 @@ import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchCo
 public class ElasticsearchConfiguration extends ReactiveElasticsearchConfiguration {
     private final ElasticsearchProperties properties;
 
-    @NotNull
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()

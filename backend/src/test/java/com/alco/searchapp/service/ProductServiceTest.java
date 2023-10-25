@@ -28,7 +28,7 @@ public class ProductServiceTest extends BaseFunctionalTest {
                         .abv(43.5f)
                         .volume(700)
                         .country("Ukraine")
-                        .imageUrls(List.of())
+                        .imageUrls(List.of("https://alcomag.ua/upload/iblock/e6a/nknlk1kpzqj57jhqjbg9b7dw6bmefr80.jpeg"))
                         .build())
                 .build();
 
@@ -44,7 +44,8 @@ public class ProductServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(product.getCategory(), CategoryTypeEnum.RUM);
         Assertions.assertEquals(product.getInfo().getPrice(), dto.getProviders().get(0).getPrice());
         Assertions.assertEquals(product.getProviderType(), dto.getProviders().get(0).getProviderType());
-        Assertions.assertEquals(product.getInfo().getImageUrls(), dto.getImageUrls());
+        Assertions.assertFalse(dto.getImageUrls().isEmpty());
+        Assertions.assertTrue(dto.getImageUrls().get(0).contains(dto.getId().toString()));
         Assertions.assertEquals(product.getInfo().getAbv(), dto.getCharacteristics().stream()
                 .filter(characteristicDto -> characteristicDto.getType().equals(CharacteristicTypeEnum.ALCOHOL_BY_VOLUME))
                 .map(CharacteristicDto::getValue)

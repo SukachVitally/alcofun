@@ -2,7 +2,6 @@ package com.alco.searchapp.image;
 
 import java.nio.ByteBuffer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -10,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-@Deprecated
+@Component
 @RequiredArgsConstructor
 public class AwsS3Storage implements StorageInterface {
     private final S3AsyncClient s3Client;

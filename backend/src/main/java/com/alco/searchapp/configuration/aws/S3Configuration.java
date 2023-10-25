@@ -1,6 +1,7 @@
 package com.alco.searchapp.configuration.aws;
 
 import com.alco.searchapp.properites.AwsS3Properties;
+import java.net.URI;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,6 +24,7 @@ public class S3Configuration {
         return S3AsyncClient.builder()
                 .httpClient(sdkAsyncHttpClient())
                 .region(Region.of(s3ConfigProperties.getRegion()))
+                .endpointOverride(URI.create(s3ConfigProperties.getUrl()))
                 .credentialsProvider(() -> AwsBasicCredentials.create(
                         s3ConfigProperties.getAccessKey(), s3ConfigProperties.getSecretKey()))
                 .forcePathStyle(true)
