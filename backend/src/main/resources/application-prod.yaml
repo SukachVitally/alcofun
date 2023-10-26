@@ -39,7 +39,7 @@ spring:
       - providers/alcomag.yaml
       - providers/rozetka.yaml
       - providers/okwine.yaml
-      - providers/product-pubsub.yaml
+      - product/product-config.yaml
 
 app:
   image-service:

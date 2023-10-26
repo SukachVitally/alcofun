@@ -53,12 +53,6 @@ public class ProductController {
                         );
     }
 
-    // todo: Temporary. Need to check admin access to it.
-    @GetMapping(path = "/refresh")
-    public Mono<Long> refreshElasticCache() {
-        return productSearchService.refresh();
-    }
-
     private ProductPreviewDto map(ProductSearchEntity entity) {
         return ProductPreviewDto.builder()
                 .id(entity.getId())
