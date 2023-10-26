@@ -46,7 +46,8 @@ app:
     base-url: /images/
     storage: S3
     bucket: images
-
+  best-price:
+    min-percent: 10
   product:
     search:
       index: products1

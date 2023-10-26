@@ -55,6 +55,8 @@ app:
   product:
     search:
       index: products-test5
+  best-price:
+    min-percent: 10
 
 logging:
   level:

@@ -3,6 +3,7 @@ package com.alco.searchapp.service;
 import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.ProductProviderDto;
 import com.alco.searchapp.entity.BestPriceEntity;
+import com.alco.searchapp.properites.BestPriceProperties;
 import com.alco.searchapp.repository.BestPriceRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -14,10 +15,9 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class BestPriceService {
-    // todo: Inject from properties
-    public static Double minPercent = 10d;
-
     private final BestPriceRepository repository;
+
+    private final BestPriceProperties properties;
 
     public Mono<BestPriceDto> getBestPrice(Long productId, List<ProductProviderDto> productProviders) {
         var bestProvider = productProviders.stream()
@@ -37,7 +37,7 @@ public class BestPriceService {
                     Double percent = Math.ceil((entity.getPrice() - bestProvider.getPrice()) / entity.getPrice() * 100);
 
                     var newEntity = createNewEntity(productId, bestProvider);
-                    newEntity.setHot(percent > minPercent);
+                    newEntity.setHot(percent > properties.getMinPercent());
                     newEntity.setPercent(percent);
 
                     return repository.save(newEntity);
