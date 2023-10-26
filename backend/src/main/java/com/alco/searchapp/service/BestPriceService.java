@@ -19,6 +19,7 @@ public class BestPriceService {
 
     private final BestPriceProperties properties;
 
+    // todo: Separate method on update and get best price.
     public Mono<BestPriceDto> getBestPrice(Long productId, List<ProductProviderDto> productProviders) {
         var bestProvider = productProviders.stream()
                 .min(Comparator.comparingDouble(ProductProviderDto::getPrice))
