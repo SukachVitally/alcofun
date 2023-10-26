@@ -111,4 +111,70 @@ public class ProductServiceTest extends BaseFunctionalTest {
                 .map(CharacteristicDto::getValue)
                 .findAny().orElse(null));
     }
+
+    @Test
+    public void addProductInfoWithoutDescription() {
+        var productWithoutDescription = Product.builder()
+                .category(CategoryTypeEnum.RUM)
+                .providerType(ProviderTypeEnum.ALCOMAG)
+                .info(ProductInfo.builder()
+                        .name("Some name")
+                        .ean("00001")
+                        .price(100d)
+                        .brand("Some brand")
+                        .volume(700)
+                        .country("Ukraine")
+                        .imageUrls(List.of())
+                        .build())
+                .build();
+
+        productService.addProduct(productWithoutDescription)
+                .blockOptional()
+                .orElseThrow();
+
+        var productWithDescription = Product.builder()
+                .category(CategoryTypeEnum.RUM)
+                .providerType(ProviderTypeEnum.ALCOMAG)
+                .info(ProductInfo.builder()
+                        .name("Some name 2")
+                        .ean("00001")
+                        .description("Some description")
+                        .price(100d)
+                        .brand("Some brand")
+                        .volume(700)
+                        .country("Ukraine")
+                        .imageUrls(List.of())
+                        .build())
+                .build();
+
+        var dto = productService.addProduct(productWithDescription)
+                .flatMap(entity -> productService.getProduct(entity.getProductId()))
+                .blockOptional()
+                .orElseThrow();
+
+        Assertions.assertNotNull(dto.getId());
+        Assertions.assertEquals(productWithoutDescription.getInfo().getName(), dto.getName());
+        Assertions.assertEquals(productWithoutDescription.getInfo().getEan(), dto.getEan());
+        Assertions.assertEquals(productWithDescription.getInfo().getDescription(), dto.getDescription());
+        Assertions.assertEquals(productWithoutDescription.getCategory(), CategoryTypeEnum.RUM);
+        Assertions.assertEquals(productWithoutDescription.getInfo().getPrice(), dto.getProviders().get(0).getPrice());
+        Assertions.assertEquals(productWithoutDescription.getProviderType(), dto.getProviders().get(0).getProviderType());
+        Assertions.assertEquals(productWithoutDescription.getInfo().getImageUrls(), dto.getImageUrls());
+        Assertions.assertNull(dto.getCharacteristics().stream()
+                .filter(characteristicDto -> characteristicDto.getType().equals(CharacteristicTypeEnum.ALCOHOL_BY_VOLUME))
+                .map(CharacteristicDto::getValue)
+                .findAny().orElse(null));
+        Assertions.assertEquals(productWithoutDescription.getInfo().getCountry(), dto.getCharacteristics().stream()
+                .filter(characteristicDto -> characteristicDto.getType().equals(CharacteristicTypeEnum.COUNTRY))
+                .map(CharacteristicDto::getValue)
+                .findAny().orElse(null));
+        Assertions.assertEquals(productWithoutDescription.getInfo().getVolume(), dto.getCharacteristics().stream()
+                .filter(characteristicDto -> characteristicDto.getType().equals(CharacteristicTypeEnum.VOLUME))
+                .map(CharacteristicDto::getValue)
+                .findAny().orElse(null));
+        Assertions.assertEquals(String.valueOf(productWithoutDescription.getInfo().getBrand()), dto.getCharacteristics().stream()
+                .filter(characteristicDto -> characteristicDto.getType().equals(CharacteristicTypeEnum.BRAND))
+                .map(CharacteristicDto::getValue)
+                .findAny().orElse(null));
+    }
 }

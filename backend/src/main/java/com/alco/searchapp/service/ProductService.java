@@ -43,6 +43,13 @@ public class ProductService {
         var providerType = product.getProviderType();
         return productRepository.findOneByEan(product.getInfo().getEan())
                 .switchIfEmpty(createProduct(product))
+                .flatMap(entity -> {
+                    if (entity.getDescription() == null && product.getInfo().getDescription() != null) {
+                        entity.setDescription(product.getInfo().getDescription());
+                        return productRepository.save(entity);
+                    }
+                    return Mono.just(entity);
+                })
                 .flatMap(entity -> providerService.createProviderIfNotExist(providerType.getId())
                         .flatMap(provider -> providerService.addProviderProduct(entity.getId(), provider.getId(),
                                 product.getInfo().getPrice(), product.getUrl())));
