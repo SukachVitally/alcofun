@@ -30,6 +30,7 @@ public class AlcomagProviderTest {
         Assertions.assertEquals("5010677740203", product.getEan());
         Assertions.assertNotNull(product.getPrice());
         Assertions.assertNotNull(product.getDescription());
+        Assertions.assertFalse(product.getDescription().contains("Alcomag"));
         Assertions.assertEquals(1000, product.getVolume());
         Assertions.assertEquals("Bacardi", product.getBrand());
         Assertions.assertEquals(35.0f, product.getAbv());

@@ -11,6 +11,7 @@ import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -110,7 +111,7 @@ public class AlcomagProvider implements IProvider {
                 .ean(info.getEan())
                 .name(info.getName())
                 .price(info.getOffers().getPrice())
-                .description(info.getDescription())
+                .description(Arrays.stream(info.getDescription().split("\\n")).findFirst().orElse(""))
                 .brand(info.getBrand().getName())
                 .volume(properties.containsKey(PROPERTY_VOLUME_TITLE)
                         ? VolumeUtils.parse(properties.get(PROPERTY_VOLUME_TITLE))
