@@ -18,5 +18,5 @@ app:
         - OKWINE
     #      - MAUDAU // broken
     refresher:
-      enable: true
+      enabled: true
       cron: 0 0 10 * * ?
