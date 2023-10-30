@@ -2,6 +2,7 @@ package com.alco.searchapp.controller.api;
 
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
+import com.alco.searchapp.dto.PriceRangeDto;
 import com.alco.searchapp.dto.ProductFullDto;
 import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.dto.RatingDto;
@@ -51,6 +52,17 @@ public class ProductController {
                                 .rating(new RatingDto(entity.getCompositeRating(), entity.getVotes()))
                                 .build()
                         );
+    }
+
+    @GetMapping("/price-range")
+    public Mono<PriceRangeDto> getPriceRange() {
+        return productSearchService.getMinPrice()
+                .flatMap(minPrice -> productSearchService.getMaxPrice()
+                        .map(maxPrice -> PriceRangeDto.builder()
+                                .min(minPrice)
+                                .max(maxPrice)
+                                .build()));
+
     }
 
     private ProductPreviewDto map(ProductSearchEntity entity) {

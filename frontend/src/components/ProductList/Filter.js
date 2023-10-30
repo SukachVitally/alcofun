@@ -26,11 +26,12 @@ function Filter(props) {
   const [characteristicsTypes, setCharacteristicsTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
+  const [priceRange, setPriceRange] = useState({min: null, max: null})
+  const [isPriceRageLoading, setPriceRageLoading] = useState(false);
   const [hot, setHot] = useState(false);
   const [sortingField, setSortingField] = useState(null);
   const [sortingOrder, setSortingOrder] = useState("desc");
-  const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
-    useState(false);
+  const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] = useState(false);
 
   const [enabledCategories, setEnabledCategories] = useState([]);
   const [enabledProviders, setEnabledProviders] = useState([]);
@@ -66,6 +67,14 @@ function Filter(props) {
     setCharacteristicsTypes(json);
 
     setCharacteristicsTypesLoading(false);
+  }
+
+  async function fetchPriceRange() {
+    setPriceRageLoading(true);
+    const json = await fetchJson("product/price-range");
+    setPriceRange(json);
+
+    setPriceRageLoading(false);
   }
 
   function updateEnabledItems() {
@@ -115,6 +124,7 @@ function Filter(props) {
     fetchCategories();
     fetchProviders();
     fetchCharacteristics();
+    fetchPriceRange();
   }, []);
 
   const handleClose = () => {
@@ -214,13 +224,14 @@ function Filter(props) {
             <Accordion.Item eventKey="100">
               <Accordion.Header>Price</Accordion.Header>
               <Accordion.Body>
-                <PriceFilter
-                  onChange={priceRangeHandler}
-                  min={0}
-                  max={10000}
-                  minPrice={minPrice}
-                  maxPrice={maxPrice}
-                />
+                {!isPriceRageLoading && (
+                  <PriceFilter
+                    onChange={priceRangeHandler}
+                    priceRange={priceRange}
+                    price={minPrice}
+                    maxPrice={maxPrice}
+                  />
+                )}
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>

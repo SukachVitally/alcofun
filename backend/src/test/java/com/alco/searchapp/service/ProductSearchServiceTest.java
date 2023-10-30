@@ -318,6 +318,23 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
     }
 
+    @Test
+    public void getMinPrice() {
+        var res = productSearchService.getMinPrice()
+                .blockOptional().orElseThrow();
+
+        Assertions.assertEquals(res, 100);
+    }
+
+    @Test
+    public void getMaxPrice() {
+        var res = productSearchService.getMaxPrice()
+                .blockOptional().orElseThrow();
+
+        Assertions.assertEquals(res, 600);
+    }
+
+
     // todo: Implement this test
     @Disabled
     @Test

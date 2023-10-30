@@ -11,8 +11,13 @@ import com.alco.searchapp.utils.PageableUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.erhlc.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -68,6 +73,26 @@ public class ProductSearchService {
                                 .currentPage(pageable.getPageNumber())
                                 .build()
                         ));
+    }
+
+    public Mono<Double> getMinPrice() {
+        return getPrice(Sort.Direction.ASC);
+    }
+
+    public Mono<Double> getMaxPrice() {
+        return getPrice(Sort.Direction.DESC);
+    }
+
+    private Mono<Double> getPrice(Sort.Direction direction) {
+        NativeQueryBuilder queryBuilder = new NativeQueryBuilder()
+                .withPageable(PageRequest.of(0, 1, Sort.by(direction, "price")));
+
+        return template.searchForPage(new NativeQuery(queryBuilder), ProductSearchEntity.class)
+                .map(result -> result.getContent().stream()
+                        .map(SearchHit::getContent)
+                        .findFirst()
+                        .map(ProductSearchEntity::getPrice)
+                        .orElse(0d));
     }
 
     private Flux<ProductSearchEntity> generateDenormalizedStructure() {
