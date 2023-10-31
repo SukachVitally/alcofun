@@ -18,7 +18,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.safety.Safelist;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -113,12 +115,14 @@ public class OkWineProvider implements IProvider {
             try {
                 var data = mapper.readValue(content, ProductData.class);
                 var productData = data.getProps().getPageProps().getHydrationData().getProductPageStore().getProduct();
+                var description = Jsoup.clean(productData.getMeta().getDescription(), "", Safelist.none(),
+                        new Document.OutputSettings().prettyPrint(true));
 
                 return ProductInfo.builder()
                         .name(productData.getMeta().getName())
                         .imageUrls(productData.getImages().stream().map(path -> IMAGE_URL_PREFIX + path).toList())
                         .ean(productData.getBarcodes().get(0))
-                        .description(productData.getMeta().getDescription())
+                        .description(description)
                         .price(productData.getPrices().getPrice())
                         .abv(parseAbv(productData.getMeta().getName()))
                         .volume(productData.getCharacteristics().stream()
