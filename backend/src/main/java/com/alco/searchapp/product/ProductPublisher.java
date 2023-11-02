@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers;
 @Component
 @ConditionalOnProperty(name = "app.product.producer.enabled", havingValue = "true")
 @RequiredArgsConstructor
-public class ProductProducer {
+public class ProductPublisher {
     private static final String THREAD_NAME = "ProductInfo collector";
 
     private final ProviderCollector collector;

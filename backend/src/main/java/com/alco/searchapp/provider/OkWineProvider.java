@@ -140,7 +140,7 @@ public class OkWineProvider implements IProvider {
                                 .orElse(null))
                         .brand(productData.getCharacteristics().stream()
                                 .filter(characteristic -> characteristic.getKey().getName().equals("Виробник"))
-                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
+                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa()) // todo: IndexOutOfBoundsException: Index 0 out of bounds for length 0
                                 .findAny()
                                 .orElse(null))
                         .build();
