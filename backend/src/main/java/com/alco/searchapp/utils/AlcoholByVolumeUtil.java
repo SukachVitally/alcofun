@@ -9,7 +9,7 @@ public class AlcoholByVolumeUtil {
                 .replace(",", ".")
                 .replace("%", "")
                 .replace(" ", "")
-                .replaceAll("^.*?\\-+", "");
+                .replaceAll("^.*?-+", "");
 
         try {
             return Float.valueOf(value);

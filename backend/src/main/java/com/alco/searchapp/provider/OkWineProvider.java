@@ -12,6 +12,8 @@ import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -36,6 +38,12 @@ public class OkWineProvider implements IProvider {
     private static final String IMAGE_URL_PREFIX = "https://content.okwine.ua/files/";
 
     private static final Pattern ABV_NAME_PATTERN = Pattern.compile("\\s([\\d.]*?)%");
+
+    private static final String CHARACTERISTIC_COUNTRY = "Країна";
+
+    private static final String CHARACTERISTIC_VOLUME = "Об'єм";
+
+    private static final String CHARACTERISTIC_MANUFACTURE = "Виробник";
 
     private final ObjectMapper mapper;
 
@@ -121,35 +129,19 @@ public class OkWineProvider implements IProvider {
                 return ProductInfo.builder()
                         .name(productData.getMeta().getName())
                         .imageUrls(productData.getImages().stream().map(path -> IMAGE_URL_PREFIX + path).toList())
-                        .ean(productData.getBarcodes().get(0))
+                        .ean(productData.getBarcodes().stream().findFirst().orElse(null))
                         .description(description)
                         .price(productData.getPrices().getPrice())
                         .abv(parseAbv(productData.getMeta().getName()))
-                        .volume(productData.getCharacteristics().stream()
-                                .filter(characteristic -> characteristic.getKey().getName().equals("Об'єм"))
-                                .map(characteristic -> {
-                                    var rawValue = characteristic.getValues().get(0).getValue().getUa();
-                                    return VolumeUtils.parse(rawValue);
-                                })
-                                .findAny()
-                                .orElse(null))
-                        .country(productData.getCharacteristics().stream()
-                                .filter(characteristic -> characteristic.getKey().getName().equals("Країна"))
-                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa())
-                                .findAny()
-                                .orElse(null))
-                        .brand(productData.getCharacteristics().stream()
-                                .filter(characteristic -> characteristic.getKey().getName().equals("Виробник"))
-                                .map(characteristic -> characteristic.getValues().get(0).getValue().getUa()) // todo: IndexOutOfBoundsException: Index 0 out of bounds for length 0
-                                .findAny()
-                                .orElse(null))
+                        .volume(findVolume(productData.getCharacteristics()))
+                        .country(findCharacteristic(productData.getCharacteristics(), CHARACTERISTIC_COUNTRY))
+                        .brand(findCharacteristic(productData.getCharacteristics(), CHARACTERISTIC_MANUFACTURE))
                         .build();
             } catch (JsonProcessingException e) {
                 return ProductInfo.builder().build();
             }
     }
-
-    // todo: Move to common utils
+    
     private Float parseAbv(String name) {
         Matcher matcher = ABV_NAME_PATTERN.matcher(name);
         if (matcher.find()) {
@@ -158,5 +150,26 @@ public class OkWineProvider implements IProvider {
         }
 
         return null;
+    }
+
+    private String findCharacteristic(List<ProductData.Characteristic> list, String type) {
+        return list.stream()
+                .filter(characteristic -> characteristic.getKey().getName().equals(type))
+                .map(characteristic -> characteristic.getValues().stream()
+                        .findFirst().orElse(null))
+                .filter(Objects::nonNull)
+                .map(obj -> obj.getValue().getUa())
+                .findAny()
+                .orElse(null);
+    }
+
+    private Integer findVolume(List<ProductData.Characteristic> list) {
+        return list.stream()
+                .filter(characteristic -> characteristic.getKey().getName().equals(CHARACTERISTIC_VOLUME))
+                .flatMap(characteristic -> characteristic.getValues().stream())
+                .map(obj -> obj.getValue().getUa())
+                .map(VolumeUtils::parse)
+                .findAny()
+                .orElse(null);
     }
 }
