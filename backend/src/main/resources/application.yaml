@@ -17,31 +17,13 @@ spring:
     locations: classpath:db/migration
   kafka:
     bootstrap-servers: localhost:8097,localhost:8098
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      group-id: product-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      enable-auto-commit: true
-      auto-commit-interval: 10
-      properties:
-        spring:
-          json:
-            use:
-              type:
-                headers: false
-            value:
-              default:
-                type: com.alco.searchapp.provider.dto.ProductPageDto
   config:
     import:
       - providers/alcomag.yaml
       - providers/rozetka.yaml
       - providers/okwine.yaml
       - product/product-config.yaml
+      - product/pubsub-config.yaml
 
 app:
   image-service:

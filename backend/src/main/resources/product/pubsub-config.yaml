@@ -1,0 +1,37 @@
+spring:
+  cloud:
+    function:
+      definition: productPageSupplier;alcomagConsumer;rozetkaConsumer;okwineConsumer
+    stream:
+      default-binder: kafka
+      kafka:
+        binder:
+          auto-create-topics: true
+          replication-factor: 2
+        bindings:
+          alcomagConsumer-in-0:
+            consumer:
+              ack-mode: record
+          rozetkaConsumer-in-0:
+            consumer:
+              ack-mode: record
+          okwineConsumer-in-0:
+            consumer:
+              ack-mode: record
+
+      bindings:
+        productPageSupplier-out-0:
+          destination: product-topic
+          binder: kafka
+        alcomagConsumer-in-0:
+          destination: product-topic
+          binder: kafka
+          group: alcomag-consumer
+        rozetkaConsumer-in-0:
+          destination: product-topic
+          binder: kafka
+          group: rozetka-consumer
+        okwineConsumer-in-0:
+          destination: product-topic
+          binder: kafka
+          group: okwine-consumer

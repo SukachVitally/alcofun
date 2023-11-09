@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class CharacteristicService {
-    private final ConversionService conversionService;
+    private final List<ConversionService> conversionService;
 
     private final CharacteristicRepository characteristicRepository;
 
@@ -79,7 +79,7 @@ public class CharacteristicService {
         return CharacteristicDto.builder()
                 .id(entity.getId())
                 .type(type)
-                .value(conversionService.convert(entity.getValue(), type.getType()))
+                .value(conversionService.get(0).convert(entity.getValue(), type.getType()))
                 .build();
     }
 

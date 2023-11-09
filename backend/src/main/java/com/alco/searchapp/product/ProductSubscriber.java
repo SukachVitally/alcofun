@@ -1,6 +1,5 @@
 package com.alco.searchapp.product;
 
-import com.alco.searchapp.constants.TopicConstants;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.properites.ProductSubscriberProperties;
@@ -8,11 +7,12 @@ import com.alco.searchapp.provider.ProviderCollector;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.service.ProductService;
 import com.alco.searchapp.service.RatingService;
-import com.alco.searchapp.utils.TimeUtils;
+import java.time.Duration;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,8 +22,6 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(name = "app.product.subscriber.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class ProductSubscriber {
-    private final static String GROUP_ID = "product-consumer";
-
     private final ProductService productService;
 
     private final RatingService ratingService;
@@ -32,26 +30,27 @@ public class ProductSubscriber {
 
     private final ProductSubscriberProperties properties;
 
-    @KafkaListener(topics = TopicConstants.PRODUCT_ALCOMAG, groupId = GROUP_ID)
-    public void listenAlcomag(ProductPageDto dto) {
-        collectInfo(dto);
-        TimeUtils.doDelay(properties.getProviders().get(ProviderTypeEnum.ALCOMAG).getDelaySec());
+    @Bean
+    public Consumer<Flux<ProductPageDto>> alcomagConsumer() {
+        return createConsumer(ProviderTypeEnum.ALCOMAG);
     }
 
-    @KafkaListener(topics = TopicConstants.PRODUCT_ROZETKA, groupId = GROUP_ID)
-    public void listenRozetka(ProductPageDto dto) {
-        collectInfo(dto);
-        TimeUtils.doDelay(properties.getProviders().get(ProviderTypeEnum.ROZETKA).getDelaySec());
+    @Bean
+    public Consumer<Flux<ProductPageDto>> rozetkaConsumer() {
+        return createConsumer(ProviderTypeEnum.ROZETKA);
     }
 
-    @KafkaListener(topics = TopicConstants.PRODUCT_OKWINE, groupId = GROUP_ID)
-    public void listenOkWine(ProductPageDto dto) {
-        collectInfo(dto);
-        TimeUtils.doDelay(properties.getProviders().get(ProviderTypeEnum.OKWINE).getDelaySec());
+    @Bean
+    public Consumer<Flux<ProductPageDto>> okwineConsumer() {
+        return createConsumer(ProviderTypeEnum.OKWINE);
     }
 
-    private void collectInfo(ProductPageDto dto) {
-        Flux.just(dto)
+    private Consumer<Flux<ProductPageDto>> createConsumer(ProviderTypeEnum provider) {
+        var configuration = properties.getProviders().get(provider);
+        log.info("Start for {}", provider.getName());
+        return stream -> stream
+                .filter(dto -> dto.getProvider().equals(provider))
+                .delayElements(Duration.ofSeconds(configuration.getDelaySec()))
                 .concatMap(collector::parse)
                 .flatMap(product -> productService.addProduct(product)
                         .flatMap(entity -> {
@@ -65,8 +64,7 @@ public class ProductSubscriber {
                                     .then(Mono.just(entity));
                         })
                         .thenReturn(product))
-                .subscribe(product -> log
-                        .info("[{}]: product {} was added", product.getProviderType().getName(),
-                                product.getInfo().getName()));
+                .subscribe(product -> log.info("[{}]: product {} was added", product.getProviderType().getName(), product.getInfo().getName()),
+                        e -> log.error("Consumer error: ", e));
     }
 }

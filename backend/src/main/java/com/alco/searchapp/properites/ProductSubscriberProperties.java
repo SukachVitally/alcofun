@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("app.product.subscriber")
 @Data
 public class ProductSubscriberProperties {
-    private Boolean enabled = false;
-
     private Map<ProviderTypeEnum, ProviderConfiguration> providers;
 
     @Data

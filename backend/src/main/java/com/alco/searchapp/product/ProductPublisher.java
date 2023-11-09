@@ -2,12 +2,16 @@ package com.alco.searchapp.product;
 
 import com.alco.searchapp.properites.ProductProducerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
-import com.alco.searchapp.service.QueueService;
+import com.alco.searchapp.provider.dto.ProductPageDto;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -22,7 +26,7 @@ public class ProductPublisher {
 
     private final ProductProducerProperties properties;
 
-    private final QueueService queueService;
+    private final Sinks.Many<ProductPageDto> sink = Sinks.many().unicast().onBackpressureBuffer();
 
     @Scheduled(cron = "${app.product.producer.cron}")
     public void init() {
@@ -30,8 +34,13 @@ public class ProductPublisher {
         Scheduler scheduler = Schedulers.newBoundedElastic(properties.getThreadCap(), properties.getQueueCap(), THREAD_NAME);
         collector.collect(properties.getProviders())
                 .publishOn(scheduler)
-                .flatMap(productPage -> queueService.sendProductPage(productPage)
-                        .thenReturn(productPage))
-                .subscribe(productPage -> log.info("Added url to queue {}", productPage.getUrl()));
+                .doOnNext(page -> log.info("Add product page {}", page.getUrl()))
+                .subscribe(message -> sink.emitNext(message, Sinks.EmitFailureHandler.FAIL_FAST));
     }
+
+    @Bean
+    public Supplier<Flux<ProductPageDto>> productPageSupplier() {
+        return sink::asFlux;
+    }
+
 }
