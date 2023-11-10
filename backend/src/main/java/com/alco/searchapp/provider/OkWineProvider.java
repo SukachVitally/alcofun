@@ -141,7 +141,7 @@ public class OkWineProvider implements IProvider {
                 return ProductInfo.builder().build();
             }
     }
-    
+
     private Float parseAbv(String name) {
         Matcher matcher = ABV_NAME_PATTERN.matcher(name);
         if (matcher.find()) {
