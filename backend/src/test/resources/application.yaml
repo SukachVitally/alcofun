@@ -40,18 +40,12 @@ spring:
     - providers/alcomag.yaml
     - providers/rozetka.yaml
     - providers/okwine.yaml
-
+    - product/product-config.yaml
 app:
   image-service:
     base-url: http://localhost:19000/test-images/
     storage: S3
     bucket: test-images
-  provider:
-    list:
-#      - ALCOMAG
-#      - ROZETKA
-      - OKWINE
-#      - MAUDAU
   product:
     search:
       index: products-test5

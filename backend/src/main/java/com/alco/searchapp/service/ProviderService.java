@@ -5,6 +5,7 @@ import com.alco.searchapp.dto.ProviderDto;
 import com.alco.searchapp.dto.ProductProviderDto;
 import com.alco.searchapp.entity.ProviderEntity;
 import com.alco.searchapp.entity.ProductProviderEntity;
+import com.alco.searchapp.properites.ProviderServiceProperties;
 import com.alco.searchapp.repository.ProductProviderRepository;
 import com.alco.searchapp.repository.ProviderRepository;
 import java.time.LocalDateTime;
@@ -19,11 +20,11 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ProviderService {
-    private static final int DAY_INTERVAL = 1;
-
     private final ProductProviderRepository productProviderRepository;
 
     private final ProviderRepository providerRepository;
+
+    private final ProviderServiceProperties properties;
 
     public Mono<ProviderEntity> createProviderIfNotExist(Integer typeId) {
         return providerRepository.findOneByTypeId(typeId)
@@ -64,7 +65,7 @@ public class ProviderService {
     }
 
     private Flux<ProductProviderEntity> findRelevantProducts(Long id) {
-        var date = LocalDateTime.now().minusDays(DAY_INTERVAL); // todo: Configure time interval
+        var date = LocalDateTime.now().minusSeconds(properties.getRelevantTimeIntervalSec());
 
         return productProviderRepository.findByProductIdAndCreatedAtAfter(id, date);
     }

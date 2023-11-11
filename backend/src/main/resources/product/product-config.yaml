@@ -1,22 +1,5 @@
 app:
-  product:
-    subscriber:
-      enabled: true
-      providers:
-        ALCOMAG:
-          delay-sec: 30
-        ROZETKA:
-          delay-sec: 5
-        OKWINE:
-          delay-sec: 20
-    producer:
-      enabled: true
-      cron: 0 0 8 * * ?
-      providers:
-        - ALCOMAG
-        - ROZETKA
-        - OKWINE
-    #      - MAUDAU // broken
-    refresher:
-      enabled: true
-      cron: 0 0 7 * * ?
+  provider-service:
+    relevant-time-interval-sec: 129600 # 36h
+  best-price:
+    min-percent: 10
