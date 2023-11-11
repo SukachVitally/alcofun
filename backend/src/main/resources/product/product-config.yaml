@@ -4,14 +4,14 @@ app:
       enabled: true
       providers:
         ALCOMAG:
-          delay-sec: 2
+          delay-sec: 30
         ROZETKA:
-          delay-sec: 1
-        OKWINE:
           delay-sec: 5
+        OKWINE:
+          delay-sec: 20
     producer:
       enabled: true
-      cron: 0 0 10 * * ?
+      cron: 0 0 8 * * ?
       providers:
         - ALCOMAG
         - ROZETKA
