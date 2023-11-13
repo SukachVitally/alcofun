@@ -55,4 +55,15 @@ microk8s kubectl exec -it <name-id> -n <namespace> -- sh
 microk8s kubectl logs -f <name-id> -n <namespace>
 ```
 
+## Update tls sertificates
+Update certbot certificate 
+
+
+```sh
+rsync -av ./kubernetes/* virusx:/home/sukach/kubernetes 
+microk8s kubectl create secret tls alcofun-co-ua-tls  -n prod  
+  --cert=certificates/alcofun.co.ua/fullchain1.pem   
+  --key=certificates/alcofun.co.ua/privkey1.pem
+
+```
 

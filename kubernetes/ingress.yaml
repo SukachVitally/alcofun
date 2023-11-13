@@ -7,8 +7,13 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: $uri
 spec:
+  tls:
+  - hosts:
+      - alcofun.co.ua
+    secretName: alcofun-co-ua-tls
   rules:
-    - http:
+    - host: alcofun.co.ua
+      http:
         paths:
           - path: /api
             pathType: Prefix
