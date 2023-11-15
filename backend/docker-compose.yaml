@@ -54,6 +54,15 @@ services:
     restart: always
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+  logstash:
+    depends_on:
+      - elasticsearch
+    image: docker.elastic.co/logstash/logstash:8.10.2
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./docker/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
   
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

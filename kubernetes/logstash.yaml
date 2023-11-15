@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: prod
+  name: logstash-pvc
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/config/logstash.conf
+  logstash.conf: |
+    input {
+      tcp {
+        port => 5000
+        codec => json_lines
+      }
+    }
+
+    filter {
+      json {
+        source => "message"
+        ecs_compatibility => "v1"
+        target => "ecs"  # Specify the target field for ECS fields
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["elasticsearch-service:9200"]
+        index => "logs-%{+YYYY.MM.dd}"
+      }
+      stdout { codec => rubydebug }  # Output to console for debugging purposes
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prod
+  name: logstash
+spec:
+
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      volumes:
+      - name: logstash-volume
+        configMap:
+          name: logstash-pvc
+      containers:
+      - name: logstash
+        image: docker.elastic.co/logstash/logstash:8.10.2
+        volumeMounts:
+        - name: logstash-volume
+          mountPath: /usr/share/logstash/config
+          readOnly: true
+
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: http://elasticsearch-service:9200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: logstash-service
+spec:
+  type: NodePort
+  selector:
+    app: logstash
+  ports:
+    - protocol: TCP
+      name: logstash
+      port: 5000
+      targetPort: 5000
+      nodePort: 30500
