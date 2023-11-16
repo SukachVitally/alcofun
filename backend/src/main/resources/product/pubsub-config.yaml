@@ -13,7 +13,6 @@ spring:
             consumer:
               ack-mode: record
           rozetkaConsumer-in-0:
-
             consumer:
               ack-mode: record
           okwineConsumer-in-0:
