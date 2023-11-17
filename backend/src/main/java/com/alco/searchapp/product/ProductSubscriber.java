@@ -64,7 +64,9 @@ public class ProductSubscriber {
                                     .then(Mono.just(entity));
                         })
                         .thenReturn(product))
+                .doOnError(e -> log.error("Error {} in {} provider", e.getMessage(), provider.getName()))
+                .onErrorResume(e -> Flux.empty())
                 .subscribe(product -> log.info("[{}]: product {} was added", product.getProviderType().getName(), product.getInfo().getName()),
-                        e -> log.error("Consumer error: ", e));
+                        e -> log.error("Consumer error: {}", e.getMessage(), e));
     }
 }
