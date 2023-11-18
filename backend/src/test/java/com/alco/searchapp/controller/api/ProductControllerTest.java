@@ -142,4 +142,15 @@ public class ProductControllerTest extends BaseFunctionalTest {
                 .exchange()
                 .expectStatus().isOk();
     }
+
+    @Test
+    void testGetProductPriceRange() {
+        webClient.get()
+                .uri("/api/product/price-range")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.min").isEqualTo(100)
+                .jsonPath("$.max").isEqualTo(600);
+    }
 }
