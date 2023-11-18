@@ -31,8 +31,6 @@ import reactor.core.publisher.Mono;
 public class RozetkaProvider implements IProvider  {
     private static final String LIST_LINK_SELECTOR = "a.goods-tile__picture";
 
-    private static final String LIST_PAGE_GET_PARAMETER = "page";
-
     private static final String PAGE_DATA_SELECTOR = "script[data-seo=Product]";
 
     private static final String CHARACTERISTIC_VOLUME = "Об'єм";

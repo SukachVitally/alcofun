@@ -40,6 +40,18 @@ public class AlcomagProviderTest {
         Assertions.assertTrue(product.getVotes() > 0);
     }
 
+    @Test
+    public void parseLinkWithCorrectDescription() {
+        var link = "https://alcomag.ua/ua/pivo-praga-premium-pils-4-7-svetloe-zh-b-0-5-l/";
+        var product = getProvider().parsePageInfo(link).block();
+
+        Assertions.assertNotNull(product);
+        Assertions.assertNotNull(product.getPrice());
+        Assertions.assertNotNull(product.getDescription());
+        Assertions.assertFalse(product.getDescription().contains("Наші консультанти"));
+        Assertions.assertFalse(product.getDescription().contains("Alcomag"));
+    }
+
     private AlcomagProvider getProvider() {
         return new AlcomagProvider(getHtmlLinkParser(), new ObjectMapperConfiguration().objectMapper(), getProperties());
     }

@@ -38,6 +38,25 @@ public class RozetkaProviderTest {
         Assertions.assertTrue(product.getVotes() > 0);
     }
 
+    @Test
+    public void parsePageInfoWith1LVolume() {
+        var link = "https://rozetka.com.ua/ua/jim_beam_5010196092142/p10484842/";
+        var product = getProvider().parsePageInfo(link).block();
+
+        Assertions.assertNotNull(product);
+        Assertions.assertEquals("Віскі Jim Beam White 4 роки витримки 1 л 40%", product.getName());
+        Assertions.assertEquals("5010196092142", product.getEan());
+        Assertions.assertNotNull(product.getPrice());
+        Assertions.assertNotNull(product.getDescription());
+        Assertions.assertEquals(1000, product.getVolume());
+        Assertions.assertEquals("Jim Beam", product.getBrand());
+        Assertions.assertEquals(40.0f, product.getAbv());
+        Assertions.assertEquals("США", product.getCountry());
+        Assertions.assertTrue(product.getImageUrls().size() > 0);
+        Assertions.assertTrue(product.getRating() > 0);
+        Assertions.assertTrue(product.getVotes() > 0);
+    }
+
     private RozetkaProperties getProperties() {
         var block = new ProviderBlock();
         block.setType(CategoryTypeEnum.WHISKEY);
