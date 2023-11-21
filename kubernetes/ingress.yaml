@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-      - alcofun.co.ua
-    secretName: alcofun-co-ua-tls
+      - alcoprice.com.ua
+    secretName: alcoprice-com-ua-tls
   rules:
-    - host: alcofun.co.ua
+    - host: alcoprice.com.ua
       http:
         paths:
           - path: /api
