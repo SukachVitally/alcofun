@@ -1,0 +1,24 @@
+{
+    "product": {
+        "description": "Oпис",
+        "characteristics": "Характеристики",
+        "providers": "Провайдери",
+        "view": "Перейти"
+    },
+    "products": {
+        "best_price_is": "Найкраща ціна ",
+        "view": "Перейти"
+    },
+    "filter": {
+        "filters": "Фільтри",
+        "providers": "Провайдери",
+        "categories": "Категорії",
+        "prices": "Ціна"
+    },
+    "menu": {
+        "home": "Головна",
+        "products": "Продукти",
+        "search_placeholder": "Введіть назву продукта",
+        "search": "Пошук"
+    }
+}

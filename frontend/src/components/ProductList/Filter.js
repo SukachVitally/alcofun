@@ -13,9 +13,11 @@ import "./Filter.css";
 import PriceFilter from "./PriceFilter";
 import Sorting from "./Sorting";
 import HotPriceFilter from "./HotPriceFilter";
+import { useTranslation } from "react-i18next";
 
 // Todo: simplify it!
 function Filter(props) {
+  const { t } = useTranslation();
   const location = useLocation();
 
   const [show, setShow] = useState(false);
@@ -26,12 +28,13 @@ function Filter(props) {
   const [characteristicsTypes, setCharacteristicsTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
-  const [priceRange, setPriceRange] = useState({min: null, max: null})
+  const [priceRange, setPriceRange] = useState({ min: null, max: null });
   const [isPriceRageLoading, setPriceRageLoading] = useState(false);
   const [hot, setHot] = useState(false);
   const [sortingField, setSortingField] = useState(null);
   const [sortingOrder, setSortingOrder] = useState("desc");
-  const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] = useState(false);
+  const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
+    useState(false);
 
   const [enabledCategories, setEnabledCategories] = useState([]);
   const [enabledProviders, setEnabledProviders] = useState([]);
@@ -174,19 +177,19 @@ function Filter(props) {
     <div className="filter">
       <div className="filter__button-block">
         <Button variant="primary" onClick={handleShow}>
-          Filters
+          {t("filter.filters")}
         </Button>
       </div>
 
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Filters</Offcanvas.Title>
+          <Offcanvas.Title>{t("filter.filters")}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <HotPriceFilter hot={hot} onChange={hotHandler} />
           <Accordion>
             <Accordion.Item eventKey="0">
-              <Accordion.Header>Categories</Accordion.Header>
+              <Accordion.Header>{t("filter.categories")}</Accordion.Header>
               <Accordion.Body>
                 {isCategoriesLoading && <Spinner />}
                 {!isCategoriesLoading && (
@@ -200,7 +203,7 @@ function Filter(props) {
               </Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
-              <Accordion.Header>Providers</Accordion.Header>
+              <Accordion.Header>{t("filter.providers")}</Accordion.Header>
               <Accordion.Body>
                 {isProvidersLoading && <Spinner />}
                 {!isProvidersLoading && (
@@ -222,7 +225,7 @@ function Filter(props) {
               />
             )}
             <Accordion.Item eventKey="100">
-              <Accordion.Header>Price</Accordion.Header>
+              <Accordion.Header>{t('filter.prices')}</Accordion.Header>
               <Accordion.Body>
                 {!isPriceRageLoading && (
                   <PriceFilter

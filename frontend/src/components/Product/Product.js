@@ -4,8 +4,10 @@ import ProviderList from "./ProviderList";
 import "./Product.css";
 import { useState } from "react";
 import StarRatings from "react-star-ratings";
+import { useTranslation } from "react-i18next";
 
 const Product = (props) => {
+  const {t} = useTranslation();
   const product = props.product;
   const [fullDescription, setFullDescription] = useState(false);
 
@@ -27,7 +29,8 @@ const Product = (props) => {
       <p className="text-end">Barcode: {product.ean}</p>
       <Carousel images={product.imageUrls} />
 
-      <h3>Description</h3>
+      <h3>
+        {t('product.description')}</h3>
       <div
         className={`product-view__description_${
           fullDescription ? "full" : "limited"

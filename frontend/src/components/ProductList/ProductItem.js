@@ -2,11 +2,13 @@ import Card from "react-bootstrap/Card";
 import { NavLink } from "react-router-dom";
 import "./ProductItem.css";
 import StarRatings from "react-star-ratings";
+import { useTranslation } from "react-i18next";
 
 function ProductItem(props) {
+  const { t } = useTranslation();
   const product = props.product;
 
-  const formattedPrice = product.price.toLocaleString("en-US", {
+  const formattedPrice = product.price.toLocaleString("uk-UA", {
     style: "currency",
     currency: "UAH",
     minimumFractionDigits: 2,
@@ -41,11 +43,11 @@ function ProductItem(props) {
           />
         </Card.Subtitle>
         <Card.Body>
-          The best price is <b>{formattedPrice}</b>
+          {t('products.best_price_is')} <b>{formattedPrice}</b>
         </Card.Body>
         <div className="product-item__footer">
           <NavLink to={`/products/${product.id}`} className="btn btn-primary">
-            View
+            {t('products.view')}
           </NavLink>
         </div>
       </Card.Body>
