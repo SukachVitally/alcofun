@@ -42,14 +42,14 @@ app:
       enabled: true
       providers:
         ALCOMAG:
-          delay-sec: 30
+          delay-sec: 50
         ROZETKA:
-          delay-sec: 5
+          delay-sec: 7
         OKWINE:
-          delay-sec: 20
+          delay-sec: 30
     producer:
       enabled: true
-      cron: 0 0 8 * * ?
+      cron: 0 0 0 * * ?
       providers:
         - ALCOMAG
         - ROZETKA
@@ -57,4 +57,4 @@ app:
     #      - MAUDAU // broken
     refresher:
       enabled: true
-      cron: 0 0 7 * * ?
+      cron: 0 0 23 * * ?

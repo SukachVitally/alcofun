@@ -18,7 +18,7 @@ public class ProductFullDto {
 
     private List<ProductSearchEntity.Provider> providers;
 
-    private List<String> imageUrls;
+    private String imageUrl;
 
     private Long categoryId;
 

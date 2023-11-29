@@ -47,7 +47,7 @@ public class ProductController {
                                 .categoryId(entity.getCategoryId())
                                 .categoryName(entity.getCategoryName())
                                 .characteristics(entity.getCharacteristics())
-                                .imageUrls(entity.getImageUrls())
+                                .imageUrl(entity.getImageUrls().stream().findFirst().orElse(null))
                                 .providers(entity.getProviders())
                                 .rating(new RatingDto(entity.getCompositeRating(), entity.getVotes()))
                                 .build()
