@@ -3,7 +3,6 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import FilterBody from "./FilterBody";
 import Accordion from "react-bootstrap/Accordion";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import fetchJson from "../../utils/http-utils.js";
 import updateList from "../../utils/list-utils.js";
 import queryString from "query-string";
@@ -11,14 +10,11 @@ import { Spinner } from "react-bootstrap";
 import CharacteristicFilter from "./CharacteristicFilter";
 import "./Filter.css";
 import PriceFilter from "./PriceFilter";
-import Sorting from "./Sorting";
-import HotPriceFilter from "./HotPriceFilter";
 import { useTranslation } from "react-i18next";
 
 // Todo: simplify it!
 function Filter(props) {
   const { t } = useTranslation();
-  const location = useLocation();
 
   const [show, setShow] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -30,9 +26,6 @@ function Filter(props) {
   const [maxPrice, setMaxPrice] = useState(null);
   const [priceRange, setPriceRange] = useState({ min: null, max: null });
   const [isPriceRageLoading, setPriceRageLoading] = useState(false);
-  const [hot, setHot] = useState(false);
-  const [sortingField, setSortingField] = useState(null);
-  const [sortingOrder, setSortingOrder] = useState("desc");
   const [isCharacteristicsTypesLoading, setCharacteristicsTypesLoading] =
     useState(false);
 
@@ -81,7 +74,7 @@ function Filter(props) {
   }
 
   function updateEnabledItems() {
-    const params = queryString.parse(location.search);
+    const params = queryString.parse(props.queryParams);
     if (params.categories instanceof Array) {
       setEnabledCategories(params.categories.map((id) => parseInt(id)));
     }
@@ -110,16 +103,6 @@ function Filter(props) {
     if (params.price_max !== undefined && params.price_max != null) {
       setMaxPrice([parseInt(params.price_max)]);
     }
-
-    if (params.sort !== undefined && params.sort != null) {
-      const pair = params.sort.split(",");
-      setSortingField(pair[0]);
-      setSortingOrder(pair[1]);
-    }
-
-    if (params.hot !== undefined) {
-      setHot(params.hot == "true");
-    }
   }
 
   useEffect(() => {
@@ -138,9 +121,6 @@ function Filter(props) {
       characteristics: enabledCharacteristics,
       price_min: minPrice,
       price_max: maxPrice,
-      sort_field: sortingField,
-      sort_order: sortingOrder,
-      hot: hot,
     });
 
     setShow(false);
@@ -164,29 +144,35 @@ function Filter(props) {
     setMaxPrice(range.max);
   };
 
-  const sortingHandler = (field, order) => {
-    setSortingField(field);
-    setSortingOrder(order);
-  };
+  const cleanHandler = () => {
+    console.log("cleanup");
+    setEnabledCategories([]);
+    setEnabledProviders([]);
+    setEnabledCharacteristics([]);
+    setMinPrice(null);
+    setMaxPrice(null);
+    
+    props.onFilterApply({
+      categories: [],
+      providers: [],
+      characteristics: [],
+      price_min: null,
+      price_max: null,
+    });
 
-  const hotHandler = (value) => {
-    setHot(value);
-  };
+    setShow(false);
+  }
 
   return (
     <div className="filter">
-      <div className="filter__button-block">
-        <Button variant="primary" onClick={handleShow}>
-          {t("filter.filters")}
-        </Button>
-      </div>
-
+      <Button variant="primary" onClick={handleShow}>
+        {t("filter.filters")}
+      </Button>
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>{t("filter.filters")}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <HotPriceFilter hot={hot} onChange={hotHandler} />
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>{t("filter.categories")}</Accordion.Header>
@@ -225,7 +211,7 @@ function Filter(props) {
               />
             )}
             <Accordion.Item eventKey="100">
-              <Accordion.Header>{t('filter.prices')}</Accordion.Header>
+              <Accordion.Header>{t("filter.prices")}</Accordion.Header>
               <Accordion.Body>
                 {!isPriceRageLoading && (
                   <PriceFilter
@@ -238,11 +224,9 @@ function Filter(props) {
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
-          <Sorting
-            onChange={sortingHandler}
-            field={sortingField}
-            order={sortingOrder}
-          />
+          <Button variant="danger" onClick={cleanHandler}>
+            {t("filter.clean")}
+          </Button>
         </Offcanvas.Body>
       </Offcanvas>
     </div>

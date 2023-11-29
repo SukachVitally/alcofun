@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 
 const ProviderList = (props) => {
   const { t } = useTranslation();
-  console.log(props);
   return (
     <>
       <h3>{t('product.providers')}</h3>

@@ -7,6 +7,8 @@ import queryString from "query-string";
 import { Spinner } from "react-bootstrap";
 import fetchJson from "../utils/http-utils.js";
 import filterNullProperties from "../utils/object-utils";
+import Sorting from "../components/ProductList/Sorting.js";
+import "./ProductListPage.css";
 
 function ProductListPage() {
   const [products, setProducts] = useState([]);
@@ -14,6 +16,8 @@ function ProductListPage() {
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryParams, setQueryParams] = useState({});
+  const [sortingField, setSortingField] = useState(null);
+  const [sortingOrder, setSortingOrder] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,14 +35,23 @@ function ProductListPage() {
             characteristics: filters.characteristics,
             price_min: filters.price_min,
             price_max: filters.price_max,
-            sort:
-              filters.sort_field != null && filters.sort_field != ""
-                ? filters.sort_field + "," + filters.sort_order
-                : null,
-            hot: filters.hot,
           })
         )
     );
+  };
+
+  const sortingApplyHandler = (field, order) => {
+    if (field != null) {
+      navigate(
+        "/products/?" +
+          queryString.stringify(
+            filterNullProperties({
+              ...queryParams,
+              sort: field != null ? field + "," + order : null,
+            })
+          )
+      );
+    }
   };
 
   async function fetchProducts(params) {
@@ -56,13 +69,27 @@ function ProductListPage() {
   useEffect(() => {
     console.log("refresh page");
     const params = queryString.parse(location.search);
+
+    if (params.sort !== undefined && params.sort != null) {
+      const pair = params.sort.split(",");
+      setSortingField(pair[0]);
+      setSortingOrder(pair[1]);
+    }
+
     setQueryParams(params);
     fetchProducts(params);
   }, [location]);
 
   return (
     <div className="Main">
-      <Filter onFilterApply={filterApplyHandler} />
+      <div className="flex-justify-container">
+        <Filter onFilterApply={filterApplyHandler} queryParams={queryParams} />
+        <Sorting
+          onChange={sortingApplyHandler}
+          field={sortingField}
+          order={sortingOrder}
+        />
+      </div>
       {isLoading && <Spinner />}
       {!isLoading && <ProductList products={products} />}
       {pageCount > 1 && (

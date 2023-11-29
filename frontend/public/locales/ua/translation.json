@@ -13,7 +13,8 @@
         "filters": "Фільтри",
         "providers": "Провайдери",
         "categories": "Категорії",
-        "prices": "Ціна"
+        "prices": "Ціна", 
+        "clean": "Очистити"
     },
     "menu": {
         "home": "Головна",
