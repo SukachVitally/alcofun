@@ -13,7 +13,7 @@ const Product = (props) => {
   const { t } = useTranslation();
   const product = props.product;
   const brandList = product.characteristics.filter(
-    (characteristic) => characteristic.name == "Brand"
+    (characteristic) => characteristic.name == "Бренд" // Use characteristic id!!!
   );
   const brand = brandList.length > 0 ? brandList[0] : null;
   const [fullDescription, setFullDescription] = useState(false);
