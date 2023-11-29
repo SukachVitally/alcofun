@@ -43,19 +43,21 @@ const Product = (props) => {
               </NavLink>
             </li>
           )}
-          <li className="breadcrumb-item active" aria-current="page">
-            <NavLink
-              className="navbar-brand"
-              to={`/products?${queryString.stringify(
-                filterNullProperties({
-                  categories: product.categoryId,
-                  characteristics: brand.id,
-                })
-              )}`}
-            >
-              {product.categoryName}
-            </NavLink>
-          </li>
+          {brand && (
+            <li className="breadcrumb-item active" aria-current="page">
+              <NavLink
+                className="navbar-brand"
+                to={`/products?${queryString.stringify(
+                  filterNullProperties({
+                    categories: product.categoryId,
+                    characteristics: brand.id,
+                  })
+                )}`}
+              >
+                {product.categoryName}
+              </NavLink>
+            </li>
+          )}
         </ol>
       </nav>
 
