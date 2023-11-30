@@ -1,12 +1,16 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider
+} from "react-router-dom";
 import ProductListPage from "./pages/ProductListPage";
 import ProductPage from "./pages/ProductPage";
 import RootLayout from "./pages/RootLayout";
+import MainPage from "./pages/MainPage";
 import ErrorPage from "./pages/ErrorPage";
-import ReactGA from 'react-ga4';
+import ReactGA from "react-ga4";
 
 function App() {
   ReactGA.initialize(process.env.REACT_APP_TRACKING_ID);
@@ -18,7 +22,7 @@ function App() {
           element: <RootLayout />,
           errorElement: <ErrorPage />,
           children: [
-            { index: true, element:  <Navigate to={"/products/"} /> },
+            { index: true, element: <MainPage /> },
             {
               path: "/products/",
               element: <ProductListPage />,

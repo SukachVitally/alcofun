@@ -5,10 +5,11 @@ import PaginatorItemPrevious from "./PaginatorItemPrevious";
 import queryString from "query-string";
 
 const Paginator = (props) => {
-  const { currentPage, pageCount, params } = props;
+  const { currentPage, pageCount, params, path } = props;
 
   const createPaginatorItem = (page) => (
     <PaginatorItem
+      path={path}
       params={queryString.stringify({ ...params, page: page })}
       page={page}
       active={page === currentPage}
@@ -19,6 +20,7 @@ const Paginator = (props) => {
     <Pagination className="d-flex justify-content-center">
       {currentPage !== 1 && (
         <PaginatorItemPrevious
+          path={path}
           params={queryString.stringify({ ...params, page: currentPage - 1 })}
           page={currentPage - 1}
         />
@@ -36,6 +38,7 @@ const Paginator = (props) => {
       {currentPage !== pageCount && createPaginatorItem(pageCount)}
       {currentPage !== pageCount && (
         <PaginatorItemNext
+          path={path}
           params={queryString.stringify({ ...params, page: currentPage + 1 })}
           page={currentPage + 1}
         />

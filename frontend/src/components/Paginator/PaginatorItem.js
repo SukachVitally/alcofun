@@ -4,7 +4,7 @@ const PaginatorItem = (props) => {
   return (
     <li className="page-item">
       <Link
-        to={`/products/?${props.params}`}
+        to={`${props.path}?${props.params}`}
         className={`page-link ${props.active ? "active" : ""}`}
         role="button"
       >

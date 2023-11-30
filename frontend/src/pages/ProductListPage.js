@@ -94,6 +94,7 @@ function ProductListPage() {
       {!isLoading && <ProductList products={products} />}
       {pageCount > 1 && (
         <Paginator
+          path="/products/"
           currentPage={currentPage}
           pageCount={pageCount}
           params={queryParams}
