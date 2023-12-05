@@ -1,7 +1,10 @@
 FROM amazoncorretto:17.0.5
 
-COPY target/searchapp-0.0.1-SNAPSHOT.jar /searchapp.jar
+WORKDIR /app
+
+COPY target/searchapp-0.0.1-SNAPSHOT.jar /app/searchapp.jar
 
 EXPOSE 7080
 
-CMD ["java", "-jar", "/searchapp.jar"]
+# Your application-specific commands
+CMD ["java", "-jar", "/app/searchapp.jar"]
