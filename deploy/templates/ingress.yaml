@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: $uri
+spec:
+  tls:
+  - hosts:
+      - alcoprice.com.ua
+    secretName: alcoprice-com-ua-tls
+  rules:
+      - host: alcoprice.com.ua
+        http:
+          paths:
+            - path: /api
+              pathType: Prefix
+              backend:
+                service:
+                  name: backend-service
+                  port:
+                    number: {{ .Values.backend.containerPort }}
+            - path: /images
+              pathType: Prefix
+              backend:
+                service:
+                  name: minio-service
+                  port:
+                    number: {{ .Values.minio.apiContainerPort }}
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: frontend-service
+                  port:
+                    number: {{ .Values.frontend.containerPort }}

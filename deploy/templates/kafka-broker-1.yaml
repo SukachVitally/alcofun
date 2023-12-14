@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: kafka1-deployment
 spec:
   replicas: 1
@@ -16,32 +16,28 @@ spec:
     spec:
       containers:
       - name: kafka1
-        image: confluentinc/cp-kafka:latest
+        image: {{ .Values.kafka.image }}
         env:
         - name: KAFKA_BROKER_ID
           value: "1"
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper-service:2181"
+          value: "zookeeper-service:{{ .Values.zookeeper.clientContainerPort }}"
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: EXTERNAL://virusx:31097,INTERNAL://kafka1-service:8097
+          value: EXTERNAL://virusx:{{ .Values.kafka1.nodePort }},INTERNAL://kafka1-service:{{ .Values.kafka1.containerPort }}
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INTERNAL
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "2"
         ports:
-        - containerPort: 8097
-        # resources:
-        #   limits:
-        #     #cpu: "4" # todo: insufficient CPU
-        #     memory: "4000Mi"
+        - containerPort: {{ .Values.kafka1.containerPort }}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: kafka1-service
 spec:
   type: NodePort
@@ -50,6 +46,6 @@ spec:
   ports:
     - protocol: TCP
       name: kafka1
-      port: 8097
-      targetPort: 8097
-      nodePort: 31097
+      port: {{ .Values.kafka1.containerPort }}
+      targetPort: {{ .Values.kafka1.containerPort }}
+      nodePort: {{ .Values.kafka1.nodePort }}

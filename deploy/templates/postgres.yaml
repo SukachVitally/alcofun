@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  namespace: prod
   name: postgres-pv
+  namespace: {{ .Values.namespace }}
 spec:
   capacity:
     storage: 20Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/sukach/volumes/postgres
+    path: {{ .Values.volumeDir }}/postgres
   claimRef:
     name: postgres-pvc
     namespace: prod
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: postgres-pvc
 spec:
   volumeName: postgres-pv
@@ -33,7 +33,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: postgres-deployment
 spec:
   replicas: 1
@@ -51,29 +51,25 @@ spec:
             claimName: postgres-pvc
       containers:
       - name: postgres
-        image: postgres:latest
+        image: {{ .Values.postgres.image }}
         env:
           - name: POSTGRES_USER
-            value: user
+            value: {{ .Values.postgres.username }}
           - name: POSTGRES_PASSWORD
-            value: password
+            value: {{ .Values.postgres.password }}
           - name: POSTGRES_DB
-            value: alcosearch
+            value: {{ .Values.postgres.database }}
         volumeMounts:
         - name: postgres-volume
           mountPath: /var/lib/postgresql/data
         ports:
-        - containerPort: 5432
-        resources:
-          limits:
-            cpu: "2"
-            memory: "2048Mi"
+        - containerPort: {{ .Values.postgres.containerPort }}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: postgres-service
 spec:
   type: NodePort
@@ -81,6 +77,6 @@ spec:
     app: postgres
   ports:
     - protocol: TCP
-      port: 5432
-      targetPort: 5432
-      nodePort: 31432
+      port: {{ .Values.postgres.containerPort }}
+      targetPort: {{ .Values.postgres.containerPort }}
+      nodePort: {{ .Values.postgres.nodePort }}

@@ -1,8 +1,0 @@
----
-- name: Restart supervisor
-  service:
-    name: supervisord
-    enabled: yes
-    state: restarted
-  become: true
-  listen: "restart_supervisor"

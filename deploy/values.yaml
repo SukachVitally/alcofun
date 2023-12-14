@@ -1,0 +1,67 @@
+namespace: prod
+
+backend: 
+  image: localhost:32000/backend:0.1.0
+  appProfile: prod
+  nodePort: 30088
+  containerPort: 7080
+
+volumeDir: /home/sukach/volumes
+
+elasticsearch:
+  image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+  nodePort: 31200
+  containerPort: 9200
+
+frontend:
+  image: localhost:32000/frontend:0.1.0
+  containerPort: 80
+  nodePort: 31089
+
+kafka: 
+  image: confluentinc/cp-kafka:latest
+
+kafka1:
+  containerPort: 8097
+  nodePort: 31097
+
+kafka2:
+  containerPort: 8098
+  nodePort: 31098
+
+kafka_ui:
+  image: provectuslabs/kafka-ui
+  containerPort: 8080
+  nodePort: 31080
+
+zookeeper:
+  image: confluentinc/cp-zookeeper:latest
+  clientContainerPort: 2181
+  clientNodePort: 31181
+
+kibana:
+  image: docker.elastic.co/kibana/kibana:8.10.2
+  containerPort: 5601
+  nodePort: 31601
+
+logstash:
+  image: docker.elastic.co/logstash/logstash:8.10.2
+  containerPort: 5000
+  nodePort: 30500
+
+minio:
+  image: quay.io/minio/minio
+  apiContainerPort: 9000
+  apiNodePort: 31900
+  dashboardContainerPort: 9001
+  dashboardNodePort: 31901
+  username: minioadmin
+  password: minioadmin
+
+postgres:
+  image: postgres:latest
+  containerPort: 5432
+  nodePort: 31432
+  username: user
+  password: password
+  database: alcosearch

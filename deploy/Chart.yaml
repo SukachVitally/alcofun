@@ -1,0 +1,12 @@
+apiVersion: v2
+name: alcoprice-web
+version: 0.1.0
+deprecated: false
+keywords:
+  - alcoprice alcohol agregator
+home: https://alcoprice.com.ua
+dependencies: []
+maintainers: # (optional)
+  - name: Vitaly Sukach
+    email: sukach.v.v@gmail.com
+appVersion: 0.1.0

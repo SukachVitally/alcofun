@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: kafka2-deployment
 spec:
   replicas: 1
@@ -16,32 +16,28 @@ spec:
     spec:
       containers:
       - name: kafka2
-        image: confluentinc/cp-kafka:latest
+        image: {{ .Values.kafka.image }}
         env:
         - name: KAFKA_BROKER_ID
           value: "2"
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: "zookeeper-service:2181"
+          value: "zookeeper-service:{{ .Values.zookeeper.clientContainerPort }}"
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: EXTERNAL://virusx:31098,INTERNAL://kafka2-service:8098
+          value: EXTERNAL://virusx:{{ .Values.kafka2.nodePort }},INTERNAL://kafka2-service:{{ .Values.kafka2.containerPort }}
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INTERNAL
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "2"
         ports:
-        - containerPort: 8098
-        # resources:
-        #   limits:
-        #     #cpu: "4" # todo: insufficient CPU
-        #     memory: "4000Mi"
+        - containerPort: {{ .Values.kafka2.containerPort }}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: kafka2-service
 spec:
   type: NodePort
@@ -50,6 +46,6 @@ spec:
   ports:
     - protocol: TCP
       name: kafka2
-      port: 8098
-      targetPort: 8098
-      nodePort: 31098
+      port: {{ .Values.kafka2.containerPort }}
+      targetPort: {{ .Values.kafka2.containerPort }}
+      nodePort: {{ .Values.kafka2.nodePort }}
