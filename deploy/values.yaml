@@ -14,7 +14,7 @@ elasticsearch:
   containerPort: 9200
 
 frontend:
-  image: localhost:32000/frontend:0.1.0
+  image: localhost:32000/frontend:0.1.1
   containerPort: 80
   nodePort: 31089
 
