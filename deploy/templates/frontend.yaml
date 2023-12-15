@@ -1,8 +1,26 @@
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: custom-nginx-config
+data:
+  custom-nginx-config.conf: |
+    server {
+      listen 80 default_server;
+      listen [::]:80 default_server;
+      root /usr/share/nginx/html;
+
+      location / {
+        try_files $uri $uri/ /index.html;
+      }
+    }
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ .Values.namespace }}
+  namespace: prod
   name: frontend-deployment
 spec:
   replicas: 1
@@ -14,11 +32,23 @@ spec:
       labels:
         app: frontend
     spec:
+      volumes:
+      - name: frontend-volume
+        hostPath:
+          path: {{ .Values.volumeDir  }}/frontend
+      - name: custom-nginx-config-volume
+        configMap:
+          name: custom-nginx-config
       containers:
       - name: frontend
-        image: {{ .Values.frontend.image }}
+        image: {{ .Values.frontend.image  }}
         ports:
         - containerPort: {{ .Values.frontend.containerPort }}
+        volumeMounts:
+        - name: frontend-volume
+          mountPath: /usr/share/nginx/html
+        - name: custom-nginx-config-volume
+          mountPath: /etc/nginx/conf.d
 
 ---
 apiVersion: v1

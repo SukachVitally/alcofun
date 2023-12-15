@@ -1,19 +1,11 @@
 .PHONY: deploy_frontend, deploy_backend, helm_upgrade, helm_install, helm_unistall
 
-frontend_version := 0.1.1
 backend_version := 0.1.0
 
-server := virusx:32000
-backend_image := $(server)/backend:$(backend_version)
-frontend_image := $(server)/frontend:$(frontend_version)
+backend_image := virusx:32000/backend:$(backend_version)
 
 deploy_frontend:
-	npm run -C frontend build 
-	docker build ./frontend -t $(frontend_image)
-	docker push $(frontend_image)
-	ssh virusx docker pull $(frontend_image)
-	$(MAKE) helm_upgrade
-	
+	rsync -av --delete --ignore-existing ./frontend/build/* virusx:/home/sukach/volumes/frontend 
 
 deploy_backend:
 	mvn clean package -DskipTests -f ./backend
