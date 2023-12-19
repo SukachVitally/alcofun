@@ -51,6 +51,8 @@ app:
       index: products-test5
   best-price:
     min-percent: 10
+  seo:
+    baseUrl: https://alcoprice.com.ua
 
 logging:
   level:

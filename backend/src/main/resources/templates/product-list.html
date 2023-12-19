@@ -1,28 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{fragments/head :: head}"></head>
+<head th:replace="~{fragments/head :: head}" th:with="title=${title}, description=${description}" ></head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light" th:replace="~{fragments/navigation :: navigation}"></nav>
-<!-- Main Content with Sidebar -->
-<div class="container-fluid mt-5">
-    <div class="row">
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar" th:replace="~{fragments/navigation :: sidebar}"></nav>
-        <!-- Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1>Welcome to My Website</h1>
-            <p>This is a basic template using Bootstrap 5.</p>
+    <nav th:replace="~{fragments/navigation :: navigation}"></nav>
+    <h1 th:text="${description}"></h1>
+    <h2>Доступні продукти</h2>
+    <ul>
+        <li th:each="product : ${products}">
+            <h3 th:text="${product.getName()}"></h3>
+            <div>ean: <b th:text="${product.getEan()}"></b></div>
 
-            <!-- ProductInfo List -->
-            <div class="row mt-4">
-                <div class="col-md-4 mb-4" th:each="product : ${products}" th:insert="~{fragments/product-list-item :: product-list-item}" th:with="product=${product}"></div>
-            </div>
-            <div th:if="${enablePaginator}">
-                <nav th:replace="~{fragments/paginator :: paginator}"></nav>
-            </div>
-        </main>
-    </div>
-</div>
-
-<footer th:replace="~{fragments/footer :: footer}"></footer>
+            <img th:attr="src=${product.getImageUrls().get(0)}" th:unless="${#lists.isEmpty(product.getImageUrls())}"/>
+            <a th:attr="href='/products/' + ${product.id}">view</a>
+        </li>
+    </ul>
 </body>
 </html>

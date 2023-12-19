@@ -4,6 +4,10 @@ metadata:
   name: main-ingress
   namespace: {{ .Values.namespace }}
   annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($http_user_agent ~* "(googlebot)" && ($uri = "/" || $uri ~ ^/products/)) {
+        rewrite ^(.*)$ /seo$1 break;
+      }
     nginx.ingress.kubernetes.io/rewrite-target: $uri
 spec:
   tls:
@@ -15,6 +19,13 @@ spec:
         http:
           paths:
             - path: /api
+              pathType: Prefix
+              backend:
+                service:
+                  name: backend-service
+                  port:
+                    number: {{ .Values.backend.containerPort }}
+            - path: /seo
               pathType: Prefix
               backend:
                 service:

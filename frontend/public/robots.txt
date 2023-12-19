@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://alcoprice.com.ua/api/seo/sitemap.xml

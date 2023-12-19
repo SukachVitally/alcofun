@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.erhlc.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -54,7 +53,11 @@ public class ProductSearchService {
     }
 
     public Mono<ProductSearchEntity> getProduct(Long id) {
-        return template.get(id.toString(), ProductSearchEntity.class);
+        return searchRepository.findById(id);
+    }
+
+    public Flux<ProductSearchEntity> getAllProducts() {
+        return searchRepository.findAll();
     }
 
     public Mono<ListResponseDto<ProductSearchEntity>> getProducts(Filterable filterable, Pageable pageable) {

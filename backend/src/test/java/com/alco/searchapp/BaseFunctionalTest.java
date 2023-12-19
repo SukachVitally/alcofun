@@ -8,6 +8,7 @@ import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.service.ProductService;
 import com.alco.searchapp.service.RatingService;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -98,5 +99,10 @@ abstract public class BaseFunctionalTest extends BaseTest {
                         .build()
                 )
                 .build();
+    }
+
+    protected void assertContains(String content, String value) {
+        Assertions.assertTrue(content.contains(value),
+                String.format("The content (%s) doesn't contains value (%s)", content, value));
     }
 }

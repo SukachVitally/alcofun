@@ -36,6 +36,8 @@ app:
   provider-topic:
     replication-factor: 2
     partitions: 2
+  seo:
+    baseUrl: https://alcoprice.com.ua
 #logging:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
