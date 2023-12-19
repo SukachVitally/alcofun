@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
-      if ($http_user_agent ~* "(googlebot)" && ($uri = "/" || $uri ~ ^/products/)) {
+      if ($http_user_agent ~* "googlebot|bingbot|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|W3C_Validator") {
         rewrite ^(.*)$ /seo$1 break;
       }
     nginx.ingress.kubernetes.io/rewrite-target: $uri
