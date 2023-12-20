@@ -5,8 +5,17 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
-      if ($http_user_agent ~* "googlebot|bingbot|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|W3C_Validator") {
-        rewrite ^(.*)$ /seo$1 break;
+      set $prerender 0;
+      if ($http_user_agent ~* "googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator") {
+          set $prerender 1;
+      }
+
+      if ($uri ~* "\.(js|css|xml|less|png|jpg|jpeg|gif|pdf|doc|txt|ico|rss|zip|mp3|rar|exe|wmv|doc|avi|ppt|mpg|mpeg|tif|wav|mov|psd|ai|xls|mp4|m4a|swf|dat|dmg|iso|flv|m4v|torrent|ttf|woff|svg|eot)") {
+        set $prerender 0;
+      }
+
+      if ($prerender = 1) {            
+        rewrite ^(.*)$ /seo$1 break;      
       }
     nginx.ingress.kubernetes.io/rewrite-target: $uri
 spec:
