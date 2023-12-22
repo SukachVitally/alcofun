@@ -1,5 +1,4 @@
 import Navigation from "../components/Navigation/Navigation";
-import Footer from "../components/Footer/Footer";
 
 const ErrorPage = () => {
   return <div className="App">
@@ -7,7 +6,6 @@ const ErrorPage = () => {
     <div className="flex-shrink-0">
       <h1>Something goes wrong!!!</h1>
     </div>
-    <Footer />
   </div>;
 };
 

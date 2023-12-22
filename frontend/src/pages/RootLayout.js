@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import Navigation from "../components/Navigation/Navigation";
-import Footer from "../components/Footer/Footer";
 import Container from "react-bootstrap/Container";
 
 const RootLayout = (props) => {
@@ -10,7 +9,6 @@ const RootLayout = (props) => {
       <Container>
         <Outlet />
       </Container>
-      <Footer />
     </div>
   );
 };
