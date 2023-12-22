@@ -1,6 +1,6 @@
 package com.alco.searchapp.controller.api;
 
-import com.alco.searchapp.entity.ProductSearchEntity;
+import com.alco.searchapp.entity.elastic.ProductSearchEntity;
 import com.alco.searchapp.service.ProductSearchService;
 import com.alco.searchapp.service.SeoService;
 import lombok.RequiredArgsConstructor;

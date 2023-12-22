@@ -1,6 +1,6 @@
 package com.alco.searchapp.dto;
 
-import com.alco.searchapp.entity.ProductSearchEntity;
+import com.alco.searchapp.entity.elastic.ProductSearchEntity;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;

@@ -33,9 +33,10 @@ app:
     bucket: images
   best-price:
     min-percent: 10
-  product:
-    search:
-      index: products1
+  search:
+    product: products1
+    category: category1
+    characteristic: characteristic1
   provider-topic:
     replication-factor: 2
     partitions: 2

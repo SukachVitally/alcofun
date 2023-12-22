@@ -20,11 +20,11 @@ public class CharacteristicController {
 
     @GetMapping("/{typeId}")
     public Flux<CharacteristicDto> getList(@PathVariable Integer typeId) {
-        return service.getAllForType(typeId);
+        return service.getAvailableForType(typeId);
     }
 
     @GetMapping("/types")
     public Flux<CharacteristicTypeDto> getCharacteristicTypes() {
-        return service.getTypes();
+        return service.getAvailableTypes();
     }
 }

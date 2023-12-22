@@ -1,4 +1,4 @@
-package com.alco.searchapp.entity;
+package com.alco.searchapp.entity.elastic;
 
 import java.util.List;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.InnerField;
 import org.springframework.data.elasticsearch.annotations.MultiField;
 
-@Document(indexName = "#{@environment.getProperty('app.product.search.index')}")
+@Document(indexName = "#{@environment.getProperty('app.search.product')}")
 @Data
 public class ProductSearchEntity {
     @Id

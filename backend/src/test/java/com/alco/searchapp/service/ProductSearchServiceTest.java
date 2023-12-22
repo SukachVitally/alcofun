@@ -5,7 +5,7 @@ import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
-import com.alco.searchapp.entity.ProductSearchEntity;
+import com.alco.searchapp.entity.elastic.ProductSearchEntity;
 import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProviderRepository;
@@ -27,6 +27,9 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
     private ProductSearchService productSearchService;
 
     @Autowired
+    private ElasticCollectService elasticService;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
     @Autowired
@@ -39,7 +42,7 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
     public void setup() {
         cleanDatabase();
         addProducts(); //todo: Just populate elasticsearch without database here.
-        productSearchService.refresh().block();
+        elasticService.refresh().block();
     }
 
     @Test

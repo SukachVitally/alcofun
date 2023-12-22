@@ -39,7 +39,7 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
         assertContains(content, "<title>Alcoprice UA</title>");
         assertContains(content,
                 "<h1>Alcoprice UA агрегатор алкогольних продуктів в Україні пропонує найвигідніші пропрозиції на ринку</h1>");
-        assertContains(content, BaseFunctionalTest.EAN1);
+        assertNotContains(content, BaseFunctionalTest.EAN1);
     }
 
     @Test

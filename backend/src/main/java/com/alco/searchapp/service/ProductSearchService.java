@@ -3,8 +3,8 @@ package com.alco.searchapp.service;
 import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
-import com.alco.searchapp.entity.ProductSearchEntity;
-import com.alco.searchapp.repository.ProductSearchRepository;
+import com.alco.searchapp.entity.elastic.ProductSearchEntity;
+import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
 import com.alco.searchapp.utils.PageableUtils;
@@ -45,11 +45,12 @@ public class ProductSearchService {
 
     private final CategoryService categoryService;
 
-    public Mono<Long> refresh() {
+    public Mono<List<Long>> refresh() {
         return searchRepository.deleteAll()
                 .thenMany(generateDenormalizedStructure())
                 .flatMap(searchRepository::save)
-                .count();
+                .map(ProductSearchEntity::getId)
+                .collectList();
     }
 
     public Mono<ProductSearchEntity> getProduct(Long id) {

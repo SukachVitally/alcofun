@@ -5,8 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties("app.product.search")
+@ConfigurationProperties("app.search")
 @Data
-public class ProductSearchServiceProperties {
-    private String index;
+public class SearchProperties {
+    private String product;
+
+    private String category;
+
+    private String characteristic;
 }

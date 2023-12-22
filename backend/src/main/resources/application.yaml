@@ -30,9 +30,10 @@ app:
     base-url: http://localhost:19000/images/
     storage: S3
     bucket: images
-  product:
-    search:
-      index: products1
+  search:
+    product: products1
+    category: category1
+    characteristic: characteristic1
   provider-topic:
     replication-factor: 2
     partitions: 2

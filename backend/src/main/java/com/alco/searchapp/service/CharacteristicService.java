@@ -5,8 +5,10 @@ import com.alco.searchapp.dto.CharacteristicDto;
 import com.alco.searchapp.dto.CharacteristicTypeDto;
 import com.alco.searchapp.entity.CharacteristicEntity;
 import com.alco.searchapp.entity.ProductCharacteristicEntity;
+import com.alco.searchapp.entity.elastic.CharacteristicSearchEntity;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProductCharacteristicRepository;
+import com.alco.searchapp.repository.elastic.CharacteristicSearchRepository;
 import com.alco.searchapp.utils.CharacteristicComparator;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -27,9 +29,27 @@ public class CharacteristicService {
 
     private final ProductCharacteristicRepository productCharacteristicRepository;
 
-    public Flux<CharacteristicTypeDto> getTypes() {
-        return characteristicRepository.findAll()
-                .map(CharacteristicEntity::getTypeId)
+    private final CharacteristicSearchRepository searchRepository;
+
+    public Mono<List<Long>> refresh(List<Long> ids) {
+        return searchRepository
+                .deleteAll()
+                .thenMany(Flux.fromIterable(ids))
+                .flatMap(characteristicRepository::findById)
+                .map(characteristic -> {
+                    var entity = new CharacteristicSearchEntity();
+                    entity.setId(characteristic.getId());
+                    entity.setTypeId(characteristic.getTypeId());
+                    entity.setValue(characteristic.getValue());
+                    return entity;
+                })
+                .flatMap(searchRepository::save)
+                .then(Mono.just(ids));
+    }
+
+    public Flux<CharacteristicTypeDto> getAvailableTypes() {
+        return searchRepository.findAll()
+                .map(CharacteristicSearchEntity::getTypeId)
                 .distinct()
                 .map(CharacteristicTypeEnum::findById)
                 .map(item -> CharacteristicTypeDto.builder()
@@ -60,8 +80,8 @@ public class CharacteristicService {
                         .map(this::map));
     }
 
-    public Flux<CharacteristicDto> getAllForType(Integer typeId) {
-        return characteristicRepository.findAllByTypeId(typeId)
+    public Flux<CharacteristicDto> getAvailableForType(Integer typeId) {
+        return searchRepository.findAllByTypeId(typeId)
                 .map(this::map)
                 .collectSortedList(new CharacteristicComparator())
                 .flatMapMany(Flux::fromIterable);
@@ -79,7 +99,16 @@ public class CharacteristicService {
         return CharacteristicDto.builder()
                 .id(entity.getId())
                 .type(type)
-                .value(conversionService.get(0).convert(entity.getValue(), type.getType()))
+                .value(conversionService.get(0).convert(entity.getValue(), type.getType())) // todo: fix it. Make only one conversion service
+                .build();
+    }
+
+    private CharacteristicDto map(CharacteristicSearchEntity entity) {
+        var type = CharacteristicTypeEnum.findById(entity.getTypeId());
+        return CharacteristicDto.builder()
+                .id(entity.getId())
+                .type(type)
+                .value(conversionService.get(0).convert(entity.getValue(), type.getType())) // todo: fix it. Make only one conversion service
                 .build();
     }
 

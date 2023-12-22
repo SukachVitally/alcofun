@@ -2,6 +2,8 @@ package com.alco.searchapp.controller.api;
 
 import com.alco.searchapp.BaseFunctionalTest;
 import com.alco.searchapp.constants.CharacteristicTypeEnum;
+import com.alco.searchapp.service.ElasticCollectService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -14,10 +16,18 @@ public class CharacteristicControllerTest extends BaseFunctionalTest {
     @Autowired
     private WebTestClient webClient;
 
+    @Autowired
+    private ElasticCollectService elasticService;
+
+    @BeforeEach
+    public void setup() {
+        cleanDatabase();
+        addProducts();
+        elasticService.refresh().block();
+    }
+
     @Test
     void testGetAllCharacteristicsForTypeList() {
-        addProducts();
-
         webClient.get()
                 .uri("/api/characteristic/" + CharacteristicTypeEnum.ALCOHOL_BY_VOLUME.getId())
                 .exchange()
@@ -28,8 +38,6 @@ public class CharacteristicControllerTest extends BaseFunctionalTest {
 
     @Test
     void testGetAllCharacteristicsTypes() {
-        addProducts();
-
         webClient.get()
                 .uri("/api/characteristic/types")
                 .exchange()

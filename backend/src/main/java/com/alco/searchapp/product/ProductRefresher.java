@@ -1,6 +1,6 @@
 package com.alco.searchapp.product;
 
-import com.alco.searchapp.service.ProductSearchService;
+import com.alco.searchapp.service.ElasticCollectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,11 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @ConditionalOnProperty(name = "app.product.refresher.enabled", havingValue = "true")
 public class ProductRefresher {
-    private final ProductSearchService productSearchService;
+    private final ElasticCollectService service;
 
     @Scheduled(cron = "${app.product.refresher.cron}")
     public void refresh() {
-        productSearchService.refresh()
-                .subscribe(count -> log.info("Product service was refreshed {} products", count));
+        service.refresh()
+                .subscribe(productIds -> log.info("Product service was refreshed {} products", productIds.size()));
     }
+
+
 }

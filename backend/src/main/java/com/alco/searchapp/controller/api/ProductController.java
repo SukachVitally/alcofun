@@ -6,7 +6,7 @@ import com.alco.searchapp.dto.PriceRangeDto;
 import com.alco.searchapp.dto.ProductFullDto;
 import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.dto.RatingDto;
-import com.alco.searchapp.entity.ProductSearchEntity;
+import com.alco.searchapp.entity.elastic.ProductSearchEntity;
 import com.alco.searchapp.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

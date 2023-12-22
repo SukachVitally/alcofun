@@ -103,6 +103,11 @@ abstract public class BaseFunctionalTest extends BaseTest {
 
     protected void assertContains(String content, String value) {
         Assertions.assertTrue(content.contains(value),
-                String.format("The content (%s) doesn't contains value (%s)", content, value));
+                String.format("The content (%s) doesn't contain value (%s)", content, value));
+    }
+
+    protected void assertNotContains(String content, String value) {
+        Assertions.assertFalse(content.contains(value),
+                String.format("The content (%s) contains value (%s)", content, value));
     }
 }

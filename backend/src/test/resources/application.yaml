@@ -46,9 +46,10 @@ app:
     base-url: http://localhost:19000/test-images/
     storage: S3
     bucket: test-images
-  product:
-    search:
-      index: products-test5
+  search:
+    product: products-test5
+    category: category-test5
+    characteristic: characteristic-test5
   best-price:
     min-percent: 10
   seo:

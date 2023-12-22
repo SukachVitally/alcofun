@@ -18,6 +18,6 @@ public class CategoryController {
 
     @GetMapping("/")
     public Flux<CategoryDto> getList() {
-        return service.getCategories();
+        return service.getAvailableCategories();
     }
 }
