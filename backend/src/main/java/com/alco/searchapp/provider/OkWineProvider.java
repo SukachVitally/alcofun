@@ -1,7 +1,6 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.exception.ProviderException;
 import com.alco.searchapp.properites.OkWineProperties;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
@@ -11,21 +10,17 @@ import com.alco.searchapp.utils.AlcoholByVolumeUtil;
 import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,37 +42,21 @@ public class OkWineProvider implements IProvider {
 
     private final ObjectMapper mapper;
 
-    private final WebClient client;
-
-    private final HtmlLinkParser linkParser;
+    private final LinkParser linkParser;
 
     private final OkWineProperties properties;
 
     @Override
     public Flux<ProductPageDto> getProductPages() {
         return Flux.fromIterable(properties.getBlocks())
-            .flatMap(block -> getContent(block.getUrl())
-                    .flatMapMany(content -> {
-                        try {
-                            var response = mapper.readValue(content, ListResponse.class);
-                            return Flux.fromStream(IntStream.range(1, response.getData().getMaxPage() + 1)
-                                    .boxed());
-                        } catch (IOException e) {
-                            return Flux.empty();
-                        }
-                    })
-                    .flatMap(page -> getContent(String.format("%s&page=%s", block.getUrl(), page)))
-                    .flatMap(content -> {
-                        try {
-                            var response = mapper.readValue(content, ListResponse.class);
-                            Stream<String> stream = response.getData().getData()
-                                .stream()
-                                .map(product -> PRODUCT_URL_PREFIX + product.getUrl());
-                            return Flux.fromStream(stream);
-                        } catch (IOException e) {
-                            return Flux.empty();
-                        }
-                    })
+            .flatMap(block -> linkParser.parseJson(block.getUrl(), ListResponse.class)
+                    .filter(response -> response.getData() != null && response.getData().getMaxPage() != null)
+                    .flatMapMany(response -> Flux
+                            .fromStream(IntStream.range(1, response.getData().getMaxPage() + 1).boxed()))
+                    .flatMap(page -> linkParser.parseJson(String.format("%s&page=%s", block.getUrl(), page), ListResponse.class))
+                    .filter(response -> response.getData() != null && response.getData().getData() != null)
+                    .flatMap(response -> Flux.fromStream(response.getData().getData().stream()
+                            .map(product -> PRODUCT_URL_PREFIX + product.getUrl())))
                     .map(url -> ProductPageDto.builder()
                             .url(url)
                             .provider(getType())
@@ -90,28 +69,11 @@ public class OkWineProvider implements IProvider {
         return ProviderTypeEnum.OKWINE;
     }
 
-    private Mono<String> getContent(String url) {
-        return client.get()
-                .uri(url)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::isError,
-                        response -> {
-                            if (response.statusCode().is4xxClientError()) {
-                                return Mono.error(new ProviderException("Custom 4xx error message"));
-                            } else if (response.statusCode().is5xxServerError()) {
-                                return Mono.error(new ProviderException("Custom 5xx error message"));
-                            } else {
-                                return Mono.error(new ProviderException("Custom error message"));
-                            }
-                        }
-                )
-                .bodyToMono(String.class);
-    }
-
     @Override
     public Mono<ProductInfo> parsePageInfo(String url) {
-        return linkParser.parse(url).map(this::parseDocument);
+        return linkParser
+                .parseHtml(url)
+                .map(this::parseDocument);
     }
 
     public ProductInfo parseDocument(Document document) {

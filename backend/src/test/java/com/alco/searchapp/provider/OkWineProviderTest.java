@@ -1,7 +1,5 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.configuration.HttpClientConfiguration;
-import com.alco.searchapp.configuration.ObjectMapperConfiguration;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.properites.OkWineProperties;
@@ -9,9 +7,8 @@ import com.alco.searchapp.properites.ProviderBlock;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
 
-public class OkWineProviderTest {
+public class OkWineProviderTest extends AbstractProviderTest {
     @Test
     public void getPathLinks() {
         var productPageDto = getProvider().getProductPages().blockFirst();
@@ -38,9 +35,17 @@ public class OkWineProviderTest {
 
     }
 
+    @Test
+    public void parseNonExistPage() {
+        var link = "https://okwine1.ua/ua/product/rom-dead-mans-fingers-dmf-black-375-07l?urlProduct=rom-dead-mans-fingers-dmf-black-375-07l";
+        var product = getProvider().parsePageInfo(link).block();
+
+        Assertions.assertNotNull(product);
+        Assertions.assertNull(product.getEan());
+    }
+
     private OkWineProvider getProvider() {
-        return new OkWineProvider(new ObjectMapperConfiguration().objectMapper(), getClient(),
-                new HtmlLinkParser(getClient()), getProperties());
+        return new OkWineProvider(objectMapper(), linkParser(), getProperties());
     }
 
     private OkWineProperties getProperties() {
@@ -50,9 +55,5 @@ public class OkWineProviderTest {
         var properties = new OkWineProperties();
         properties.setBlocks(List.of(block));
         return properties;
-    }
-
-    private WebClient getClient() {
-        return new HttpClientConfiguration().client();
     }
 }

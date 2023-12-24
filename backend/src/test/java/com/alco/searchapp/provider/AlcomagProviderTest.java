@@ -1,6 +1,5 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.configuration.HttpClientConfiguration;
 import com.alco.searchapp.configuration.ObjectMapperConfiguration;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
@@ -10,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class AlcomagProviderTest {
+public class AlcomagProviderTest extends AbstractProviderTest {
     @Test
     public void getPathLinks() {
         var productPageDto = getProvider().getProductPages().blockFirst();
@@ -53,7 +52,7 @@ public class AlcomagProviderTest {
     }
 
     private AlcomagProvider getProvider() {
-        return new AlcomagProvider(getHtmlLinkParser(), new ObjectMapperConfiguration().objectMapper(), getProperties());
+        return new AlcomagProvider(linkParser(), new ObjectMapperConfiguration().objectMapper(), getProperties());
     }
 
     private AlcomagProperties getProperties() {
@@ -63,9 +62,5 @@ public class AlcomagProviderTest {
         var properties = new AlcomagProperties();
         properties.setBlocks(List.of(block));
         return properties;
-    }
-
-    private HtmlLinkParser getHtmlLinkParser() {
-        return new HtmlLinkParser(new HttpClientConfiguration().client());
     }
 }

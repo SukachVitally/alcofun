@@ -1,7 +1,5 @@
 package com.alco.searchapp.provider;
 
-import com.alco.searchapp.configuration.HttpClientConfiguration;
-import com.alco.searchapp.configuration.ObjectMapperConfiguration;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.properites.ProviderBlock;
@@ -10,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class RozetkaProviderTest {
+public class RozetkaProviderTest extends AbstractProviderTest {
     @Test
     public void getPathLinks() {
         var productPageDto = getProvider().getProductPages().blockFirst();
@@ -67,10 +65,6 @@ public class RozetkaProviderTest {
     }
 
     private RozetkaProvider getProvider() {
-        return new RozetkaProvider(new ObjectMapperConfiguration().objectMapper(), getLinkParser(), getProperties());
-    }
-
-    private HtmlLinkParser getLinkParser() {
-        return new HtmlLinkParser(new HttpClientConfiguration().client());
+        return new RozetkaProvider(objectMapper(), linkParser(), getProperties());
     }
 }

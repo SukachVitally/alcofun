@@ -39,7 +39,7 @@ public class RozetkaProvider implements IProvider  {
 
     private final ObjectMapper mapper;
 
-    private final HtmlLinkParser linkParser;
+    private final LinkParser linkParser;
 
     private final RozetkaProperties properties;
 
@@ -62,7 +62,7 @@ public class RozetkaProvider implements IProvider  {
 
     @Override
     public Mono<ProductInfo> parsePageInfo(String url) {
-        return linkParser.parse(url).map(this::parseDocument);
+        return linkParser.parseHtml(url).map(this::parseDocument);
     }
 
     @Override

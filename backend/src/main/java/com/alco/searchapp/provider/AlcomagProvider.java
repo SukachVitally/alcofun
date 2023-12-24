@@ -40,7 +40,7 @@ public class AlcomagProvider implements IProvider {
 
     private static final String PROPERTY_COUNTRY_TITLE = "Країна";
 
-    private final HtmlLinkParser linkParser;
+    private final LinkParser linkParser;
 
     private final ObjectMapper mapper;
 
@@ -70,7 +70,7 @@ public class AlcomagProvider implements IProvider {
 
     @Override
     public Mono<ProductInfo> parsePageInfo(String url) {
-        return linkParser.parse(url).map(this::parseDocument);
+        return linkParser.parseHtml(url).map(this::parseDocument);
     }
 
     private ProductInfo parseDocument(Document document) {
@@ -134,6 +134,7 @@ public class AlcomagProvider implements IProvider {
                 .toList();
     }
 
+    // todo: Make this collector not blocking
     @RequiredArgsConstructor
     public static class ProductLinkCollector implements Iterable<List<String>> {
         private final Function<Integer, String> createLink;
