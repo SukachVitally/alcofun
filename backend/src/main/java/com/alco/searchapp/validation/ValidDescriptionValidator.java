@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ValidDescriptionValidator implements ConstraintValidator<ValidDescription, String> {
     private static final List<String> BLACK_LIST = List.of(
-            "alcomag", "rozetka", "okwine", "інтернет-магазин", "АЛКОМАГ", "розетка"
+            "alcomag", "rozetka", "okwine", "інтернет-магазин", "АЛКОМАГ", "розетка", "перевіряється нашими сомельє"
     );
 
     @Override
