@@ -10,15 +10,19 @@ import com.alco.searchapp.utils.AlcoholByVolumeUtil;
 import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.json.Json;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -85,14 +89,12 @@ public class OkWineProvider implements IProvider {
             try {
                 var data = mapper.readValue(content, ProductData.class);
                 var productData = data.getProps().getPageProps().getHydrationData().getProductPageStore().getProduct();
-                var description = Jsoup.clean(productData.getMeta().getDescription(), "", Safelist.none(),
-                        new Document.OutputSettings().prettyPrint(true));
 
                 return ProductInfo.builder()
                         .name(productData.getMeta().getName())
                         .imageUrls(productData.getImages().stream().map(path -> IMAGE_URL_PREFIX + path).toList())
                         .ean(productData.getBarcodes().stream().findFirst().orElse(null))
-                        .description(description)
+                        .description(parseDescription(productData.getMeta().getDescription()))
                         .price(productData.getPrices().getPrice())
                         .abv(parseAbv(productData.getMeta().getName()))
                         .volume(findVolume(productData.getCharacteristics()))
@@ -133,5 +135,16 @@ public class OkWineProvider implements IProvider {
                 .map(VolumeUtils::parse)
                 .findAny()
                 .orElse(null);
+    }
+
+    private String parseDescription(String rawDescription) {
+        var dom = Jsoup.parse(rawDescription);
+        var div = Optional.ofNullable(dom.selectFirst("div"))
+                .map(element -> element.childNodes().stream()
+                        .map(Node::outerHtml)
+                        .filter(html -> !html.contains("УТП") && !html.contains("Код товару"))
+                        .collect(Collectors.joining("")))
+                .orElse("");
+        return Jsoup.clean(div, "", Safelist.none(), new Document.OutputSettings().prettyPrint(true));
     }
 }

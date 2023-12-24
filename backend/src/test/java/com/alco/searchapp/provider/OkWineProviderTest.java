@@ -32,7 +32,16 @@ public class OkWineProviderTest extends AbstractProviderTest {
         Assertions.assertEquals(37.5f, product.getAbv());
         Assertions.assertEquals("Кариби", product.getCountry());
         Assertions.assertEquals(2, product.getImageUrls().size());
+    }
 
+    @Test
+    public void parsePageInfoWithoutCustomInfo() {
+        var link = "https://okwine.ua/ua/product/vodka-klassicheskaya-rada-classic-rada-40-0-7l";
+        var product = getProvider().parsePageInfo(link).block();
+
+        Assertions.assertNotNull(product);
+        Assertions.assertEquals("4820080723066", product.getEan());
+        Assertions.assertFalse(product.getDescription().contains("УТП010212"));
     }
 
     @Test
