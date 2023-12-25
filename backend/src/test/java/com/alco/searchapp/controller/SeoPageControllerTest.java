@@ -38,7 +38,7 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
         var content = new String(body, StandardCharsets.UTF_8);
         assertContains(content, "<title>Alcoprice UA</title>");
         assertContains(content,
-                "<h1>Alcoprice UA агрегатор алкогольних продуктів в Україні пропонує найвигідніші пропрозиції на ринку</h1>");
+                "<h1>AlcoPrice UA: ваш найкращий агрегатор алкогольних напоїв в Україні!</h1>");
         assertNotContains(content, BaseFunctionalTest.EAN1);
     }
 

@@ -62,6 +62,6 @@ logging:
 
 aws:
   s3:
-    accessKey: j3ehAGqWjN8bkrikjgCi
-    secretKey: ESLP5aEm3PM2iyz0xNLsFuGaGxsxj6g2DFblDT9f
+    accessKey: hpfTzLZQQtrx9kCOBE48
+    secretKey: WDKBaVSZMSZRGRfPLhbx8ANq8mJ0Evq7UPsL3lq8
     url: http://localhost:19000

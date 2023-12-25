@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: alcosearch
+      POSTGRES_DB: test_alcosearch
     volumes:
       - database_data:/var/lib/postgresql/data
   
