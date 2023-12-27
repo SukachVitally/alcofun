@@ -2,7 +2,7 @@ package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.properites.OkWineProperties;
+import com.alco.searchapp.properites.provider.OkWineProperties;
 import com.alco.searchapp.properites.ProviderBlock;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;

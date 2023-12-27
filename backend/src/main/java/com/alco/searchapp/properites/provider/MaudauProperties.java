@@ -1,13 +1,15 @@
-package com.alco.searchapp.properites;
+package com.alco.searchapp.properites.provider;
 
-import java.util.List;
+import com.alco.searchapp.properites.ProviderBlock;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Data
 @Component
-@ConfigurationProperties("providers.rozetka")
-public class RozetkaProperties {
+@ConfigurationProperties("providers.maudau")
+public class MaudauProperties {
     private List<ProviderBlock> blocks;
 }

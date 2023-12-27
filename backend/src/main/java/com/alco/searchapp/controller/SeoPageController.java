@@ -6,6 +6,8 @@ import com.alco.searchapp.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,8 +48,9 @@ public class SeoPageController {
                     model.addAttribute("product", product);
                     return Mono.just(Rendering.view("product").build());
                 })
-                .switchIfEmpty(Mono.just(Rendering.view("page-not-found").build()));
-
+                .switchIfEmpty(Mono.just(Rendering.view("page-not-found")
+                        .status(HttpStatus.NOT_FOUND)
+                        .build()));
     }
 
     private Mono<Rendering> renderList(Model model, String title, String description, Filterable filterable) {

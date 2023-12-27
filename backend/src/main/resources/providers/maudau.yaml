@@ -1,0 +1,27 @@
+providers:
+  maudau:
+    blocks:
+      - type: WHISKEY
+        url: https://maudau.com.ua/category/viski/
+      - type: COGNAC
+        url: https://maudau.com.ua/category/brendi-i-koniak
+      - type: VODKA
+        url: https://maudau.com.ua/category/horilka
+      - type: GIN
+        url: https://maudau.com.ua/category/dzhyn
+      - type: RUM
+        url: https://maudau.com.ua/category/rom
+      - type: TEQUILA
+        url: https://maudau.com.ua/category/tekila
+      - type: LIQUEUR
+        url: https://maudau.com.ua/category/likery-i-nalyvky
+      - type: SAKE
+        url: https://maudau.com.ua/category/sake-i-aziiskyi-alkohol
+      - type: LIQUEUR
+        url: https://maudau.com.ua/category/nastoianky-balzamy-bittery
+      - type: VINE
+        url: https://maudau.com.ua/category/vyno
+      - type: CHAMPAGNE
+        url: https://maudau.com.ua/category/ihrysti-vyna
+      - type: VERMOUTH
+        url: https://maudau.com.ua/category/vermuty

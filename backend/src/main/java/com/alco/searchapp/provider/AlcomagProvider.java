@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.properites.AlcomagProperties;
+import com.alco.searchapp.properites.provider.AlcomagProperties;
 import com.alco.searchapp.provider.dto.LdJsonDto;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;

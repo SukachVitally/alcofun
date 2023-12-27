@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.properites.OkWineProperties;
+import com.alco.searchapp.properites.provider.OkWineProperties;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.provider.dto.okwine.ListResponse;
@@ -10,7 +10,7 @@ import com.alco.searchapp.utils.AlcoholByVolumeUtil;
 import com.alco.searchapp.utils.VolumeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.json.Json;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

@@ -3,7 +3,7 @@ package com.alco.searchapp.provider;
 import com.alco.searchapp.configuration.ObjectMapperConfiguration;
 import com.alco.searchapp.constants.CategoryTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.properites.AlcomagProperties;
+import com.alco.searchapp.properites.provider.AlcomagProperties;
 import com.alco.searchapp.properites.ProviderBlock;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;

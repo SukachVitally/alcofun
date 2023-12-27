@@ -1,7 +1,7 @@
 package com.alco.searchapp.provider;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
-import com.alco.searchapp.properites.RozetkaProperties;
+import com.alco.searchapp.properites.provider.RozetkaProperties;
 import com.alco.searchapp.provider.dto.ProductInfo;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.provider.dto.rozetka.RozetkaData;

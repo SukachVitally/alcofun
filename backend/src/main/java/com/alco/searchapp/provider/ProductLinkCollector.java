@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -15,6 +16,7 @@ public class ProductLinkCollector implements Iterable<List<String>> {
 
     private final String selector;
 
+    @NotNull
     @Override
     public Iterator<List<String>> iterator() {
         return new Iterator<>() {

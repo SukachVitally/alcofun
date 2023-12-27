@@ -92,7 +92,7 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
         var body = webClient.get()
                 .uri("/seo/products/123456")
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.TEXT_HTML)
                 .expectBody().returnResult()
                 .getResponseBody();

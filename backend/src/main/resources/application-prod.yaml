@@ -23,6 +23,7 @@ spring:
       - providers/alcomag.yaml
       - providers/rozetka.yaml
       - providers/okwine.yaml
+      - providers/maudau.yaml
       - product/product-config.yaml
       - product/pubsub-config.yaml
 

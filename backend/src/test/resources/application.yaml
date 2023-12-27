@@ -37,10 +37,12 @@ spring:
 #          packages: "*"
   config:
     import:
-    - providers/alcomag.yaml
-    - providers/rozetka.yaml
-    - providers/okwine.yaml
-    - product/product-config.yaml
+      - providers/alcomag.yaml
+      - providers/rozetka.yaml
+      - providers/okwine.yaml
+      - providers/maudau.yaml
+      - product/product-config.yaml
+      - product/pubsub-config.yaml
 app:
   image-service:
     base-url: http://localhost:19000/test-images/
