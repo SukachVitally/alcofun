@@ -86,4 +86,18 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
         assertContains(content, product.getEan());
         assertContains(content, product.getCategoryName());
     }
+
+    @Test
+    void getProductPageNotFound() {
+        var body = webClient.get()
+                .uri("/seo/products/123456")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.TEXT_HTML)
+                .expectBody().returnResult()
+                .getResponseBody();
+        Assertions.assertNotNull(body);
+        var content = new String(body, StandardCharsets.UTF_8);
+        assertContains(content, "Вибачте, але сторінку, яку ви шукаєте, не знайдено...");
+    }
 }
