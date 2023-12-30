@@ -4,6 +4,7 @@ import com.alco.searchapp.properites.ProductProducerProperties;
 import com.alco.searchapp.provider.ProviderCollector;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

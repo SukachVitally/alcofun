@@ -15,43 +15,41 @@ function ProductItem(props) {
   });
 
   return (
-    <Card className="d-inline-block product-item">
-      <Card.Img
-        variant="top"
-        src={product.imageUrl}
-        className="product-item__image"
-        title={product.name}
-        data-toggle="tooltip"
-        data-placement="top"
-      />
-      <Card.Body>
-        <Card.Title
-          style={{ color: product.hot ? "red" : "black" }}
-          title={product.name}
-          data-toggle="tooltip"
-          data-placement="top"
-        >
-          {product.name}
-        </Card.Title>
-        <Card.Subtitle>
-          <StarRatings
-            rating={product.rating != null ? product.rating.rating : 0}
-            starRatedColor="#ebd834"
-            numberOfStars={5}
-            starDimension="25"
-            name="rating"
+    <NavLink to={`/products/${product.id}`}>
+      <Card className="d-inline-block product-item">
+        <div className="product-item__image">
+          <Card.Img
+            variant="top"
+            src={product.imageUrl}
+            title={product.name}
+            data-toggle="tooltip"
+            data-placement="top"
           />
-        </Card.Subtitle>
-        <Card.Body>
-          {t('products.best_price_is')} <b>{formattedPrice}</b>
-        </Card.Body>
-        <div className="product-item__footer">
-          <NavLink to={`/products/${product.id}`} className="btn btn-primary">
-            {t('products.view')}
-          </NavLink>
         </div>
-      </Card.Body>
-    </Card>
+        <Card.Body>
+          <Card.Title
+            style={{ color: product.hot ? "red" : "black" }}
+            title={product.name}
+            data-toggle="tooltip"
+            data-placement="top"
+          >
+            {product.name}
+          </Card.Title>
+          <Card.Subtitle>
+            <StarRatings
+              rating={product.rating != null ? product.rating.rating : 0}
+              starRatedColor="#ebd834"
+              numberOfStars={5}
+              starDimension="25"
+              name="rating"
+            />
+          </Card.Subtitle>
+          <Card.Body>
+            {t('products.best_price_is')} <b>{formattedPrice}</b>
+          </Card.Body>
+        </Card.Body>
+      </Card>
+    </NavLink>
   );
 }
 

@@ -74,3 +74,11 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 ```shell
 rsync -av ./frontend/build/* virusx:/home/sukach/volumes/frontend  
 ```
+
+### Add .env file to root directory
+```env
+#REACT_APP_SERVER_API_URL=http://localhost:7080/api
+REACT_APP_SERVER_API_URL=/api/
+REACT_APP_TRACKING_ID=G-329W6N2DCP
+
+```

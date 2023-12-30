@@ -6,7 +6,7 @@ backend_image := virusx:32000/backend:$(backend_version)
 
 deploy_frontend:
 	npm run build -C ./frontend/
-	rsync -av --delete ./frontend/build/* virusx:/home/sukach/volumes/frontend 
+	rsync -av --chmod=a+rx --delete ./frontend/build/* virusx:/home/sukach/volumes/frontend 
 
 deploy_backend:
 	mvn clean package -DskipTests -f ./backend
