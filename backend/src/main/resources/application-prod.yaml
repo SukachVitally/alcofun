@@ -29,7 +29,7 @@ spring:
 
 app:
   image-service:
-    base-url: /images/
+    base-url: http://alcoprice.com.ua/images/
     storage: S3
     bucket: images
   best-price:
