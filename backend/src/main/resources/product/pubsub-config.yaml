@@ -1,7 +1,7 @@
 spring:
   cloud:
     function:
-      definition: productPageSupplier;alcomagConsumer;rozetkaConsumer;okwineConsumer
+      definition: productPageSupplier;alcomagConsumer;rozetkaConsumer;okwineConsumer;fozzyConsumer
     stream:
       default-binder: kafka
       kafka:
@@ -16,6 +16,9 @@ spring:
             consumer:
               ack-mode: record
           okwineConsumer-in-0:
+            consumer:
+              ack-mode: record
+          fozzyConsumer-in-0:
             consumer:
               ack-mode: record
 
@@ -35,6 +38,10 @@ spring:
           destination: product-topic
           binder: kafka
           group: okwine-consumer
+        fozzyConsumer-in-0:
+          destination: product-topic
+          binder: kafka
+          group: fozzy-consumer
 
 app:
   product:
@@ -47,6 +54,8 @@ app:
           delay-sec: 7
         OKWINE:
           delay-sec: 30
+        FOZZY:
+          delay-sec: 15
     producer:
       enabled: true
       cron: 0 0 0 * * ?
@@ -54,6 +63,7 @@ app:
         - ALCOMAG
         - ROZETKA
         - OKWINE
+        - FOZZY
     #      - MAUDAU // broken
     refresher:
       enabled: true

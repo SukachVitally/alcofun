@@ -49,7 +49,7 @@ public class ProviderCollector {
         return provider.parsePageInfo(url)
                 .filter(productInfo -> {
                     var constraints = validator.validate(productInfo);
-                    if (constraints.size() == 0) {
+                    if (constraints.isEmpty()) {
                         return true;
                     }
                     var message = constraints.stream()

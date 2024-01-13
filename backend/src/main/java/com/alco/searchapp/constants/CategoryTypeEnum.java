@@ -24,7 +24,9 @@ public enum CategoryTypeEnum {
     SAKE(14, "Саке"),
     CHACHA(15, "Чача"),
     GRAPPA(16, "Граппа"),
-    ARMAGNAC(17, "Арманьяк");
+    ARMAGNAC(17, "Арманьяк"),
+    CIDER(18, "Сидр"),
+    CALVADOS(19, "Кальвадос");
 
     private final int id;
 

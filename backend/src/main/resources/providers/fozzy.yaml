@@ -1,0 +1,51 @@
+providers:
+  fozzy:
+    blocks:
+      - type: RUM
+        url: https://fozzyshop.ua/300354-rom
+      - type: VINE
+        url: https://fozzyshop.ua/300336-vina-belye
+      - type: VINE
+        url: https://fozzyshop.ua/300337-vina-krasnye
+      - type: VINE
+        url: https://fozzyshop.ua/300338-vina-rozovye
+      - type: VINE
+        url: https://fozzyshop.ua/300526-vina-plodovye
+      - type: CHAMPAGNE
+        url: https://fozzyshop.ua/300333-vina-igristye
+      - type: CHAMPAGNE
+        url: https://fozzyshop.ua/300334-shampanskoe
+      - type: COGNAC
+        url: https://fozzyshop.ua/300352-konyak-brendi-armanyak
+      - type: WHISKEY
+        url: https://fozzyshop.ua/300348-viski
+      - type: VODKA
+        url: https://fozzyshop.ua/300349-vodka
+      - type: LIQUEUR
+        url: https://fozzyshop.ua/300346-aperetiv
+      - type: TEQUILA
+        url: https://fozzyshop.ua/300355-tekila
+      - type: BEER
+        url: https://fozzyshop.ua/300356-pivo-bezalkogolnoe
+      - type: BEER
+        url: https://fozzyshop.ua/300357-pivo-polutemnoe-krasnoe
+      - type: BEER
+        url: https://fozzyshop.ua/300358-pivo-pshenichnoe
+      - type: BEER
+        url: https://fozzyshop.ua/300359-pivo-svetloe
+      - type: BEER
+        url: https://fozzyshop.ua/300360-pivo-temnoe
+      - type: CIDER
+        url: https://fozzyshop.ua/300361-sidr
+      - type: VERMOUTH
+        url: https://fozzyshop.ua/300335-vermut
+      - type: ABSENT
+        url: https://fozzyshop.ua/300345-absent
+      - type: LIQUEUR
+        url: https://fozzyshop.ua/300347-balzamy-i-nastojki
+      - type: GIN
+        url: https://fozzyshop.ua/300350-dzhin
+      - type: CALVADOS
+        url: https://fozzyshop.ua/300351-kalvados
+      - type: LIQUEUR
+        url: https://fozzyshop.ua/300353-liker

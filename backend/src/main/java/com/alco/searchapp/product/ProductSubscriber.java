@@ -37,6 +37,11 @@ public class ProductSubscriber {
         return createConsumer(ProviderTypeEnum.OKWINE);
     }
 
+    @Bean
+    public Consumer<Flux<ProductPageDto>> fozzyConsumer() {
+        return createConsumer(ProviderTypeEnum.FOZZY);
+    }
+
     private Consumer<Flux<ProductPageDto>> createConsumer(ProviderTypeEnum provider) {
         var configuration = properties.getProviders().get(provider);
         log.info("Start subscription for {}", provider.getName());

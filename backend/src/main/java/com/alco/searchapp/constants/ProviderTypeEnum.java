@@ -10,7 +10,8 @@ public enum ProviderTypeEnum {
     ALCOMAG(1, "Alcomag"),
     ROZETKA(2, "Rozetka"),
     OKWINE(3, "Okwine"),
-    MAUDAU(4, "Maudau");
+    MAUDAU(4, "Maudau"),
+    FOZZY(5, "Fozzy");
 
     private final int id;
 

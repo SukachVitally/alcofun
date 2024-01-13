@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,9 +21,10 @@ public class LinkParser {
 
     private final ObjectMapper mapper;
 
-    private Mono<String> get(String url) {
+    public Mono<String> get(String url) {
         return client.get()
                 .uri(url)
+                .header(HttpHeaders.HOST, getUrlHost(url))
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::isError,
@@ -49,5 +51,11 @@ public class LinkParser {
                         return Mono.empty();
                     }
                 });
+    }
+
+    private static String getUrlHost(String url) {
+        // Parse the url and extract the host
+        // This is a simplified example, robust parsing should be done in actual scenario based on your needs
+        return url.replace("http://", "").replace("https://", "").split("/")[0];
     }
 }

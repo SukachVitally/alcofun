@@ -41,7 +41,7 @@ public class ProductSubscribeFlow {
                                     .then(Mono.just(entity));
                         })
                         .thenReturn(product))
-                .doOnError(e -> log.error("Error {} in {} provider", e.getMessage(), provider.getName()))
-                .onErrorResume(e -> Flux.empty());
+                .onErrorContinue((error, object) ->
+                        log.error("Error {} in {} provider", error.getMessage(), provider.getName()));
     }
 }
