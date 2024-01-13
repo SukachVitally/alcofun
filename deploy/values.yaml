@@ -1,7 +1,7 @@
 namespace: prod
 
 backend: 
-  image: localhost:32000/backend:0.6.3
+  image: localhost:32000/backend:0.6.4
   appProfile: prod
   nodePort: 30088
   containerPort: 7080
