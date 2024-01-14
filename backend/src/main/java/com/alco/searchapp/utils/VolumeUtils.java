@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class VolumeUtils {
     public Integer parse(String rawValue) {
+
+
         rawValue = rawValue.replace(",", ".");
         try {
             var coefficient = rawValue.contains("мл") ? 1 : 1000;

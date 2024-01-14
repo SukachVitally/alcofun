@@ -68,8 +68,12 @@ public class FozzyProvider implements IProvider {
                 .price(parsePrice(document))
                 .brand(characteristics.getOrDefault("Бренд", null))
                 .country(characteristics.getOrDefault("Країна", null))
-                .abv(AlcoholByVolumeUtil.parse(characteristics.getOrDefault("Міцність алкоголю, %", null)))
-                .volume(VolumeUtils.parse(characteristics.getOrDefault("Об`єм, л", null)))
+                .abv(Optional.ofNullable(characteristics.getOrDefault("Міцність алкоголю, %", null))
+                        .map(AlcoholByVolumeUtil::parse)
+                        .orElse(null))
+                .volume(Optional.ofNullable(characteristics.getOrDefault("Об`єм, л", null))
+                        .map(VolumeUtils::parse)
+                        .orElse(null))
                 .imageUrls(parseImages(document))
                 .build();
     }
