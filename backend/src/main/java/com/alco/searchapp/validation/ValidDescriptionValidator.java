@@ -11,6 +11,9 @@ public class ValidDescriptionValidator implements ConstraintValidator<ValidDescr
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+        if (s == null) {
+            return true;
+        }
         return BLACK_LIST.stream().noneMatch(value -> s.toLowerCase().contains(value.toLowerCase()));
     }
 }
