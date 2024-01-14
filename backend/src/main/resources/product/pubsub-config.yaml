@@ -49,19 +49,19 @@ app:
       enabled: true
       providers:
         ALCOMAG:
-          delay-sec: 50
+          delay-sec: 70
         ROZETKA:
           delay-sec: 7
         OKWINE:
-          delay-sec: 30
+          delay-sec: 40
         FOZZY:
-          delay-sec: 15
+          delay-sec: 40
     producer:
       enabled: true
       cron: 0 0 0 * * ?
       providers:
         - ALCOMAG
-        - ROZETKA
+#        - ROZETKA //
         - OKWINE
         - FOZZY
     #      - MAUDAU // broken

@@ -2,4 +2,4 @@ app:
   provider-service:
     relevant-time-interval-sec: 129600 # 36h
   best-price:
-    min-percent: 10
+    min-percent: 20
