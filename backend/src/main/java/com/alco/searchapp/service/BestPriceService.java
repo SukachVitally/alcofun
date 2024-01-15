@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import com.alco.searchapp.exception.BestPriceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class BestPriceService {
                 .min(Comparator.comparingDouble(ProductProviderDto::getPrice))
                 .orElse(null);
         if (bestProvider == null) {
-            return Mono.empty();
+            return Mono.error(new BestPriceNotFoundException(productId));
         }
 
         return repository.findFirstByProductIdOrderByIdDesc(productId)

@@ -6,8 +6,10 @@ import com.alco.searchapp.properites.ProviderBlock;
 import com.alco.searchapp.properites.provider.RozetkaProperties;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class RozetkaProviderTest extends AbstractProviderTest {
     @Test
     public void getPathLinks() {

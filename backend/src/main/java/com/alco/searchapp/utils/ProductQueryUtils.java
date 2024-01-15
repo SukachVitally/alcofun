@@ -17,6 +17,7 @@ public class ProductQueryUtils {
     public NativeQuery createQuery(Filterable filterable, List<List<Long>> characteristicBlocks) {
         NativeQueryBuilder builder = new NativeQueryBuilder();
         ArrayList<Query> queries = new ArrayList<>();
+        queries.add(QueryBuilders.exists(b -> b.field("price")));
 
         if (!filterable.getCategories().isEmpty()) {
             queries.add(ProductQueryUtils.createCategoriesQuery(filterable.getCategories()));

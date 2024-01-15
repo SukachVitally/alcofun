@@ -3,6 +3,10 @@ package com.alco.searchapp.controller;
 import com.alco.searchapp.BaseFunctionalTest;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
+import com.alco.searchapp.repository.ProductProviderRepository;
+import com.alco.searchapp.repository.ProductRepository;
+import com.alco.searchapp.repository.elastic.ProductSearchRepository;
+import com.alco.searchapp.service.ElasticCollectService;
 import com.alco.searchapp.service.ProductSearchService;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Assertions;
@@ -23,10 +27,20 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
     @Autowired
     private WebTestClient webClient;
 
+    @Autowired
+    private ElasticCollectService elasticCollectService;
+
+    @Autowired
+    private ProductSearchRepository productSearchRepository;
+
+    @Autowired
+    private ProductProviderRepository productProviderRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
     @Test
     void getMainPage() {
-        addProducts();
-
         var body = webClient.get()
                 .uri("/seo/")
                 .exchange()
@@ -44,7 +58,10 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
 
     @Test
     void getProductListPage() {
+        cleanDatabase();
+        productSearchRepository.deleteAll().block();
         addProducts();
+        elasticCollectService.refresh().block();
 
         var body = webClient.get()
                 .uri("/seo/products/")
@@ -62,7 +79,10 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
 
     @Test
     void getProductPage() {
+        cleanDatabase();
+        productSearchRepository.deleteAll().block();
         addProducts();
+        elasticCollectService.refresh().block();
 
         var products = productSearchService.getProducts(Filterable.builder().build(),
                         PageRequest.of(1, 1))
@@ -85,6 +105,33 @@ public class SeoPageControllerTest extends BaseFunctionalTest {
         assertContains(content, product.getName());
         assertContains(content, product.getEan());
         assertContains(content, product.getCategoryName());
+    }
+
+    @Test
+    void getProductPageWithoutPrice() {
+        cleanDatabase();
+        productSearchRepository.deleteAll().block();
+        addProducts();
+        productProviderRepository.deleteAll().block();
+        elasticCollectService.refresh().block();
+
+
+
+        var product = productRepository.findOneByEan(EAN1).block();
+        Assertions.assertNotNull(product);
+
+        var body = webClient.get()
+                .uri("/seo/products/" + product.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.TEXT_HTML)
+                .expectBody().returnResult()
+                .getResponseBody();
+        Assertions.assertNotNull(body);
+        var content = new String(body, StandardCharsets.UTF_8);
+        assertContains(content, product.getName());
+        assertContains(content, product.getEan());
+        assertNotContains(content, "Ціна");
     }
 
     @Test

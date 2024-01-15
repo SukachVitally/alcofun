@@ -18,17 +18,34 @@ public class ElasticCollectService {
 
     public Mono<List<Long>> refresh() {
         return productSearchService.refresh()
-                .flatMap(ids -> productSearchService.getAllProducts()
-                    .map(ProductSearchEntity::getCategoryId)
-                    .distinct()
-                    .collectList()
-                    .flatMap(categoryService::refresh))
-                .flatMap(ids -> productSearchService.getAllProducts()
-                    .flatMap(entity -> Flux.fromIterable(entity.getCharacteristics().stream()
-                            .map(ProductSearchEntity.Characteristic::getId)
-                            .toList()))
-                    .distinct()
-                    .collectList()
-                    .flatMap(characteristicService::refresh));
+                .then(refreshCategories())
+                .then(refreshCharacteristics())
+                .then(getRelevantProductIds());
     }
+
+    private Mono<Void> refreshCategories() {
+        return productSearchService.getAllRelevantProducts()
+                .map(ProductSearchEntity::getCategoryId)
+                .distinct()
+                .collectList()
+                .flatMap(categoryService::refresh)
+                .then();
+    }
+
+    private Mono<Void> refreshCharacteristics() {
+        return productSearchService.getAllRelevantProducts()
+                .flatMap(entity -> Flux.fromIterable(entity.getCharacteristics()))
+                .map(ProductSearchEntity.Characteristic::getId)
+                .distinct()
+                .collectList()
+                .flatMap(characteristicService::refresh)
+                .then();
+    }
+
+    private Mono<List<Long>> getRelevantProductIds() {
+        return productSearchService.getAllRelevantProducts()
+                .map(ProductSearchEntity::getId)
+                .collectList();
+    }
+
 }

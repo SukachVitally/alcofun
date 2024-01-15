@@ -2,11 +2,14 @@ package com.alco.searchapp.service;
 
 import com.alco.searchapp.BaseFunctionalTest;
 import com.alco.searchapp.dto.ProductProviderDto;
+import com.alco.searchapp.exception.BestPriceNotFoundException;
+import com.alco.searchapp.repository.ProductProviderRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.test.StepVerifier;
 
 @SpringBootTest()
 public class BestPriceServiceTest extends BaseFunctionalTest {
@@ -15,6 +18,9 @@ public class BestPriceServiceTest extends BaseFunctionalTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductProviderRepository productProviderRepository;
 
     @Autowired
     private ProviderService providerService;
@@ -92,5 +98,20 @@ public class BestPriceServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(50d, bestPrice.getPrice());
         Assertions.assertEquals(50d, bestPrice.getPercent());
         Assertions.assertTrue(bestPrice.getHot());
+    }
+
+    @Test
+    public void getBestPriceWithError() {
+        addProducts();
+        productProviderRepository.deleteAll().block();
+        var product = productRepository.findOneByEan(EAN1).block();
+        Assertions.assertNotNull(product);
+
+        var publisher = providerService.getRelevantProducts(product.getId())
+                .flatMap(providers -> service.getBestPrice(product.getId(), providers));
+
+        StepVerifier.create(publisher)
+                .expectError(BestPriceNotFoundException.class)
+                .verify();
     }
 }

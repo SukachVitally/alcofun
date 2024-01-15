@@ -32,7 +32,7 @@ public class SeoController {
         xmlBuffer.append(createUrlBlock("/"));
         xmlBuffer.append(createUrlBlock("/products/"));
 
-        return productService.getAllProducts().map(ProductSearchEntity::getId)
+        return productService.getAllRelevantProducts().map(ProductSearchEntity::getId)
                 .collectList()
                 .flatMap(ids -> {
                     ids.forEach(id -> xmlBuffer.append(createUrlBlock(String.format("/products/%s", id))));

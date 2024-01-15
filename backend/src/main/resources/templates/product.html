@@ -8,6 +8,7 @@
     <img th:attr="src=${product.getImageUrls().get(0)}" th:unless="${#lists.isEmpty(product.getImageUrls())}"/>
     <div>Категорія <b th:text="${product.categoryName}"></b></div>
     <p th:text="${product.description}"></p>
-    <div>Ціна <b th:text="${product.price}"></b></div>
+
+    <div th:if="${product.price != null}">Ціна <b th:text="${product.price}"></b></div>
 </body>
 </html>

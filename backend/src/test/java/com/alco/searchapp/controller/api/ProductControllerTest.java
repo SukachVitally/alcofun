@@ -8,6 +8,7 @@ import com.alco.searchapp.repository.CategoryRepository;
 import com.alco.searchapp.repository.CharacteristicRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.repository.ProviderRepository;
+import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import com.alco.searchapp.service.ElasticCollectService;
 import com.alco.searchapp.service.ProductSearchService;
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +40,13 @@ public class ProductControllerTest extends BaseFunctionalTest {
     @Autowired
     private ElasticCollectService elasticService;
 
+    @Autowired
+    private ProductSearchRepository productSearchRepository;
+
     @BeforeEach
     public void setup() {
         cleanDatabase();
+        productSearchRepository.deleteAll().block();
         addProducts();
         elasticService.refresh().block();
     }

@@ -26,7 +26,6 @@ public class SeoPageController {
 
     @GetMapping("/")
     public Mono<Rendering> getMain(Model model) {
-        Filterable filterable = Filterable.builder().hot(true).build();
         model.addAttribute("title", "Alcoprice UA");
         model.addAttribute("description", "Alcoprice UA агрегатор алкогольних продуктів в Україні пропонує найвигідніші пропрозиції на ринку");
         return Mono.just(Rendering.view("main").build());

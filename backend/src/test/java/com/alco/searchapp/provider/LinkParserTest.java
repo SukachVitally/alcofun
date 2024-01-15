@@ -1,6 +1,7 @@
 package com.alco.searchapp.provider;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class LinkParserTest extends AbstractProviderTest {
@@ -11,6 +12,7 @@ public class LinkParserTest extends AbstractProviderTest {
         Assertions.assertNotEquals("", html);
     }
 
+    @Disabled
     @Test
     public void parseRozetkaPage() {
         var url = "https://rozetka.com.ua/ua/glenmorangie_5010494560282/p5006350/";

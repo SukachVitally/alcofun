@@ -3,6 +3,7 @@ package com.alco.searchapp.service;
 import com.alco.searchapp.dto.BestPriceDto;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
+import com.alco.searchapp.entity.ProductEntity;
 import com.alco.searchapp.entity.elastic.ProductSearchEntity;
 import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import com.alco.searchapp.repository.ProductRepository;
@@ -46,8 +47,7 @@ public class ProductSearchService {
     private final CategoryService categoryService;
 
     public Mono<List<Long>> refresh() {
-        return searchRepository.deleteAll()
-                .thenMany(generateDenormalizedStructure())
+        return generateDenormalizedStructure()
                 .flatMap(searchRepository::save)
                 .map(ProductSearchEntity::getId)
                 .collectList();
@@ -57,8 +57,8 @@ public class ProductSearchService {
         return searchRepository.findById(id);
     }
 
-    public Flux<ProductSearchEntity> getAllProducts() {
-        return searchRepository.findAll();
+    public Flux<ProductSearchEntity> getAllRelevantProducts() {
+        return searchRepository.findAllByPriceNotNull();
     }
 
     public Mono<ListResponseDto<ProductSearchEntity>> getProducts(Filterable filterable, Pageable pageable) {
@@ -101,15 +101,7 @@ public class ProductSearchService {
 
     private Flux<ProductSearchEntity> generateDenormalizedStructure() {
         return productRepository.findAll()
-                .map(product -> {
-                        var entity = new ProductSearchEntity();
-                        entity.setId(product.getId());
-                        entity.setName(product.getName());
-                        entity.setDescription(product.getDescription());
-                        entity.setEan(product.getEan());
-                        entity.setCategoryId(product.getCategoryId());
-                        return entity;
-                })
+                .map(this::mapProductToEntity)
                 .flatMap(this::addCategory)
                 .flatMap(this::addProviders)
                 .flatMap(this::addCharacteristics)
@@ -143,7 +135,8 @@ public class ProductSearchService {
                                     entity.setPercent(bestPrice.getPercent());
                                     entity.setHot(bestPrice.getHot());
                                     return entity;
-                                }));
+                                })
+                                .onErrorReturn(entity));
     }
 
     private Mono<ProductSearchEntity> addCharacteristics(ProductSearchEntity entity) {
@@ -185,5 +178,15 @@ public class ProductSearchService {
 
     private Boolean isHot(BestPriceDto bestPrice, Double price) {
         return bestPrice.getHot() && bestPrice.getPrice().equals(price);
+    }
+
+    private ProductSearchEntity mapProductToEntity(ProductEntity product) {
+        var entity = new ProductSearchEntity();
+        entity.setId(product.getId());
+        entity.setName(product.getName());
+        entity.setDescription(product.getDescription());
+        entity.setEan(product.getEan());
+        entity.setCategoryId(product.getCategoryId());
+        return entity;
     }
 }

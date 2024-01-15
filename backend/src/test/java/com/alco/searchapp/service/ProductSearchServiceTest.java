@@ -6,11 +6,12 @@ import com.alco.searchapp.constants.CharacteristicTypeEnum;
 import com.alco.searchapp.constants.ProviderTypeEnum;
 import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.entity.elastic.ProductSearchEntity;
-import com.alco.searchapp.repository.CategoryRepository;
-import com.alco.searchapp.repository.CharacteristicRepository;
-import com.alco.searchapp.repository.ProviderRepository;
+import com.alco.searchapp.repository.*;
+
 import java.util.Comparator;
 import java.util.List;
+
+import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 
@@ -38,10 +40,20 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
     @Autowired
     private ProviderRepository providerRepository;
 
+    @Autowired
+    private ProductProviderRepository productProviderRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private ProductSearchRepository productSearchRepository;
+
     @BeforeEach
     public void setup() {
         cleanDatabase();
-        addProducts(); //todo: Just populate elasticsearch without database here.
+        productSearchRepository.deleteAll().block();
+        addProducts();
         elasticService.refresh().block();
     }
 
@@ -351,5 +363,30 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
 
         Assertions.assertEquals(res.getResults().get(0).getEan(), EAN6);
         Assertions.assertEquals(res.getResults().get(5).getEan(), EAN1);
+    }
+
+    @Test
+    public void getProductWithoutPriceById() {
+        productProviderRepository.deleteAll().block();
+        productSearchService.refresh().block();
+        elasticService.refresh().block();
+        var product = productRepository.findOneByEan(EAN1).block();
+        Assertions.assertNotNull(product);
+
+        var res = productSearchService.getProduct(product.getId()).block();
+        Assertions.assertNotNull(res);
+        Assertions.assertEquals(product.getId(), res.getId());
+        Assertions.assertNull(res.getPrice());
+    }
+
+    @Test
+    public void getProductsWithoutPrice() {
+        productProviderRepository.deleteAll().block();
+        elasticService.refresh().block();
+
+        Pageable pageable = PageRequest.of(1, 10);
+        var res = productSearchService.getProducts(Filterable.builder().build(), pageable).block();
+        Assertions.assertNotNull(res);
+        Assertions.assertEquals(0, res.getResults().size());
     }
 }
