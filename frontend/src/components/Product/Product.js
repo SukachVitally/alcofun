@@ -84,7 +84,7 @@ const Product = (props) => {
       </div>
 
       <CharacteristicList characteristics={product.characteristics} />
-      <ProviderList providers={product.providers} />
+      {product.providers && <ProviderList providers={product.providers} />}
     </div>
   );
 };

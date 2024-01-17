@@ -55,7 +55,7 @@ app:
         OKWINE:
           delay-sec: 40
         FOZZY:
-          delay-sec: 40
+          delay-sec: 30
     producer:
       enabled: true
       cron: 0 0 0 * * ?
