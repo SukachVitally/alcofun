@@ -1,7 +1,7 @@
 spring:
   cloud:
     function:
-      definition: productPageSupplier;alcomagConsumer;rozetkaConsumer;okwineConsumer;fozzyConsumer
+      definition: alcomagSupplier;okwineSupplier;fozzySupplier;alcomagConsumer;okwineConsumer;fozzyConsumer
     stream:
       default-binder: kafka
       kafka:
@@ -12,9 +12,6 @@ spring:
           alcomagConsumer-in-0:
             consumer:
               ack-mode: record
-          rozetkaConsumer-in-0:
-            consumer:
-              ack-mode: record
           okwineConsumer-in-0:
             consumer:
               ack-mode: record
@@ -23,23 +20,25 @@ spring:
               ack-mode: record
 
       bindings:
-        productPageSupplier-out-0:
-          destination: product-topic
+        alcomagSupplier-out-0:
+          destination: product-alcomag
+          binder: kafka
+        okwineSupplier-out-0:
+          destination: product-okwine
+          binder: kafka
+        fozzySupplier-out-0:
+          destination: product-fozzy
           binder: kafka
         alcomagConsumer-in-0:
-          destination: product-topic
+          destination: product-alcomag
           binder: kafka
           group: alcomag-consumer
-        rozetkaConsumer-in-0:
-          destination: product-topic
-          binder: kafka
-          group: rozetka-consumer
         okwineConsumer-in-0:
-          destination: product-topic
+          destination: product-okwine
           binder: kafka
           group: okwine-consumer
         fozzyConsumer-in-0:
-          destination: product-topic
+          destination: product-fozzy
           binder: kafka
           group: fozzy-consumer
 
@@ -50,8 +49,8 @@ app:
       providers:
         ALCOMAG:
           delay-sec: 70
-        ROZETKA:
-          delay-sec: 7
+#        ROZETKA:
+#          delay-sec: 7
         OKWINE:
           delay-sec: 40
         FOZZY:
@@ -61,7 +60,7 @@ app:
       cron: 0 0 0 * * ?
       providers:
         - ALCOMAG
-#        - ROZETKA //
+#        - ROZETKA // broken
         - OKWINE
         - FOZZY
     #      - MAUDAU // broken

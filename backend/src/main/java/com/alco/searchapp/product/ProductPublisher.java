@@ -27,7 +27,11 @@ public class ProductPublisher {
 
     private final ProductProducerProperties properties;
 
-    private final Sinks.Many<ProductPageDto> sink = Sinks.many().unicast().onBackpressureBuffer();
+    private final Sinks.Many<ProductPageDto> alcomagSink = createSink();
+
+    private final Sinks.Many<ProductPageDto> okwineSink = createSink();
+
+    private final Sinks.Many<ProductPageDto> fozzySink = createSink();
 
     @Scheduled(cron = "${app.product.producer.cron}")
     public void init() {
@@ -36,12 +40,34 @@ public class ProductPublisher {
         collector.collect(properties.getProviders())
                 .publishOn(scheduler)
                 .doOnNext(page -> log.info("Add product page {}", page.getUrl()))
-                .subscribe(message -> sink.emitNext(message, Sinks.EmitFailureHandler.FAIL_FAST));
+                .subscribe(this::publish);
     }
 
     @Bean
-    public Supplier<Flux<ProductPageDto>> productPageSupplier() {
-        return sink::asFlux;
+    public Supplier<Flux<ProductPageDto>> alcomagSupplier() {
+        return alcomagSink::asFlux;
+    }
+
+    @Bean
+    public Supplier<Flux<ProductPageDto>> okwineSupplier() {
+        return okwineSink::asFlux;
+    }
+
+    @Bean
+    public Supplier<Flux<ProductPageDto>> fozzySupplier() {
+        return okwineSink::asFlux;
+    }
+
+    private static Sinks.Many<ProductPageDto> createSink() {
+        return Sinks.many().unicast().onBackpressureBuffer();
+    }
+
+    private void publish(ProductPageDto message) {
+        switch (message.getProvider()) {
+            case ALCOMAG -> alcomagSink.emitNext(message, Sinks.EmitFailureHandler.FAIL_FAST);
+            case OKWINE -> okwineSink.emitNext(message, Sinks.EmitFailureHandler.FAIL_FAST);
+            case FOZZY -> fozzySink.emitNext(message, Sinks.EmitFailureHandler.FAIL_FAST);
+        }
     }
 
 }
