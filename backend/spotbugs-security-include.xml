@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+    <!-- The full list of the bugs could be found here: https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html -->
+    <!-- The list of the security bugs could be found here: https://find-sec-bugs.github.io/bugs.html -->
+    <Match>
+        <Or>
+            <Bug category="BAD_PRACTICE"/>
+            <Bug category="CORRECTNESS"/>
+            <Bug category="I18N"/>
+            <Bug category="MALICIOUS_CODE"/>
+            <Bug category="MT_CORRECTNESS"/>
+            <Bug category="NOISE"/>
+            <Bug category="PERFORMANCE"/>
+            <Bug category="SECURITY"/>
+            <Bug category="STYLE"/>
+        </Or>
+    </Match>
+</FindBugsFilter>
