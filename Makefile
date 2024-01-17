@@ -1,6 +1,6 @@
 .PHONY: deploy_frontend, deploy_backend, helm_upgrade, helm_install, helm_unistall
 
-backend_version := 0.8.1
+backend_version := 0.9.0
 
 backend_image := virusx:32000/backend:$(backend_version)
 
