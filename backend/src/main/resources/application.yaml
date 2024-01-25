@@ -1,6 +1,12 @@
 server:
   port: 7080
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ "prometheus" ]
+
 spring:
   elasticsearch:
     uris: "localhost:19200"

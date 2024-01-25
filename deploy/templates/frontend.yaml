@@ -49,6 +49,7 @@ spec:
           mountPath: /usr/share/nginx/html
         - name: custom-nginx-config-volume
           mountPath: /etc/nginx/conf.d
+          readOnly: true
 
 ---
 apiVersion: v1

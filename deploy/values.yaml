@@ -1,7 +1,7 @@
 namespace: prod
 
 backend: 
-  image: localhost:32000/backend:0.9.0
+  image: localhost:32000/backend:0.10.0
   appProfile: prod
   nodePort: 30088
   containerPort: 7080
@@ -65,3 +65,13 @@ postgres:
   username: user
   password: password
   database: alcosearch
+
+prometheus:
+  image: prom/prometheus
+  containerPort: 9090
+  nodePort: 31090
+
+grafana:
+  image: grafana/grafana
+  containerPort: 3000
+  nodePort: 31300
