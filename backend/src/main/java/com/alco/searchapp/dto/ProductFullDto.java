@@ -27,4 +27,8 @@ public class ProductFullDto {
     private List<ProductSearchEntity.Characteristic> characteristics;
 
     private RatingDto rating;
+
+    private Boolean hot;
+
+    private Integer percent;
 }

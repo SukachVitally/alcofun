@@ -12,7 +12,7 @@ public class PageableUtils {
             "created_at", "id",
             "rating", "internalRating",
             "price", "price",
-            "hot", "percent" // todo: Add hot search sorting
+            "hot", "percent"
     );
 
     public Pageable mapToInternal(Pageable pageable) {

@@ -17,6 +17,7 @@ function ProductItem(props) {
   return (
     <NavLink to={`/products/${product.id}`}>
       <Card className="d-inline-block product-item">
+        {product.hot && <span className="hot-percent">-{product.percent}%</span>}
         <div className="product-item__image">
           <Card.Img
             variant="top"
@@ -28,7 +29,6 @@ function ProductItem(props) {
         </div>
         <Card.Body>
           <Card.Title
-            style={{ color: product.hot ? "red" : "black" }}
             title={product.name}
             data-toggle="tooltip"
             data-placement="top"

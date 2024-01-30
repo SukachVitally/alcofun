@@ -19,4 +19,6 @@ public class ProductPreviewDto {
     private RatingDto rating;
 
     private Boolean hot;
+
+    private Integer percent;
 }

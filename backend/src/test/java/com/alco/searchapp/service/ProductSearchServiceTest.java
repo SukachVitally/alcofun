@@ -14,7 +14,6 @@ import java.util.List;
 import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +47,9 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
 
     @Autowired
     private ProductSearchRepository productSearchRepository;
+
+    @Autowired
+    private BestPriceRepository bestPriceRepository;
 
     @BeforeEach
     public void setup() {
@@ -349,15 +351,24 @@ public class ProductSearchServiceTest extends BaseFunctionalTest {
         Assertions.assertEquals(res, 600);
     }
 
-
-    // todo: Implement this test
-    @Disabled
     @Test
     public void getProductsAllWithSortByHotDesc() {
+        bestPriceRepository.findAll()
+                .map(entity -> {
+                    entity.setPercent(entity.getPrice());
+                    return entity;
+                })
+                .flatMap(bestPriceRepository::save)
+                .collectList()
+                .then()
+                .block();
+
+        elasticService.refresh().block();
+
         var filter = Filterable.builder()
                 .build();
         var res = productSearchService.getProducts(filter, PageRequest.of(1, 6,
-                        Sort.by(Sort.Direction.DESC, "price")))
+                        Sort.by(Sort.Direction.DESC, "hot")))
                 .blockOptional().orElseThrow();
         Assertions.assertEquals(6, res.getResults().size());
 

@@ -1,3 +1,7 @@
+.product-view {
+  position: relative;
+}
+
 .product-view__description_limited {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -13,4 +17,16 @@
 
 .product-view row {
   align-items: center;
+}
+
+.product-view .hot-percent {
+  display: inline-block;
+  position: absolute;
+  top: -2rem;
+  right: 0rem;
+  background-color: red;
+  border-radius: 1.5rem;
+  color: white;
+  padding: 0.5rem;
+  font-weight: bold;
 }

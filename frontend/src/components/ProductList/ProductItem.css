@@ -26,3 +26,15 @@
     line-clamp: 3;
     -webkit-box-orient: vertical;
 }
+
+.product-item .hot-percent {
+    display: inline-block;
+    position: absolute;
+    top: 1rem;
+    left: 14rem;
+    background-color: red;
+    border-radius: 1.5rem;
+    color: white;
+    padding: 0.5rem;
+    font-weight: bold;
+}

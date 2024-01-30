@@ -23,7 +23,7 @@ const Product = (props) => {
   };
 
   return (
-    <div className="product-view">
+    <div className="product-layout">
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
           <li className="breadcrumb-item">
@@ -60,31 +60,33 @@ const Product = (props) => {
           )}
         </ol>
       </nav>
+      <div className="product-view">
+        {product.hot && <span className="hot-percent">-{product.percent}%</span>}
+        <h2>{product.name}</h2>
+        <StarRatings
+          rating={product.rating != null ? product.rating.rating : 0}
+          starRatedColor="#ebd834"
+          numberOfStars={5}
+          starDimension="25"
+          name="rating"
+        />
+        <p className="text-end">Barcode: {product.ean}</p>
 
-      <h2>{product.name}</h2>
-      <StarRatings
-        rating={product.rating != null ? product.rating.rating : 0}
-        starRatedColor="#ebd834"
-        numberOfStars={5}
-        starDimension="25"
-        name="rating"
-      />
-      <p className="text-end">Barcode: {product.ean}</p>
+        <Image src={product.imageUrl} thumbnail />
 
-      <Image src={product.imageUrl} thumbnail />
+        <h3>{t("product.description")}</h3>
+        <div
+          className={`product-view__description_${fullDescription ? "full" : "limited"
+            }`}
+          onClick={descriptionClickHandler}
+        >
+          {product.description}
+        </div>
 
-      <h3>{t("product.description")}</h3>
-      <div
-        className={`product-view__description_${
-          fullDescription ? "full" : "limited"
-        }`}
-        onClick={descriptionClickHandler}
-      >
-        {product.description}
+        <CharacteristicList characteristics={product.characteristics} />
+        {product.providers && <ProviderList providers={product.providers} />}
       </div>
 
-      <CharacteristicList characteristics={product.characteristics} />
-      {product.providers && <ProviderList providers={product.providers} />}
     </div>
   );
 };
