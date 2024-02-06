@@ -5,6 +5,7 @@ import com.alco.searchapp.dto.Filterable;
 import com.alco.searchapp.dto.ListResponseDto;
 import com.alco.searchapp.entity.ProductEntity;
 import com.alco.searchapp.entity.elastic.ProductSearchEntity;
+import com.alco.searchapp.exception.ProductNotFoundException;
 import com.alco.searchapp.repository.elastic.ProductSearchRepository;
 import com.alco.searchapp.repository.ProductRepository;
 import com.alco.searchapp.utils.ProductQueryUtils;
@@ -54,7 +55,8 @@ public class ProductSearchService {
     }
 
     public Mono<ProductSearchEntity> getProduct(Long id) {
-        return searchRepository.findById(id);
+        return searchRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(id)));
     }
 
     public Flux<ProductSearchEntity> getAllRelevantProducts() {

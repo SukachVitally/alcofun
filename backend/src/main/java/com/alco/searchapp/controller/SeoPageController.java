@@ -46,9 +46,9 @@ public class SeoPageController {
                     model.addAttribute("product", product);
                     return Mono.just(Rendering.view("product").build());
                 })
-                .switchIfEmpty(Mono.just(Rendering.view("page-not-found")
+                .onErrorReturn(Rendering.view("page-not-found")
                         .status(HttpStatus.NOT_FOUND)
-                        .build()));
+                        .build());
     }
 
     private Mono<Rendering> renderList(Model model, String title, String description, Filterable filterable) {

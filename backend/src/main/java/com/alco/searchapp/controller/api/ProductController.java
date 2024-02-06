@@ -7,6 +7,7 @@ import com.alco.searchapp.dto.ProductFullDto;
 import com.alco.searchapp.dto.ProductPreviewDto;
 import com.alco.searchapp.dto.RatingDto;
 import com.alco.searchapp.entity.elastic.ProductSearchEntity;
+import com.alco.searchapp.exception.ProductNotFoundException;
 import com.alco.searchapp.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -52,8 +53,7 @@ public class ProductController {
                                 .rating(new RatingDto(entity.getCompositeRating(), entity.getVotes()))
                                 .hot(entity.getHot())
                                 .percent(entity.getPercent().intValue())
-                                .build()
-                        );
+                                .build());
     }
 
     @GetMapping("/price-range")

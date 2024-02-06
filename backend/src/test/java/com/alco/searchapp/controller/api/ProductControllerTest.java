@@ -150,6 +150,16 @@ public class ProductControllerTest extends BaseFunctionalTest {
     }
 
     @Test
+    void testGetProductNotFound() {
+        webClient.get()
+                .uri("/api/product/" + 10000000)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Product with id '10000000' not found");
+    }
+
+    @Test
     void testGetProductPriceRange() {
         webClient.get()
                 .uri("/api/product/price-range")
