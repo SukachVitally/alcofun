@@ -52,7 +52,7 @@ public class ProductController {
                                 .providers(entity.getProviders())
                                 .rating(new RatingDto(entity.getCompositeRating(), entity.getVotes()))
                                 .hot(entity.getHot())
-                                .percent(entity.getPercent().intValue())
+                                .percent(entity.getPercent() != null ? entity.getPercent().intValue() : null)
                                 .build());
     }
 
