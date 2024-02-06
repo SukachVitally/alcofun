@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ErrorResponseDto>> handleInternalError(Exception ex) {
-        log.error(ex.getMessage(), ex);
+        log.error(String.format("Internal error: %s", ex.getMessage()), ex);
         return Mono.just(getResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
