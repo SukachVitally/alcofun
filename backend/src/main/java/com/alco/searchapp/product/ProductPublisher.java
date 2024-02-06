@@ -55,7 +55,7 @@ public class ProductPublisher {
 
     @Bean
     public Supplier<Flux<ProductPageDto>> fozzySupplier() {
-        return okwineSink::asFlux;
+        return fozzySink::asFlux;
     }
 
     private static Sinks.Many<ProductPageDto> createSink() {

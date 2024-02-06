@@ -23,6 +23,6 @@ public class AwsS3Storage implements StorageInterface {
                 .build();
 
         return Mono.fromFuture(s3Client.putObject(request, AsyncRequestBody.fromByteBuffer(ByteBuffer.wrap(content))))
-                .map(response -> response.sdkFields().size() > 0);
+                .map(response -> !response.sdkFields().isEmpty());
     }
 }
