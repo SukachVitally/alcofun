@@ -2,8 +2,6 @@ package com.alco.searchapp.controller.api;
 
 import com.alco.searchapp.BaseFunctionalTest;
 import com.alco.searchapp.repository.ProductRepository;
-import com.alco.searchapp.repository.elastic.ProductSearchRepository;
-import com.alco.searchapp.service.ElasticCollectService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +18,11 @@ public class PriceControllerTest extends BaseFunctionalTest {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private ProductSearchRepository productSearchRepository;
-
-    @Autowired
-    private ElasticCollectService elasticService;
-
     @Test
     void testGetAllCategoriesList() {
         cleanDatabase();
-        productSearchRepository.deleteAll().block();
         addProducts();
-        elasticService.refresh().block();
+
 
         var entity = productRepository.findAll().blockFirst();
         Assertions.assertNotNull(entity);

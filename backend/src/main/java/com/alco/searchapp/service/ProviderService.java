@@ -1,6 +1,7 @@
 package com.alco.searchapp.service;
 
 import com.alco.searchapp.constants.ProviderTypeEnum;
+import com.alco.searchapp.dto.PriceHistoryItemDto;
 import com.alco.searchapp.dto.ProviderDto;
 import com.alco.searchapp.dto.ProductProviderDto;
 import com.alco.searchapp.entity.ProviderEntity;
@@ -38,6 +39,19 @@ public class ProviderService {
                         .type(ProviderTypeEnum.findById(entity.getTypeId()))
                         .build())
                 .sort(Comparator.comparing(providerDto -> providerDto.getType().getName()));
+    }
+
+    public Flux<PriceHistoryItemDto> getPriceHistory(Long productId) {
+        return productProviderRepository
+                .findAllByProductIdOrderById(productId)
+                .map(entity -> PriceHistoryItemDto.builder()
+                        .price(entity.getPrice())
+                        .date(entity.getCreatedAt().toLocalDate())
+                        .build())
+                .groupBy(PriceHistoryItemDto::getDate)
+                .flatMap(groupedFlux -> groupedFlux.reduce((item1, item2) ->
+                        item1.getPrice() < item2.getPrice() ? item1 : item2))
+                .sort(Comparator.comparing(PriceHistoryItemDto::getDate));
     }
 
     public Mono<ProductProviderEntity> addProviderProduct(Long productId, Long providerId, Double price, String link) {

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class BestPriceHistoryItemDto {
+public class PriceHistoryItemDto {
     private Double price;
 
     @JsonFormat(pattern = "dd-MM-yyyy")

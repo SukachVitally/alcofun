@@ -1,5 +1,6 @@
 import CharacteristicList from "./CharacteristicList";
 import ProviderList from "./ProviderList";
+import ProductHistory from "./ProductHistory";
 import "./Product.css";
 import { useState } from "react";
 import StarRatings from "react-star-ratings";
@@ -85,6 +86,7 @@ const Product = (props) => {
 
         <CharacteristicList characteristics={product.characteristics} />
         {product.providers && <ProviderList providers={product.providers} />}
+        <ProductHistory />
       </div>
 
     </div>

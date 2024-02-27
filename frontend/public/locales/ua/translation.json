@@ -3,7 +3,9 @@
         "description": "Oпис",
         "characteristics": "Характеристики",
         "providers": "Провайдери",
-        "view": "Перейти"
+        "view": "Перейти",
+        "price_dynamics": "Динаміка цін",
+        "history": "Історія"
     },
     "products": {
         "best_price_is": "Найкраща ціна ",
