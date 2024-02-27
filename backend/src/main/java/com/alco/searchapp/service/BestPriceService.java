@@ -1,6 +1,7 @@
 package com.alco.searchapp.service;
 
 import com.alco.searchapp.dto.BestPriceDto;
+import com.alco.searchapp.dto.BestPriceHistoryItemDto;
 import com.alco.searchapp.dto.ProductProviderDto;
 import com.alco.searchapp.entity.BestPriceEntity;
 import com.alco.searchapp.properites.BestPriceProperties;
@@ -10,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import com.alco.searchapp.exception.BestPriceNotFoundException;
 
@@ -48,6 +50,14 @@ public class BestPriceService {
                         .price(entity.getPrice())
                         .hot(entity.getHot())
                         .percent(entity.getPercent())
+                        .build());
+    }
+
+    public Flux<BestPriceHistoryItemDto> getHistory(Long productId) {
+        return repository.findAllByProductIdOrderById(productId)
+                .map(entity -> BestPriceHistoryItemDto.builder()
+                        .price(entity.getPrice())
+                        .date(entity.getCreatedAt().toLocalDate())
                         .build());
     }
 
