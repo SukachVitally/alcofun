@@ -1,46 +1,48 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Graph = (props) => {
-    const data = [
-        {
-          name: 'Page A',
-          pv: 2400,
 
-        },
-        {
-          name: 'Page B',
-          pv: 1398,
-        },
-        {
-          name: 'Page C',
-          pv: 9800,
-        },
-        {
-          name: 'Page D',
-          pv: 3908,
-        },
-        {
-          name: 'Page E',
-          pv: 4800,
-        },
-        {
-          name: 'Page F',
-          pv: 3800,
-        },
-        {
-          name: 'Page G',
-          pv: 4300,
-        },
-      ];
-    return <LineChart width={730} height={250} data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Line type="monotone" dataKey="pv" stroke="#8884d8" />
+  const prepareData = (prices) => {
+
+    const parsedData = prices.map(item => ({
+      price: item.price,
+      date: new Date(item.date)
+    }));
+
+    // Find the earliest and latest dates
+    const startDate = parsedData[0].date;
+    const endDate = parsedData[parsedData.length - 1].date;
+
+    // Create a map of dates to prices
+    const priceMap = new Map(parsedData.map(item => [item.date.toLocaleDateString(), item.price]));
+
+    // Iterate through dates between the start and end date
+    const filledData = [];
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const currentDateISO = currentDate.toLocaleDateString();
+      
+      filledData.push({
+        price: priceMap.has(currentDateISO) ? priceMap.get(currentDateISO) : null,
+        date: currentDate.toLocaleDateString('en-GB') // Format date as required
+      });
+      currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+    }
+
+    return filledData;
+  }
+
+  const data = prepareData(props.prices)
+
+  return <ResponsiveContainer width="100%" height={250}>
+    <LineChart width={100} height={250} data={data}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="date" />
+      <YAxis domain={['auto', 'auto']} />
+      <Tooltip />
+      <Line type="monotone" dot={false} dataKey="price" stroke="#8884d8" strokeWidth={3} />
     </LineChart>
+  </ResponsiveContainer>
 }
 
 export default Graph

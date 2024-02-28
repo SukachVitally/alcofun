@@ -86,7 +86,8 @@ const Product = (props) => {
 
         <CharacteristicList characteristics={product.characteristics} />
         {product.providers && <ProviderList providers={product.providers} />}
-        <ProductHistory />
+
+        <ProductHistory productId={product.id} />
       </div>
 
     </div>

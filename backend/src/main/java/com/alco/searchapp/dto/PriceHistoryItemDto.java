@@ -10,6 +10,6 @@ import lombok.Getter;
 public class PriceHistoryItemDto {
     private Double price;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 }

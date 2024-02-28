@@ -1,25 +1,39 @@
 import { useTranslation } from "react-i18next";
-import Accordion from 'react-bootstrap/Accordion';
+
 import Graph from "./Graph";
+import Container from "react-bootstrap/Container";
+import { useState, useEffect } from "react";
+import { Spinner } from "react-bootstrap";
+import fetchJson from "../../utils/http-utils.js";
 
 const ProductHistory = (props) => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    const clickHandler = () => {
-        console.log("click")
-    }
+  const [isLoading, setIsLoading] = useState(false);
+  const [prices, setPrices] = useState(null);
 
-    return (
-        <Accordion defaultActiveKey="0">
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>Accordion Item #1</Accordion.Header>
-          <Accordion.Body>
-            <Graph />
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
-    );
+  async function fetchPrices(id) {
+    setIsLoading(true);
+    const json = await fetchJson(`price/history/${id}`);
 
+    setPrices(json);
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    console.log("here", props.productId)
+    fetchPrices(props.productId);
+  }, [props.productId]);
+
+  return (
+    <>
+      <h3>{t('product.price_dynamics')}</h3>
+      <Container>
+        {isLoading && <Spinner />}
+        {!isLoading && prices != null && <Graph prices={prices} />}
+      </Container>
+    </>
+  );
 }
 
 export default ProductHistory;
