@@ -11,7 +11,7 @@ const Graph = (props) => {
 
     // Find the earliest and latest dates
     const startDate = parsedData[0].date;
-    const endDate = parsedData[parsedData.length - 1].date;
+    const endDate = Date.now();
 
     // Create a map of dates to prices
     const priceMap = new Map(parsedData.map(item => [item.date.toLocaleDateString(), item.price]));
