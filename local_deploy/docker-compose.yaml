@@ -9,10 +9,21 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: test_alcosearch
+      POSTGRES_DB: alcosearch
     volumes:
       - database_data:/var/lib/postgresql/data
   
+  test_database:
+    image: postgres
+    container_name: test_database
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_alcosearch
+
   minio:
     image: quay.io/minio/minio
     container_name: minio

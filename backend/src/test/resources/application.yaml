@@ -2,13 +2,13 @@ spring:
   elasticsearch:
     uris: "localhost:19200"
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/test_alcosearch
+    url: r2dbc:postgresql://localhost:5433/test_alcosearch
     username: user
     password: password
   thymeleaf:
     cache: false
   flyway:
-    url: jdbc:postgresql://localhost:5432/test_alcosearch
+    url: jdbc:postgresql://localhost:5433/test_alcosearch
     user: user
     password: password
     locations: classpath:db/migration

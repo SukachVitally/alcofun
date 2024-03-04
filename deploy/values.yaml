@@ -1,10 +1,11 @@
 namespace: prod
 
 backend: 
-  image: localhost:32000/backend:0.12.3
+  image: localhost:32000/backend:0.13.1
   appProfile: prod
   nodePort: 30088
   containerPort: 7080
+  sentry_auth_token: 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
 
 volumeDir: /home/sukach/volumes
 

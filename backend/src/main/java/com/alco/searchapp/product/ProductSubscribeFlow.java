@@ -7,6 +7,7 @@ import com.alco.searchapp.provider.dto.Product;
 import com.alco.searchapp.provider.dto.ProductPageDto;
 import com.alco.searchapp.service.ProductService;
 import com.alco.searchapp.service.RatingService;
+import io.sentry.Sentry;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,9 @@ public class ProductSubscribeFlow {
                                     .then(Mono.just(entity));
                         })
                         .thenReturn(product))
-                .onErrorContinue((error, object) ->
-                        log.error("Error {} in {} provider", error.getMessage(), provider.getName()));
+                .onErrorContinue((error, object) -> {
+                            Sentry.captureException(error);
+                            log.error("Error {} in {} provider", error.getMessage(), provider.getName());
+                        });
     }
 }

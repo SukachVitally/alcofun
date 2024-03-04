@@ -20,6 +20,8 @@ spec:
         env:
         - name: spring_profiles_active
           value: {{ .Values.backend.appProfile }}
+        - name: SENTRY_AUTH_TOKEN
+          value: {{ .Values.backend.sentry_auth_token }}
         ports:
         - containerPort: {{ .Values.backend.containerPort }}
 

@@ -2,6 +2,7 @@ package com.alco.searchapp.advice;
 
 import com.alco.searchapp.dto.ErrorResponseDto;
 import com.alco.searchapp.exception.ProductNotFoundException;
+import io.sentry.Sentry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ErrorResponseDto>> handleInternalError(Exception ex) {
         log.error(String.format("Internal error: %s", ex.getMessage()), ex);
+        Sentry.captureException(ex);
         return Mono.just(getResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
     }
 

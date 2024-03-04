@@ -61,3 +61,9 @@ aws:
 springdoc:
   swagger-ui:
     path: /swagger/
+
+sentry:
+  dsn: https://cd8d035420218dced67a9313acab823c@o503129.ingest.sentry.io/4506835843350528
+  # Set traces-sample-rate to 1.0 to capture 100% of transactions for performance monitoring.
+  # We recommend adjusting this value in production.
+  traces-sample-rate: 1.0
